@@ -1,49 +1,46 @@
 'use client';
+
 import { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { 
-  FiStar, 
-  FiMapPin, 
-  FiPhone, 
-  FiMail, 
-  FiClock,
-  FiInstagram,
-  FiFacebook,
+  FiShare2,
+  FiPhone,
+  FiMapPin,
   FiExternalLink,
-  FiChevronRight,
-  FiAward,
-  FiDollarSign,
-  FiArrowLeft,
+  FiStar,
   FiMenu,
-  FiShare2
+  FiInstagram
 } from 'react-icons/fi';
-import { db, Restaurant } from '@/lib/mock-data';
+import { db, Restaurant, Advertisement as AdType } from '@/lib/mock-data';
+import Advertisement from '@/components/shared/Advertisement';
 
-export default function RestaurantPage() {
+export default function RestaurantDetailPage() {
   const params = useParams();
+  const router = useRouter();
   const restaurantId = params.restaurantId as string;
   
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
+  const [ads, setAds] = useState<AdType[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeDay, setActiveDay] = useState('');
 
   useEffect(() => {
-    loadRestaurant();
-    setActiveDay(getCurrentDay());
+    loadData();
   }, [restaurantId]);
 
-  const loadRestaurant = async () => {
+  const loadData = async () => {
     setLoading(true);
-    const data = await db.getRestaurantById(restaurantId);
-    setRestaurant(data);
+    
+    // Fetch restaurant and ads together
+    const [restaurantData, adsData] = await Promise.all([
+      db.getRestaurantById(restaurantId),
+      db.getAdvertisements()
+    ]);
+    
+    setRestaurant(restaurantData);
+    setAds(adsData);
     setLoading(false);
-  };
-
-  const getCurrentDay = () => {
-    const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
-    return days[new Date().getDay()];
   };
 
   const handleShare = async () => {
@@ -51,7 +48,7 @@ export default function RestaurantPage() {
       try {
         await navigator.share({
           title: restaurant.name,
-          text: restaurant.description,
+          text: restaurant.tagline,
           url: window.location.href,
         });
       } catch (err) {
@@ -60,14 +57,26 @@ export default function RestaurantPage() {
     }
   };
 
+  const handleCall = () => {
+    if (restaurant) {
+      window.location.href = `tel:${restaurant.mobileNo}`;
+    }
+  };
+
+  // Get ad for specific position
+  const getAdForPosition = (position: string) => {
+    return ads.find(ad => ad.position === position);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50">
         <div className="animate-pulse">
-          <div className="h-64 bg-gray-200"></div>
-          <div className="max-w-6xl mx-auto px-4 py-8">
-            <div className="h-8 bg-gray-200 rounded w-1/3 mb-4"></div>
-            <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+          <div className="h-56 bg-gray-200"></div>
+          <div className="px-4 py-6 space-y-4">
+            <div className="h-8 bg-gray-200 rounded w-2/3"></div>
+            <div className="h-4 bg-gray-200 rounded w-full"></div>
+            <div className="h-32 bg-gray-200 rounded"></div>
           </div>
         </div>
       </div>
@@ -78,415 +87,205 @@ export default function RestaurantPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-gray-800 mb-4">Restaurant Not Found</h1>
-          <p className="text-gray-600 mb-8">The restaurant you're looking for doesn't exist.</p>
-          <Link 
-            href="/"
-            className="inline-block bg-gradient-to-r from-orange-500 to-red-500 text-white px-8 py-3 rounded-lg font-semibold hover:from-orange-600 hover:to-red-600 transition-all duration-300"
+          <h1 className="text-2xl font-bold text-gray-800 mb-4">Restaurant Not Found</h1>
+          <button 
+            onClick={() => router.push('/')}
+            className="bg-orange-500 text-white px-6 py-3 rounded-xl font-semibold"
           >
-            Back to Home
-          </Link>
+            Go to Home
+          </button>
         </div>
       </div>
     );
   }
 
-  return (
-    <div className="min-h-screen bg-gray-50">
+  // Get position-specific ads
+  const topAd = getAdForPosition('rest-1');
+  const midAd = getAdForPosition('rest-2');
 
-      {/* Cover Image */}
-      <div className="relative h-64 lg:h-96 w-full">
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+      {/* Advertisement Section - Top (rest-1) */}
+      {topAd && (
+        <div className="px-4 pt-4 mb-6">
+          <Advertisement ad={topAd} variant="banner" />
+        </div>
+      )}
+      
+      {/* Header Image Section */}
+      <div className="relative h-56 bg-gray-900">
         <Image
           src={restaurant.coverImage}
           alt={restaurant.name}
           fill
-          className="object-cover"
+          className="object-cover opacity-90"
           priority
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
         
-        {/* Restaurant Info Overlay - Desktop Only */}
-        <div className="hidden lg:block absolute bottom-0 left-0 right-0 p-8">
-          <div className="max-w-6xl mx-auto flex items-end space-x-6">
-            <div className="relative w-32 h-32 rounded-2xl overflow-hidden border-4 border-white shadow-2xl flex-shrink-0">
-              <Image
-                src={restaurant.logo}
-                alt={restaurant.name}
-                fill
-                className="object-cover"
-              />
-            </div>
-            <div className="text-white mb-4">
-              <h1 className="text-5xl font-bold mb-2">{restaurant.name}</h1>
-              <div className="flex items-center space-x-4">
-                <div className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full">
-                  <FiStar className="text-yellow-400 fill-yellow-400" />
-                  <span className="font-semibold">{restaurant.rating}</span>
-                  <span className="text-sm">({restaurant.totalReviews} reviews)</span>
-                </div>
-                <div className="flex items-center space-x-1 text-sm">
-                  {restaurant.cuisine.map((c, idx) => (
-                    <span key={idx} className="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full">
-                      {c}
-                    </span>
-                  ))}
-                </div>
-                <div className="flex items-center space-x-1 text-sm bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full">
-                  <FiDollarSign />
-                  <span>{restaurant.priceRange}</span>
-                </div>
-              </div>
-            </div>
+        {/* Header Overlay with Share */}
+        <div className="absolute top-0 left-0 right-0 flex items-center justify-end p-4 bg-gradient-to-b from-black/50 to-transparent">
+          <button 
+            onClick={handleShare}
+            className="p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition-all"
+          >
+            <FiShare2 className="w-6 h-6 text-gray-800" />
+          </button>
+        </div>
+
+        {/* Logo Floating at Bottom */}
+        <div className="absolute -bottom-12 left-4">
+          <div className="relative w-24 h-24 rounded-2xl overflow-hidden border-4 border-white shadow-2xl bg-white">
+            <Image
+              src={restaurant.logo}
+              alt={restaurant.name}
+              fill
+              className="object-cover"
+            />
           </div>
         </div>
       </div>
 
-      {/* Mobile Restaurant Header - Below Cover Image */}
-      <div className="lg:hidden bg-white border-b border-gray-200">
-        <div className="px-4 py-4">
-          <div className="flex items-start space-x-4 mb-4">
-            <div className="relative w-20 h-20 rounded-xl overflow-hidden border-2 border-orange-200 shadow-md flex-shrink-0">
-              <Image
-                src={restaurant.logo}
-                alt={restaurant.name}
-                fill
-                className="object-cover"
-              />
-            </div>
-            <div className="flex-1 min-w-0">
-              <h2 className="text-2xl font-bold text-gray-800 mb-1">{restaurant.name}</h2>
-              <div className="flex flex-wrap gap-2 mb-2">
-                {restaurant.cuisine.map((c, idx) => (
-                  <span key={idx} className="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded-full">
-                    {c}
-                  </span>
-                ))}
-              </div>
-              <div className="flex items-center space-x-3 text-sm text-gray-600">
-                <div className="flex items-center space-x-1">
-                  <FiStar className="text-yellow-500 fill-yellow-500 w-4 h-4" />
-                  <span className="font-semibold">{restaurant.rating}</span>
-                </div>
-                <span>•</span>
-                <span>{restaurant.priceRange}</span>
-                <span>•</span>
-                <span>{restaurant.totalReviews} reviews</span>
-              </div>
-            </div>
-          </div>
+      {/* Restaurant Info Section */}
+      <div className="px-4 pt-16 pb-6">
+        <div className="mb-4">
+          <h1 className="text-2xl font-bold text-gray-900 mb-1">
+            {restaurant.name}
+          </h1>
+          <p className="text-base text-gray-600 mb-3">
+            {restaurant.tagline}
+          </p>
 
-          {/* Mobile View Menu Button - TOP POSITION */}
+          {/* Google Rating */}
+          <a
+            href={restaurant.googleRatingLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center space-x-2 bg-white border-2 border-gray-200 px-4 py-2 rounded-lg hover:border-orange-300 transition-all"
+          >
+            <FiStar className="w-5 h-5 text-yellow-500 fill-yellow-500" />
+            <span className="text-sm font-semibold text-gray-800">Rate us on Google</span>
+            <FiExternalLink className="w-4 h-4 text-gray-500" />
+          </a>
+        </div>
+
+        {/* View Menu Button - PRIMARY CTA */}
+        <Link
+          href={`/menu/${restaurant.id}`}
+          className="block w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white py-4 rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl transition-all text-center mb-4 group"
+        >
+          <div className="flex items-center justify-center space-x-3">
+            <FiMenu className="w-6 h-6 group-hover:scale-110 transition-transform" />
+            <span>View Full Menu</span>
+          </div>
+        </Link>
+
+        {/* Social Media Links */}
+        <div className="grid grid-cols-1 gap-3 mb-6">
+          <a
+            href={restaurant.googleRatingLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center space-x-2 bg-gradient-to-r from-pink-500 to-purple-600 text-white py-3 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all"
+          >
+            <FiInstagram className="w-5 h-5" />
+            <span>Instagram</span>
+          </a>
+        </div>
+      </div>
+
+      {/* Advertisement Section - Mid (rest-2) */}
+      {midAd && (
+        <div className="px-4 mb-6">
+          <Advertisement ad={midAd} variant="banner" />
+        </div>
+      )}
+
+      {/* Contact Information Card */}
+      <div className="px-4 mb-6">
+        <div className="bg-white rounded-2xl shadow-md border border-gray-200 p-5">
+          <h2 className="text-lg font-bold text-gray-800 mb-4">Contact Information</h2>
+          
+          <div className="space-y-4">
+            {/* Phone */}
+            <a
+              href={`tel:${restaurant.mobileNo}`}
+              className="flex items-start space-x-3 p-3 bg-gray-50 rounded-xl hover:bg-orange-50 transition-colors group"
+            >
+              <div className="p-2 bg-orange-100 rounded-lg group-hover:bg-orange-200 transition-colors">
+                <FiPhone className="w-5 h-5 text-orange-600" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
+                  Phone Number
+                </p>
+                <p className="text-base font-semibold text-gray-800">
+                  {restaurant.mobileNo}
+                </p>
+              </div>
+            </a>
+
+            {/* Location */}
+            <a
+              href={restaurant.googleMapLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-start space-x-3 p-3 bg-gray-50 rounded-xl hover:bg-blue-50 transition-colors group"
+            >
+              <div className="p-2 bg-blue-100 rounded-lg group-hover:bg-blue-200 transition-colors">
+                <FiMapPin className="w-5 h-5 text-blue-600" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
+                  Location
+                </p>
+                <p className="text-base font-semibold text-gray-800">
+                  View on Google Maps
+                </p>
+                <p className="text-sm text-gray-600 mt-1 flex items-center">
+                  Get directions
+                  <FiExternalLink className="w-3 h-3 ml-1" />
+                </p>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      {/* About Section */}
+      <div className="px-4 mb-6">
+        <div className="bg-white rounded-2xl shadow-md border border-gray-200 p-5">
+          <h2 className="text-lg font-bold text-gray-800 mb-3">About Us</h2>
+          <p className="text-base text-gray-600 leading-relaxed">
+            Welcome to <span className="font-semibold text-gray-800">{restaurant.name}</span>! {restaurant.tagline}. 
+            We are committed to providing you with the best dining experience. 
+            Our menu features a wide variety of delicious dishes made with fresh, quality ingredients.
+          </p>
+        </div>
+      </div>
+
+      {/* Quick Actions - Sticky Bottom Bar (Mobile) */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-2xl lg:hidden z-40">
+        <div className="flex items-center">
+          <button
+            onClick={handleCall}
+            className="flex-1 flex items-center justify-center space-x-2 py-4 text-gray-700 font-semibold hover:bg-gray-50 transition-colors border-r border-gray-200"
+          >
+            <FiPhone className="w-5 h-5" />
+            <span>Call</span>
+          </button>
+          
           <Link
             href={`/menu/${restaurant.id}`}
-            className="flex items-center justify-center space-x-2 w-full bg-gradient-to-r from-orange-500 to-red-500 text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:from-orange-600 hover:to-red-600 transition-all mb-4"
+            className="flex-1 flex items-center justify-center space-x-2 py-4 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold hover:from-orange-600 hover:to-red-600 transition-all"
           >
-            <FiMenu className="w-6 h-6" />
+            <FiMenu className="w-5 h-5" />
             <span>View Menu</span>
-            <FiChevronRight className="w-5 h-5" />
           </Link>
-
-          {/* Mobile Social Media Links - AFTER MENU */}
-          <div className="flex items-center space-x-3">
-            {restaurant.socialMedia.instagram && (
-              <a
-                href={restaurant.socialMedia.instagram}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex-1 flex items-center justify-center space-x-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white py-3 rounded-lg font-semibold transition-all"
-              >
-                <FiInstagram className="w-5 h-5" />
-                <span className="text-sm">Instagram</span>
-              </a>
-            )}
-
-            {restaurant.socialMedia.facebook && (
-              <a
-                href={restaurant.socialMedia.facebook}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex-1 flex items-center justify-center space-x-2 bg-blue-600 text-white py-3 rounded-lg font-semibold transition-all"
-              >
-                <FiFacebook className="w-5 h-5" />
-                <span className="text-sm">Facebook</span>
-              </a>
-            )}
-
-            {restaurant.socialMedia.googleReviews && (
-              <a
-                href={restaurant.socialMedia.googleReviews}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex-1 flex items-center justify-center space-x-2 bg-yellow-500 text-white py-3 rounded-lg font-semibold transition-all"
-              >
-                <FiStar className="w-5 h-5" />
-                <span className="text-sm">Reviews</span>
-              </a>
-            )}
-          </div>
         </div>
       </div>
 
-      {/* ADVERTISEMENT - TOP BANNER */}
-      <div className="max-w-6xl mx-auto px-4 py-4 lg:py-6">
-        {/* <Advertisement position="top" /> */}
-      </div>
-
-      {/* Main Content */}
-      <div className="max-w-6xl mx-auto px-4 py-6 lg:py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
-          {/* Left Column - Main Info */}
-          <div className="lg:col-span-2 space-y-6 lg:space-y-8">
-            {/* About Section */}
-            <div className="bg-white rounded-2xl shadow-md p-6 lg:p-8 border border-gray-100">
-              <h2 className="text-xl lg:text-2xl font-bold text-gray-800 mb-4">About Us</h2>
-              <p className="text-gray-600 leading-relaxed">{restaurant.description}</p>
-            </div>
-
-            {/* Specialties */}
-            <div className="bg-white rounded-2xl shadow-md p-6 lg:p-8 border border-gray-100">
-              <h2 className="text-xl lg:text-2xl font-bold text-gray-800 mb-6 flex items-center">
-                <FiAward className="mr-3 text-orange-500" />
-                Our Specialties
-              </h2>
-              <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-4">
-                {restaurant.specialties.map((specialty, idx) => (
-                  <div 
-                    key={idx}
-                    className="bg-gradient-to-br from-orange-50 to-amber-50 p-4 rounded-xl border border-orange-200 text-center"
-                  >
-                    <p className="font-semibold text-gray-800 text-sm lg:text-base">{specialty}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Opening Hours */}
-            <div className="bg-white rounded-2xl shadow-md p-6 lg:p-8 border border-gray-100">
-              <h2 className="text-xl lg:text-2xl font-bold text-gray-800 mb-6 flex items-center">
-                <FiClock className="mr-3 text-orange-500" />
-                Opening Hours
-              </h2>
-              <div className="space-y-3">
-                {Object.entries(restaurant.openingHours).map(([day, hours]) => (
-                  <div 
-                    key={day}
-                    className={`flex justify-between items-center p-3 lg:p-4 rounded-xl transition-all ${
-                      activeDay === day 
-                        ? 'bg-gradient-to-r from-orange-100 to-amber-100 border-2 border-orange-300' 
-                        : 'bg-gray-50 border border-gray-200'
-                    }`}
-                  >
-                    <span className="font-semibold text-gray-800 capitalize text-sm lg:text-base">
-                      {day}
-                      {activeDay === day && (
-                        <span className="ml-2 text-xs bg-orange-500 text-white px-2 py-1 rounded-full">
-                          Today
-                        </span>
-                      )}
-                    </span>
-                    <span className="text-gray-600 text-sm lg:text-base">
-                      {hours.closed ? 'Closed' : `${hours.open} - ${hours.close}`}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Right Column - Contact & Links (Desktop Only) */}
-          <div className="hidden lg:block space-y-6">
-            {/* Menu Button - Desktop */}
-            <Link
-              href={`/menu/${restaurant.id}`}
-              className="block bg-gradient-to-r from-orange-500 to-red-500 text-white p-6 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105 text-center group"
-            >
-              <div className="text-3xl font-bold mb-2">View Menu</div>
-              <div className="flex items-center justify-center text-sm opacity-90">
-                <span>See all dishes</span>
-                <FiChevronRight className="ml-2 group-hover:translate-x-1 transition-transform" />
-              </div>
-            </Link>
-
-            {/* ADVERTISEMENT - SIDEBAR */}
-            {/* <Advertisement position="sidebar" /> */}
-
-            {/* Contact Information */}
-            <div className="bg-white rounded-2xl shadow-md p-6 border border-gray-100 space-y-4">
-              <h3 className="text-xl font-bold text-gray-800 mb-4">Contact Information</h3>
-              
-              {/* Address */}
-              <div className="flex items-start space-x-3 p-4 bg-gray-50 rounded-xl">
-                <FiMapPin className="w-5 h-5 text-orange-500 mt-1 flex-shrink-0" />
-                <div className="flex-1">
-                  <p className="text-sm font-semibold text-gray-800 mb-1">Address</p>
-                  <p className="text-sm text-gray-600">
-                    {restaurant.address.street}, {restaurant.address.city}, {restaurant.address.state} {restaurant.address.zipCode}
-                  </p>
-                  {restaurant.address.mapLink && (
-                    <a
-                      href={restaurant.address.mapLink}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center text-orange-600 hover:text-orange-700 text-sm mt-2 font-medium"
-                    >
-                      View on Map <FiExternalLink className="ml-1 w-4 h-4" />
-                    </a>
-                  )}
-                </div>
-              </div>
-
-              {/* Phone */}
-              <a
-                href={`tel:${restaurant.phone}`}
-                className="flex items-center space-x-3 p-4 bg-gray-50 rounded-xl hover:bg-orange-50 transition-colors group"
-              >
-                <FiPhone className="w-5 h-5 text-orange-500 group-hover:scale-110 transition-transform" />
-                <div>
-                  <p className="text-sm font-semibold text-gray-800 mb-1">Phone</p>
-                  <p className="text-sm text-gray-600">{restaurant.phone}</p>
-                </div>
-              </a>
-
-              {/* Email */}
-              <a
-                href={`mailto:${restaurant.email}`}
-                className="flex items-center space-x-3 p-4 bg-gray-50 rounded-xl hover:bg-orange-50 transition-colors group"
-              >
-                <FiMail className="w-5 h-5 text-orange-500 group-hover:scale-110 transition-transform" />
-                <div>
-                  <p className="text-sm font-semibold text-gray-800 mb-1">Email</p>
-                  <p className="text-sm text-gray-600">{restaurant.email}</p>
-                </div>
-              </a>
-            </div>
-
-            {/* Social Links & Reviews - Desktop */}
-            <div className="bg-white rounded-2xl shadow-md p-6 border border-gray-100">
-              <h3 className="text-xl font-bold text-gray-800 mb-4">Connect With Us</h3>
-              <div className="space-y-3">
-                {restaurant.socialMedia.instagram && (
-                  <a
-                    href={restaurant.socialMedia.instagram}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-between p-4 bg-gradient-to-r from-pink-50 to-purple-50 rounded-xl hover:from-pink-100 hover:to-purple-100 transition-all group"
-                  >
-                    <div className="flex items-center space-x-3">
-                      <FiInstagram className="w-6 h-6 text-pink-600" />
-                      <span className="font-semibold text-gray-800">Instagram</span>
-                    </div>
-                    <FiExternalLink className="w-5 h-5 text-gray-400 group-hover:text-gray-600 transition-colors" />
-                  </a>
-                )}
-
-                {restaurant.socialMedia.facebook && (
-                  <a
-                    href={restaurant.socialMedia.facebook}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl hover:from-blue-100 hover:to-indigo-100 transition-all group"
-                  >
-                    <div className="flex items-center space-x-3">
-                      <FiFacebook className="w-6 h-6 text-blue-600" />
-                      <span className="font-semibold text-gray-800">Facebook</span>
-                    </div>
-                    <FiExternalLink className="w-5 h-5 text-gray-400 group-hover:text-gray-600 transition-colors" />
-                  </a>
-                )}
-
-                {restaurant.socialMedia.googleReviews && (
-                  <a
-                    href={restaurant.socialMedia.googleReviews}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-between p-4 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl hover:from-yellow-100 hover:to-orange-100 transition-all group"
-                  >
-                    <div className="flex items-center space-x-3">
-                      <FiStar className="w-6 h-6 text-yellow-600" />
-                      <span className="font-semibold text-gray-800">Google Reviews</span>
-                    </div>
-                    <FiExternalLink className="w-5 h-5 text-gray-400 group-hover:text-gray-600 transition-colors" />
-                  </a>
-                )}
-              </div>
-            </div>
-
-            {/* Quick Stats - Desktop */}
-            <div className="bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl shadow-md p-6 text-white">
-              <h3 className="text-lg font-bold mb-4">Why Choose Us?</h3>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm opacity-90">Rating</span>
-                  <span className="text-xl font-bold">{restaurant.rating}/5.0</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm opacity-90">Total Reviews</span>
-                  <span className="text-xl font-bold">{restaurant.totalReviews}+</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm opacity-90">Cuisines</span>
-                  <span className="text-xl font-bold">{restaurant.cuisine.length}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Mobile Contact Section */}
-        <div className="lg:hidden mt-6 space-y-4">
-          {/* Contact Cards */}
-          <div className="bg-white rounded-2xl shadow-md p-6 border border-gray-100">
-            <h3 className="text-lg font-bold text-gray-800 mb-4">Contact Information</h3>
-            
-            <div className="space-y-3">
-              {/* Address */}
-              <div className="flex items-start space-x-3 p-4 bg-gray-50 rounded-xl">
-                <FiMapPin className="w-5 h-5 text-orange-500 mt-1 flex-shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-gray-800 mb-1">Address</p>
-                  <p className="text-sm text-gray-600">
-                    {restaurant.address.street}, {restaurant.address.city}
-                  </p>
-                  {restaurant.address.mapLink && (
-                    <a
-                      href={restaurant.address.mapLink}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center text-orange-600 text-sm mt-2 font-medium"
-                    >
-                      View on Map <FiExternalLink className="ml-1 w-4 h-4" />
-                    </a>
-                  )}
-                </div>
-              </div>
-
-              {/* Phone */}
-              <a
-                href={`tel:${restaurant.phone}`}
-                className="flex items-center space-x-3 p-4 bg-gray-50 rounded-xl active:bg-orange-50"
-              >
-                <FiPhone className="w-5 h-5 text-orange-500" />
-                <div>
-                  <p className="text-sm font-semibold text-gray-800">Phone</p>
-                  <p className="text-sm text-gray-600">{restaurant.phone}</p>
-                </div>
-              </a>
-
-              {/* Email */}
-              <a
-                href={`mailto:${restaurant.email}`}
-                className="flex items-center space-x-3 p-4 bg-gray-50 rounded-xl active:bg-orange-50"
-              >
-                <FiMail className="w-5 h-5 text-orange-500" />
-                <div>
-                  <p className="text-sm font-semibold text-gray-800">Email</p>
-                  <p className="text-sm text-gray-600">{restaurant.email}</p>
-                </div>
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
+      {/* Bottom Spacer for Sticky Bar */}
+      <div className="h-16 lg:hidden"></div>
     </div>
   );
 }
