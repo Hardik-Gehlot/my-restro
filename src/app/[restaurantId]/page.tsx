@@ -1,26 +1,26 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
-import Image from 'next/image';
-import Link from 'next/link';
-import { 
+import { useState, useEffect } from "react";
+import { useParams, useRouter } from "next/navigation";
+import Image from "next/image";
+import Link from "next/link";
+import {
   FiShare2,
   FiPhone,
   FiMapPin,
   FiExternalLink,
   FiStar,
   FiMenu,
-  FiInstagram
-} from 'react-icons/fi';
-import { db, Restaurant, Advertisement as AdType } from '@/lib/mock-data';
-import Advertisement from '@/components/shared/Advertisement';
+  FiInstagram,
+} from "react-icons/fi";
+import { db, Restaurant, Advertisement as AdType } from "@/lib/mock-data";
+import Advertisement from "@/components/shared/Advertisement";
 
 export default function RestaurantDetailPage() {
   const params = useParams();
   const router = useRouter();
   const restaurantId = params.restaurantId as string;
-  
+
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [ads, setAds] = useState<AdType[]>([]);
   const [loading, setLoading] = useState(true);
@@ -31,13 +31,13 @@ export default function RestaurantDetailPage() {
 
   const loadData = async () => {
     setLoading(true);
-    
+
     // Fetch restaurant and ads together
     const [restaurantData, adsData] = await Promise.all([
       db.getRestaurantById(restaurantId),
-      db.getAdvertisements()
+      db.getAdvertisements(),
     ]);
-    
+
     setRestaurant(restaurantData);
     setAds(adsData);
     setLoading(false);
@@ -52,7 +52,7 @@ export default function RestaurantDetailPage() {
           url: window.location.href,
         });
       } catch (err) {
-        console.log('Share cancelled');
+        console.log("Share cancelled");
       }
     }
   };
@@ -65,7 +65,7 @@ export default function RestaurantDetailPage() {
 
   // Get ad for specific position
   const getAdForPosition = (position: string) => {
-    return ads.find(ad => ad.position === position);
+    return ads.find((ad) => ad.position === position);
   };
 
   if (loading) {
@@ -87,9 +87,11 @@ export default function RestaurantDetailPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-800 mb-4">Restaurant Not Found</h1>
-          <button 
-            onClick={() => router.push('/')}
+          <h1 className="text-2xl font-bold text-gray-800 mb-4">
+            Restaurant Not Found
+          </h1>
+          <button
+            onClick={() => router.push("/")}
             className="bg-orange-500 text-white px-6 py-3 rounded-xl font-semibold"
           >
             Go to Home
@@ -100,18 +102,18 @@ export default function RestaurantDetailPage() {
   }
 
   // Get position-specific ads
-  const topAd = getAdForPosition('rest-1');
-  const midAd = getAdForPosition('rest-2');
+  const topAd = getAdForPosition("rest-1");
+  const midAd = getAdForPosition("rest-2");
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       {/* Advertisement Section - Top (rest-1) */}
-      {topAd && (
+      {/* {topAd && (
         <div className="px-4 pt-4 mb-6">
           <Advertisement ad={topAd} variant="banner" />
         </div>
-      )}
-      
+      )} */}
+
       {/* Header Image Section */}
       <div className="relative h-56 bg-gray-900">
         <Image
@@ -121,10 +123,10 @@ export default function RestaurantDetailPage() {
           className="object-cover opacity-90"
           priority
         />
-        
+
         {/* Header Overlay with Share */}
         <div className="absolute top-0 left-0 right-0 flex items-center justify-end p-4 bg-gradient-to-b from-black/50 to-transparent">
-          <button 
+          <button
             onClick={handleShare}
             className="p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition-all"
           >
@@ -151,9 +153,7 @@ export default function RestaurantDetailPage() {
           <h1 className="text-2xl font-bold text-gray-900 mb-1">
             {restaurant.name}
           </h1>
-          <p className="text-base text-gray-600 mb-3">
-            {restaurant.tagline}
-          </p>
+          <p className="text-base text-gray-600 mb-3">{restaurant.tagline}</p>
 
           {/* Google Rating */}
           <a
@@ -163,7 +163,9 @@ export default function RestaurantDetailPage() {
             className="inline-flex items-center space-x-2 bg-white border-2 border-gray-200 px-4 py-2 rounded-lg hover:border-orange-300 transition-all"
           >
             <FiStar className="w-5 h-5 text-yellow-500 fill-yellow-500" />
-            <span className="text-sm font-semibold text-gray-800">Rate us on Google</span>
+            <span className="text-sm font-semibold text-gray-800">
+              Rate us on Google
+            </span>
             <FiExternalLink className="w-4 h-4 text-gray-500" />
           </a>
         </div>
@@ -194,17 +196,19 @@ export default function RestaurantDetailPage() {
       </div>
 
       {/* Advertisement Section - Mid (rest-2) */}
-      {midAd && (
+      {/* {midAd && (
         <div className="px-4 mb-6">
           <Advertisement ad={midAd} variant="banner" />
         </div>
-      )}
+      )} */}
 
       {/* Contact Information Card */}
       <div className="px-4 mb-6">
         <div className="bg-white rounded-2xl shadow-md border border-gray-200 p-5">
-          <h2 className="text-lg font-bold text-gray-800 mb-4">Contact Information</h2>
-          
+          <h2 className="text-lg font-bold text-gray-800 mb-4">
+            Contact Information
+          </h2>
+
           <div className="space-y-4">
             {/* Phone */}
             <a
@@ -256,9 +260,13 @@ export default function RestaurantDetailPage() {
         <div className="bg-white rounded-2xl shadow-md border border-gray-200 p-5">
           <h2 className="text-lg font-bold text-gray-800 mb-3">About Us</h2>
           <p className="text-base text-gray-600 leading-relaxed">
-            Welcome to <span className="font-semibold text-gray-800">{restaurant.name}</span>! {restaurant.tagline}. 
-            We are committed to providing you with the best dining experience. 
-            Our menu features a wide variety of delicious dishes made with fresh, quality ingredients.
+            Welcome to{" "}
+            <span className="font-semibold text-gray-800">
+              {restaurant.name}
+            </span>
+            ! {restaurant.tagline}. We are committed to providing you with the
+            best dining experience. Our menu features a wide variety of
+            delicious dishes made with fresh, quality ingredients.
           </p>
         </div>
       </div>
@@ -273,7 +281,7 @@ export default function RestaurantDetailPage() {
             <FiPhone className="w-5 h-5" />
             <span>Call</span>
           </button>
-          
+
           <Link
             href={`/menu/${restaurant.id}`}
             className="flex-1 flex items-center justify-center space-x-2 py-4 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold hover:from-orange-600 hover:to-red-600 transition-all"
@@ -285,7 +293,7 @@ export default function RestaurantDetailPage() {
       </div>
 
       {/* Bottom Spacer for Sticky Bar */}
-      <div className="h-16 lg:hidden"></div>
+      <div className="h-32 lg:hidden"></div>
     </div>
   );
 }
