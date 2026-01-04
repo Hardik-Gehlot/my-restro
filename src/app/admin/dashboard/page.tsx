@@ -1,6 +1,15 @@
-'use client';
-import React, { useState, useEffect } from 'react';
-import { Menu, User, Plus, Edit2, Trash2, LogOut, Search, Filter } from 'lucide-react';
+"use client";
+import React, { useState, useEffect } from "react";
+import {
+  Menu,
+  User,
+  Plus,
+  Edit2,
+  Trash2,
+  LogOut,
+  Search,
+  Filter,
+} from "lucide-react";
 
 // Mock data from the document
 const mockRestaurants = [
@@ -10,9 +19,11 @@ const mockRestaurants = [
     tagline: "Authentic Italian Pizzas & Pasta",
     mobileNo: "+91-9876543210",
     logo: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=200&h=200&fit=crop",
-    coverImage: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=1200&h=400&fit=crop",
+    coverImage:
+      "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=1200&h=400&fit=crop",
     googleMapLink: "https://maps.google.com/?q=Pizza+Paradise+Mumbai",
-    googleRatingLink: "https://www.google.com/maps/search/Pizza+Paradise/@19.0760,72.8777,12z",
+    googleRatingLink:
+      "https://www.google.com/maps/search/Pizza+Paradise/@19.0760,72.8777,12z",
     aboutus: "We serve authentic Italian cuisine with passion",
   },
   {
@@ -21,9 +32,11 @@ const mockRestaurants = [
     tagline: "Royal Indian Cuisine",
     mobileNo: "+91-9123456789",
     logo: "https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=200&h=200&fit=crop",
-    coverImage: "https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=1200&h=400&fit=crop",
+    coverImage:
+      "https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=1200&h=400&fit=crop",
     googleMapLink: "https://maps.google.com/?q=Spice+Route+Bangalore",
-    googleRatingLink: "https://www.google.com/maps/search/Spice+Route/@12.9716,77.5946,12z",
+    googleRatingLink:
+      "https://www.google.com/maps/search/Spice+Route/@12.9716,77.5946,12z",
     aboutus: "Experience royal Indian flavors",
   },
   {
@@ -32,9 +45,11 @@ const mockRestaurants = [
     tagline: "Gourmet Burgers & Shakes",
     mobileNo: "+91-9988776655",
     logo: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=200&h=200&fit=crop",
-    coverImage: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=1200&h=400&fit=crop",
+    coverImage:
+      "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=1200&h=400&fit=crop",
     googleMapLink: "https://maps.google.com/?q=Burger+Hub+Delhi",
-    googleRatingLink: "https://www.google.com/maps/search/Burger+Hub/@28.7041,77.1025,12z",
+    googleRatingLink:
+      "https://www.google.com/maps/search/Burger+Hub/@28.7041,77.1025,12z",
     aboutus: "Best gourmet burgers in town",
   },
 ];
@@ -45,9 +60,11 @@ const initialDishes = [
     restaurantId: "pizza_paradise_123",
     isVeg: true,
     name: "Margherita Pizza",
-    image: "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=600&h=400&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=600&h=400&fit=crop",
     category: "Pizza",
-    description: "Classic Italian pizza with San Marzano tomatoes, fresh mozzarella, basil leaves",
+    description:
+      "Classic Italian pizza with San Marzano tomatoes, fresh mozzarella, basil leaves",
     variations: [
       { size: "small", price: 249 },
       { size: "medium", price: 349 },
@@ -59,9 +76,11 @@ const initialDishes = [
     restaurantId: "pizza_paradise_123",
     isVeg: false,
     name: "Pepperoni Feast",
-    image: "https://images.unsplash.com/photo-1628840042765-356cda07504e?w=600&h=400&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1628840042765-356cda07504e?w=600&h=400&fit=crop",
     category: "Pizza",
-    description: "Loaded with premium pepperoni slices, mozzarella cheese, oregano",
+    description:
+      "Loaded with premium pepperoni slices, mozzarella cheese, oregano",
     variations: [
       { size: "small", price: 299 },
       { size: "medium", price: 449 },
@@ -70,38 +89,62 @@ const initialDishes = [
   },
 ];
 
+interface AddDishModalProps {
+  onClose: () => void;
+  onSave: (data: any) => void; // you can replace `any` with a proper type later
+  restaurantId: string | number;
+}
 // Add Dish Modal Component
-const AddDishModal = ({ onClose, onSave, restaurantId }) => {
+const AddDishModal: React.FC<AddDishModalProps> = ({
+  onClose,
+  onSave,
+  restaurantId,
+}) => {
   const [form, setForm] = useState({
     name: "",
     description: "",
     image: "",
     category: "Pizza",
     isVeg: true,
-    variations: [{ size: "small", price: 0 }]
+    variations: [{ size: "small", price: 0 }],
   });
 
-  const update = (key, value) => {
-    setForm(prev => ({ ...prev, [key]: value }));
+  const update = (key: string, value: string | number | boolean) => {
+    setForm((prev) => ({ ...prev, [key]: value }));
   };
 
   const addVariation = () => {
-    setForm(prev => ({
+    setForm((prev) => ({
       ...prev,
-      variations: [...prev.variations, { size: "medium", price: 0 }]
+      variations: [...prev.variations, { size: "medium", price: 0 }],
+    }));
+  };
+  type Variation = {
+    size: string;
+    price: number;
+  };
+  const updateVariation = (
+    index: number,
+    field: keyof Variation,
+    value: string | number
+  ) => {
+    const newVariations = [...form.variations];
+
+    newVariations[index] = {
+      ...newVariations[index],
+      [field]: field === "price" ? Number(value) : value,
+    };
+
+    setForm((prev) => ({
+      ...prev,
+      variations: newVariations,
     }));
   };
 
-  const updateVariation = (index, field, value) => {
-    const newVariations = [...form.variations];
-    newVariations[index][field] = field === 'price' ? Number(value) : value;
-    setForm(prev => ({ ...prev, variations: newVariations }));
-  };
-
-  const removeVariation = (index) => {
-    setForm(prev => ({
+  const removeVariation = (index: number) => {
+    setForm((prev) => ({
       ...prev,
-      variations: prev.variations.filter((_, i) => i !== index)
+      variations: prev.variations.filter((_, i) => i !== index),
     }));
   };
 
@@ -113,7 +156,7 @@ const AddDishModal = ({ onClose, onSave, restaurantId }) => {
     onSave({
       ...form,
       id: `dish_${Date.now()}`,
-      restaurantId
+      restaurantId,
     });
   };
 
@@ -122,12 +165,19 @@ const AddDishModal = ({ onClose, onSave, restaurantId }) => {
       <div className="bg-white rounded-t-2xl sm:rounded-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
         <div className="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center">
           <h2 className="text-xl font-bold text-gray-900">Add New Dish</h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-700">✕</button>
+          <button
+            onClick={onClose}
+            className="text-gray-500 hover:text-gray-700"
+          >
+            ✕
+          </button>
         </div>
-        
+
         <div className="p-6 space-y-4">
           <div>
-            <label className="block text-sm font-semibold text-gray-900 mb-1">Dish Name *</label>
+            <label className="block text-sm font-semibold text-gray-900 mb-1">
+              Dish Name *
+            </label>
             <input
               placeholder="Enter dish name"
               value={form.name}
@@ -137,7 +187,9 @@ const AddDishModal = ({ onClose, onSave, restaurantId }) => {
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-900 mb-1">Image URL *</label>
+            <label className="block text-sm font-semibold text-gray-900 mb-1">
+              Image URL *
+            </label>
             <input
               placeholder="https://example.com/image.jpg"
               value={form.image}
@@ -147,7 +199,9 @@ const AddDishModal = ({ onClose, onSave, restaurantId }) => {
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-900 mb-1">Description</label>
+            <label className="block text-sm font-semibold text-gray-900 mb-1">
+              Description
+            </label>
             <textarea
               placeholder="Describe your dish"
               value={form.description}
@@ -158,7 +212,9 @@ const AddDishModal = ({ onClose, onSave, restaurantId }) => {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-1">Category</label>
+              <label className="block text-sm font-semibold text-gray-900 mb-1">
+                Category
+              </label>
               <select
                 value={form.category}
                 onChange={(e) => update("category", e.target.value)}
@@ -174,10 +230,12 @@ const AddDishModal = ({ onClose, onSave, restaurantId }) => {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-1">Type</label>
+              <label className="block text-sm font-semibold text-gray-900 mb-1">
+                Type
+              </label>
               <select
-                value={form.isVeg}
-                onChange={(e) => update("isVeg", e.target.value === 'true')}
+                value={form.isVeg ? "true" : "false"}
+                onChange={(e) => update("isVeg", e.target.value === "true")}
                 className="w-full border border-gray-300 p-3 rounded-lg text-gray-900"
               >
                 <option value="true">Veg</option>
@@ -188,7 +246,9 @@ const AddDishModal = ({ onClose, onSave, restaurantId }) => {
 
           <div>
             <div className="flex justify-between items-center mb-2">
-              <label className="block text-sm font-semibold text-gray-900">Price Variations *</label>
+              <label className="block text-sm font-semibold text-gray-900">
+                Price Variations *
+              </label>
               <button
                 onClick={addVariation}
                 className="text-orange-600 text-sm font-medium hover:text-orange-700"
@@ -200,7 +260,9 @@ const AddDishModal = ({ onClose, onSave, restaurantId }) => {
               <div key={index} className="flex gap-2 mb-2">
                 <select
                   value={variation.size}
-                  onChange={(e) => updateVariation(index, 'size', e.target.value)}
+                  onChange={(e) =>
+                    updateVariation(index, "size", e.target.value)
+                  }
                   className="flex-1 border border-gray-300 p-2 rounded-lg text-gray-900"
                 >
                   <option value="small">Small</option>
@@ -213,7 +275,9 @@ const AddDishModal = ({ onClose, onSave, restaurantId }) => {
                   type="number"
                   placeholder="Price"
                   value={variation.price}
-                  onChange={(e) => updateVariation(index, 'price', e.target.value)}
+                  onChange={(e) =>
+                    updateVariation(index, "price", e.target.value)
+                  }
                   className="flex-1 border border-gray-300 p-2 rounded-lg text-gray-900"
                 />
                 {form.variations.length > 1 && (
@@ -230,7 +294,10 @@ const AddDishModal = ({ onClose, onSave, restaurantId }) => {
         </div>
 
         <div className="sticky bottom-0 bg-white border-t px-6 py-4 flex gap-3">
-          <button onClick={onClose} className="flex-1 px-4 py-3 rounded-lg bg-gray-200 text-gray-900 font-medium">
+          <button
+            onClick={onClose}
+            className="flex-1 px-4 py-3 rounded-lg bg-gray-200 text-gray-900 font-medium"
+          >
             Cancel
           </button>
           <button
@@ -246,30 +313,30 @@ const AddDishModal = ({ onClose, onSave, restaurantId }) => {
 };
 
 // Edit Dish Modal Component
-const DishEditModal = ({ dish, onClose, onSave }) => {
+const DishEditModal = ({ dish, onClose, onSave }:{dish:any,onClose:()=>void,onSave:(data:any)=>void}) => {
   const [form, setForm] = useState(dish);
 
-  const update = (key, value) => {
-    setForm(prev => ({ ...prev, [key]: value }));
+  const update = (key:string, value:string|number|boolean) => {
+    setForm((prev: any) => ({ ...prev, [key]: value }));
   };
 
-  const updateVariation = (index, field, value) => {
+  const updateVariation = (index:number, field:string, value:string|number|boolean) => {
     const newVariations = [...form.variations];
-    newVariations[index][field] = field === 'price' ? Number(value) : value;
-    setForm(prev => ({ ...prev, variations: newVariations }));
+    newVariations[index][field] = field === "price" ? Number(value) : value;
+    setForm((prev: any) => ({ ...prev, variations: newVariations }));
   };
 
   const addVariation = () => {
-    setForm(prev => ({
+    setForm((prev: { variations: any; }) => ({
       ...prev,
-      variations: [...prev.variations, { size: "medium", price: 0 }]
+      variations: [...prev.variations, { size: "medium", price: 0 }],
     }));
   };
 
-  const removeVariation = (index) => {
-    setForm(prev => ({
+  const removeVariation = (index: any) => {
+    setForm((prev: { variations: any[]; }) => ({
       ...prev,
-      variations: prev.variations.filter((_, i) => i !== index)
+      variations: prev.variations.filter((_: any, i: any) => i !== index),
     }));
   };
 
@@ -282,12 +349,19 @@ const DishEditModal = ({ dish, onClose, onSave }) => {
       <div className="bg-white rounded-t-2xl sm:rounded-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
         <div className="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center">
           <h2 className="text-xl font-bold text-gray-900">Edit Dish</h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-700">✕</button>
+          <button
+            onClick={onClose}
+            className="text-gray-500 hover:text-gray-700"
+          >
+            ✕
+          </button>
         </div>
 
         <div className="p-6 space-y-4">
           <div>
-            <label className="block text-sm font-semibold text-gray-900 mb-1">Dish Name</label>
+            <label className="block text-sm font-semibold text-gray-900 mb-1">
+              Dish Name
+            </label>
             <input
               value={form.name}
               onChange={(e) => update("name", e.target.value)}
@@ -296,7 +370,9 @@ const DishEditModal = ({ dish, onClose, onSave }) => {
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-900 mb-1">Image URL</label>
+            <label className="block text-sm font-semibold text-gray-900 mb-1">
+              Image URL
+            </label>
             <input
               value={form.image}
               onChange={(e) => update("image", e.target.value)}
@@ -305,7 +381,9 @@ const DishEditModal = ({ dish, onClose, onSave }) => {
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-900 mb-1">Description</label>
+            <label className="block text-sm font-semibold text-gray-900 mb-1">
+              Description
+            </label>
             <textarea
               value={form.description}
               onChange={(e) => update("description", e.target.value)}
@@ -315,7 +393,9 @@ const DishEditModal = ({ dish, onClose, onSave }) => {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-1">Category</label>
+              <label className="block text-sm font-semibold text-gray-900 mb-1">
+                Category
+              </label>
               <select
                 value={form.category}
                 onChange={(e) => update("category", e.target.value)}
@@ -331,10 +411,12 @@ const DishEditModal = ({ dish, onClose, onSave }) => {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-1">Type</label>
+              <label className="block text-sm font-semibold text-gray-900 mb-1">
+                Type
+              </label>
               <select
                 value={form.isVeg}
-                onChange={(e) => update("isVeg", e.target.value === 'true')}
+                onChange={(e) => update("isVeg", e.target.value === "true")}
                 className="w-full border border-gray-300 p-3 rounded-lg text-gray-900"
               >
                 <option value="true">Veg</option>
@@ -345,7 +427,9 @@ const DishEditModal = ({ dish, onClose, onSave }) => {
 
           <div>
             <div className="flex justify-between items-center mb-2">
-              <label className="block text-sm font-semibold text-gray-900">Price Variations</label>
+              <label className="block text-sm font-semibold text-gray-900">
+                Price Variations
+              </label>
               <button
                 onClick={addVariation}
                 className="text-orange-600 text-sm font-medium hover:text-orange-700"
@@ -353,11 +437,13 @@ const DishEditModal = ({ dish, onClose, onSave }) => {
                 + Add Size
               </button>
             </div>
-            {form.variations.map((variation, index) => (
+            {form.variations.map((variation: { size: string | number | readonly string[] | undefined; price: string | number | readonly string[] | undefined; }, index: React.Key | null | undefined) => (
               <div key={index} className="flex gap-2 mb-2">
                 <select
                   value={variation.size}
-                  onChange={(e) => updateVariation(index, 'size', e.target.value)}
+                  onChange={(e) =>
+                    updateVariation(index, "size", e.target.value)
+                  }
                   className="flex-1 border border-gray-300 p-2 rounded-lg text-gray-900"
                 >
                   <option value="small">Small</option>
@@ -369,7 +455,9 @@ const DishEditModal = ({ dish, onClose, onSave }) => {
                 <input
                   type="number"
                   value={variation.price}
-                  onChange={(e) => updateVariation(index, 'price', e.target.value)}
+                  onChange={(e) =>
+                    updateVariation(index, "price", e.target.value)
+                  }
                   className="flex-1 border border-gray-300 p-2 rounded-lg text-gray-900"
                 />
                 {form.variations.length > 1 && (
@@ -386,7 +474,10 @@ const DishEditModal = ({ dish, onClose, onSave }) => {
         </div>
 
         <div className="sticky bottom-0 bg-white border-t px-6 py-4 flex gap-3">
-          <button onClick={onClose} className="flex-1 px-4 py-3 rounded-lg bg-gray-200 text-gray-900 font-medium">
+          <button
+            onClick={onClose}
+            className="flex-1 px-4 py-3 rounded-lg bg-gray-200 text-gray-900 font-medium"
+          >
             Cancel
           </button>
           <button
@@ -405,8 +496,8 @@ const DishEditModal = ({ dish, onClose, onSave }) => {
 const RestaurantEditModal = ({ restaurant, onClose, onSave }) => {
   const [form, setForm] = useState(restaurant);
 
-  const update = (key, value) => {
-    setForm(prev => ({ ...prev, [key]: value }));
+  const update = (key: string, value: string) => {
+    setForm((prev: any) => ({ ...prev, [key]: value }));
   };
 
   const handleSubmit = () => {
@@ -418,12 +509,19 @@ const RestaurantEditModal = ({ restaurant, onClose, onSave }) => {
       <div className="bg-white rounded-t-2xl sm:rounded-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
         <div className="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center">
           <h2 className="text-xl font-bold text-gray-900">Edit Restaurant</h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-700">✕</button>
+          <button
+            onClick={onClose}
+            className="text-gray-500 hover:text-gray-700"
+          >
+            ✕
+          </button>
         </div>
 
         <div className="p-6 space-y-4">
           <div>
-            <label className="block text-sm font-semibold text-gray-900 mb-1">Restaurant Name</label>
+            <label className="block text-sm font-semibold text-gray-900 mb-1">
+              Restaurant Name
+            </label>
             <input
               value={form.name}
               onChange={(e) => update("name", e.target.value)}
@@ -432,7 +530,9 @@ const RestaurantEditModal = ({ restaurant, onClose, onSave }) => {
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-900 mb-1">Tagline</label>
+            <label className="block text-sm font-semibold text-gray-900 mb-1">
+              Tagline
+            </label>
             <input
               value={form.tagline}
               onChange={(e) => update("tagline", e.target.value)}
@@ -441,7 +541,9 @@ const RestaurantEditModal = ({ restaurant, onClose, onSave }) => {
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-900 mb-1">Mobile Number</label>
+            <label className="block text-sm font-semibold text-gray-900 mb-1">
+              Mobile Number
+            </label>
             <input
               value={form.mobileNo}
               onChange={(e) => update("mobileNo", e.target.value)}
@@ -450,7 +552,9 @@ const RestaurantEditModal = ({ restaurant, onClose, onSave }) => {
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-900 mb-1">Logo URL</label>
+            <label className="block text-sm font-semibold text-gray-900 mb-1">
+              Logo URL
+            </label>
             <input
               value={form.logo}
               onChange={(e) => update("logo", e.target.value)}
@@ -459,7 +563,9 @@ const RestaurantEditModal = ({ restaurant, onClose, onSave }) => {
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-900 mb-1">Cover Image URL</label>
+            <label className="block text-sm font-semibold text-gray-900 mb-1">
+              Cover Image URL
+            </label>
             <input
               value={form.coverImage}
               onChange={(e) => update("coverImage", e.target.value)}
@@ -468,7 +574,9 @@ const RestaurantEditModal = ({ restaurant, onClose, onSave }) => {
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-900 mb-1">About Us</label>
+            <label className="block text-sm font-semibold text-gray-900 mb-1">
+              About Us
+            </label>
             <textarea
               value={form.aboutus}
               onChange={(e) => update("aboutus", e.target.value)}
@@ -477,7 +585,9 @@ const RestaurantEditModal = ({ restaurant, onClose, onSave }) => {
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-900 mb-1">Google Maps Link</label>
+            <label className="block text-sm font-semibold text-gray-900 mb-1">
+              Google Maps Link
+            </label>
             <input
               value={form.googleMapLink}
               onChange={(e) => update("googleMapLink", e.target.value)}
@@ -487,7 +597,10 @@ const RestaurantEditModal = ({ restaurant, onClose, onSave }) => {
         </div>
 
         <div className="sticky bottom-0 bg-white border-t px-6 py-4 flex gap-3">
-          <button onClick={onClose} className="flex-1 px-4 py-3 rounded-lg bg-gray-200 text-gray-900 font-medium">
+          <button
+            onClick={onClose}
+            className="flex-1 px-4 py-3 rounded-lg bg-gray-200 text-gray-900 font-medium"
+          >
             Cancel
           </button>
           <button
@@ -504,52 +617,66 @@ const RestaurantEditModal = ({ restaurant, onClose, onSave }) => {
 
 // Main Admin Dashboard Component
 export default function AdminDashboard() {
-  const [activeTab, setActiveTab] = useState('menu');
-  const [currentRestaurant, setCurrentRestaurant] = useState(mockRestaurants[0]);
+  const [activeTab, setActiveTab] = useState("menu");
+  const [currentRestaurant, setCurrentRestaurant] = useState(
+    mockRestaurants[0]
+  );
   const [dishes, setDishes] = useState(initialDishes);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filterCategory, setFilterCategory] = useState('all');
-  const [filterVeg, setFilterVeg] = useState('all');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterCategory, setFilterCategory] = useState("all");
+  const [filterVeg, setFilterVeg] = useState("all");
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingDish, setEditingDish] = useState(null);
   const [editingRestaurant, setEditingRestaurant] = useState(null);
 
   // Filter dishes
-  const filteredDishes = dishes.filter(dish => {
+  const filteredDishes = dishes.filter((dish) => {
     if (dish.restaurantId !== currentRestaurant.id) return false;
-    if (searchQuery && !dish.name.toLowerCase().includes(searchQuery.toLowerCase())) return false;
-    if (filterCategory !== 'all' && dish.category !== filterCategory) return false;
-    if (filterVeg === 'veg' && !dish.isVeg) return false;
-    if (filterVeg === 'nonveg' && dish.isVeg) return false;
+    if (
+      searchQuery &&
+      !dish.name.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+      return false;
+    if (filterCategory !== "all" && dish.category !== filterCategory)
+      return false;
+    if (filterVeg === "veg" && !dish.isVeg) return false;
+    if (filterVeg === "nonveg" && dish.isVeg) return false;
     return true;
   });
 
-  const categories = ['all', ...new Set(dishes.filter(d => d.restaurantId === currentRestaurant.id).map(d => d.category))];
+  const categories = [
+    "all",
+    ...new Set(
+      dishes
+        .filter((d) => d.restaurantId === currentRestaurant.id)
+        .map((d) => d.category)
+    ),
+  ];
 
-  const handleAddDish = (newDish) => {
+  const handleAddDish = (newDish: { id: string; restaurantId: string; isVeg: boolean; name: string; image: string; category: string; description: string; variations: { size: string; price: number; }[]; }) => {
     setDishes([...dishes, newDish]);
     setShowAddModal(false);
   };
 
-  const handleEditDish = (updatedDish) => {
-    setDishes(dishes.map(d => d.id === updatedDish.id ? updatedDish : d));
+  const handleEditDish = (updatedDish: { id: string; }) => {
+    setDishes(dishes.map((d) => (d.id === updatedDish.id ? updatedDish : d)));
     setEditingDish(null);
   };
 
-  const handleDeleteDish = (dishId) => {
-    if (confirm('Are you sure you want to delete this dish?')) {
-      setDishes(dishes.filter(d => d.id !== dishId));
+  const handleDeleteDish = (dishId: string) => {
+    if (confirm("Are you sure you want to delete this dish?")) {
+      setDishes(dishes.filter((d) => d.id !== dishId));
     }
   };
 
-  const handleUpdateRestaurant = (updatedRestaurant) => {
+  const handleUpdateRestaurant = (updatedRestaurant: React.SetStateAction<{ id: string; name: string; tagline: string; mobileNo: string; logo: string; coverImage: string; googleMapLink: string; googleRatingLink: string; aboutus: string; }>) => {
     setCurrentRestaurant(updatedRestaurant);
     setEditingRestaurant(null);
   };
 
   const handleLogout = () => {
-    if (confirm('Are you sure you want to logout?')) {
-      alert('Logged out successfully!');
+    if (confirm("Are you sure you want to logout?")) {
+      alert("Logged out successfully!");
     }
   };
 
@@ -559,26 +686,33 @@ export default function AdminDashboard() {
       <div className="bg-white border-b sticky top-0 z-40">
         <div className="px-4 py-4">
           <div className="flex items-center gap-3">
-            <img 
-              src={currentRestaurant.logo} 
+            <img
+              src={currentRestaurant.logo}
               alt={currentRestaurant.name}
               className="w-12 h-12 rounded-full object-cover"
             />
             <div className="flex-1">
-              <h1 className="text-lg font-bold text-gray-900">{currentRestaurant.name}</h1>
-              <p className="text-sm text-gray-700">{currentRestaurant.tagline}</p>
+              <h1 className="text-lg font-bold text-gray-900">
+                {currentRestaurant.name}
+              </h1>
+              <p className="text-sm text-gray-700">
+                {currentRestaurant.tagline}
+              </p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Content */}
-      {activeTab === 'menu' ? (
+      {activeTab === "menu" ? (
         <div className="px-4 py-4">
           {/* Search and Filter */}
           <div className="bg-white rounded-xl p-4 mb-4 shadow-sm">
             <div className="relative mb-3">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" size={20} />
+              <Search
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+                size={20}
+              />
               <input
                 type="text"
                 placeholder="Search dishes..."
@@ -589,14 +723,14 @@ export default function AdminDashboard() {
             </div>
 
             <div className="flex gap-2 overflow-x-auto pb-2">
-              {categories.map(cat => (
+              {categories.map((cat) => (
                 <button
                   key={cat}
                   onClick={() => setFilterCategory(cat)}
                   className={`px-4 py-2 rounded-lg whitespace-nowrap text-sm font-medium ${
-                    filterCategory === cat 
-                      ? 'bg-orange-600 text-white' 
-                      : 'bg-gray-100 text-gray-900'
+                    filterCategory === cat
+                      ? "bg-orange-600 text-white"
+                      : "bg-gray-100 text-gray-900"
                   }`}
                 >
                   {cat.charAt(0).toUpperCase() + cat.slice(1)}
@@ -606,25 +740,31 @@ export default function AdminDashboard() {
 
             <div className="flex gap-2 mt-3">
               <button
-                onClick={() => setFilterVeg('all')}
+                onClick={() => setFilterVeg("all")}
                 className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium ${
-                  filterVeg === 'all' ? 'bg-orange-600 text-white' : 'bg-gray-100 text-gray-900'
+                  filterVeg === "all"
+                    ? "bg-orange-600 text-white"
+                    : "bg-gray-100 text-gray-900"
                 }`}
               >
                 All
               </button>
               <button
-                onClick={() => setFilterVeg('veg')}
+                onClick={() => setFilterVeg("veg")}
                 className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium ${
-                  filterVeg === 'veg' ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-900'
+                  filterVeg === "veg"
+                    ? "bg-green-600 text-white"
+                    : "bg-gray-100 text-gray-900"
                 }`}
               >
                 🟢 Veg
               </button>
               <button
-                onClick={() => setFilterVeg('nonveg')}
+                onClick={() => setFilterVeg("nonveg")}
                 className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium ${
-                  filterVeg === 'nonveg' ? 'bg-red-600 text-white' : 'bg-gray-100 text-gray-900'
+                  filterVeg === "nonveg"
+                    ? "bg-red-600 text-white"
+                    : "bg-gray-100 text-gray-900"
                 }`}
               >
                 🔴 Non-Veg
@@ -646,14 +786,19 @@ export default function AdminDashboard() {
             {filteredDishes.length === 0 ? (
               <div className="text-center py-12 text-gray-600">
                 <p className="text-lg font-medium">No dishes found</p>
-                <p className="text-sm mt-1">Try adjusting your filters or add a new dish</p>
+                <p className="text-sm mt-1">
+                  Try adjusting your filters or add a new dish
+                </p>
               </div>
             ) : (
-              filteredDishes.map(dish => (
-                <div key={dish.id} className="bg-white rounded-xl overflow-hidden shadow-sm">
+              filteredDishes.map((dish) => (
+                <div
+                  key={dish.id}
+                  className="bg-white rounded-xl overflow-hidden shadow-sm"
+                >
                   <div className="flex gap-3 p-3">
-                    <img 
-                      src={dish.image} 
+                    <img
+                      src={dish.image}
                       alt={dish.name}
                       className="w-24 h-24 rounded-lg object-cover"
                     />
@@ -661,14 +806,25 @@ export default function AdminDashboard() {
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
-                            <span className="text-lg">{dish.isVeg ? '🟢' : '🔴'}</span>
-                            <h3 className="font-bold text-gray-900 truncate">{dish.name}</h3>
+                            <span className="text-lg">
+                              {dish.isVeg ? "🟢" : "🔴"}
+                            </span>
+                            <h3 className="font-bold text-gray-900 truncate">
+                              {dish.name}
+                            </h3>
                           </div>
-                          <p className="text-xs text-gray-700 mb-1">{dish.category}</p>
-                          <p className="text-sm text-gray-700 line-clamp-2 mb-2">{dish.description}</p>
+                          <p className="text-xs text-gray-700 mb-1">
+                            {dish.category}
+                          </p>
+                          <p className="text-sm text-gray-700 line-clamp-2 mb-2">
+                            {dish.description}
+                          </p>
                           <div className="flex flex-wrap gap-1">
                             {dish.variations.map((v, i) => (
-                              <span key={i} className="text-xs bg-gray-100 text-gray-900 px-2 py-1 rounded">
+                              <span
+                                key={i}
+                                className="text-xs bg-gray-100 text-gray-900 px-2 py-1 rounded"
+                              >
                                 {v.size}: ₹{v.price}
                               </span>
                             ))}
@@ -704,21 +860,25 @@ export default function AdminDashboard() {
           {/* Restaurant Cover */}
           <div className="bg-white rounded-xl overflow-hidden shadow-sm mb-4">
             <div className="relative h-40">
-              <img 
-                src={currentRestaurant.coverImage} 
+              <img
+                src={currentRestaurant.coverImage}
                 alt="Cover"
                 className="w-full h-full object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
               <div className="absolute bottom-4 left-4 flex items-center gap-3">
-                <img 
-                  src={currentRestaurant.logo} 
+                <img
+                  src={currentRestaurant.logo}
                   alt={currentRestaurant.name}
                   className="w-16 h-16 rounded-full border-4 border-white object-cover"
                 />
                 <div>
-                  <h2 className="text-xl font-bold text-white">{currentRestaurant.name}</h2>
-                  <p className="text-sm text-white/90">{currentRestaurant.tagline}</p>
+                  <h2 className="text-xl font-bold text-white">
+                    {currentRestaurant.name}
+                  </h2>
+                  <p className="text-sm text-white/90">
+                    {currentRestaurant.tagline}
+                  </p>
                 </div>
               </div>
             </div>
@@ -726,32 +886,52 @@ export default function AdminDashboard() {
 
           {/* Restaurant Details */}
           <div className="bg-white rounded-xl p-4 shadow-sm mb-4">
-            <h3 className="text-lg font-bold text-gray-900 mb-4">Restaurant Information</h3>
-            
+            <h3 className="text-lg font-bold text-gray-900 mb-4">
+              Restaurant Information
+            </h3>
+
             <div className="space-y-4">
               <div>
-                <label className="text-sm font-semibold text-gray-700 block mb-1">Restaurant Name</label>
-                <p className="text-base text-gray-900">{currentRestaurant.name}</p>
+                <label className="text-sm font-semibold text-gray-700 block mb-1">
+                  Restaurant Name
+                </label>
+                <p className="text-base text-gray-900">
+                  {currentRestaurant.name}
+                </p>
               </div>
 
               <div>
-                <label className="text-sm font-semibold text-gray-700 block mb-1">Tagline</label>
-                <p className="text-base text-gray-900">{currentRestaurant.tagline}</p>
+                <label className="text-sm font-semibold text-gray-700 block mb-1">
+                  Tagline
+                </label>
+                <p className="text-base text-gray-900">
+                  {currentRestaurant.tagline}
+                </p>
               </div>
 
               <div>
-                <label className="text-sm font-semibold text-gray-700 block mb-1">Mobile Number</label>
-                <p className="text-base text-gray-900">{currentRestaurant.mobileNo}</p>
+                <label className="text-sm font-semibold text-gray-700 block mb-1">
+                  Mobile Number
+                </label>
+                <p className="text-base text-gray-900">
+                  {currentRestaurant.mobileNo}
+                </p>
               </div>
 
               <div>
-                <label className="text-sm font-semibold text-gray-700 block mb-1">About Us</label>
-                <p className="text-base text-gray-900">{currentRestaurant.aboutus}</p>
+                <label className="text-sm font-semibold text-gray-700 block mb-1">
+                  About Us
+                </label>
+                <p className="text-base text-gray-900">
+                  {currentRestaurant.aboutus}
+                </p>
               </div>
 
               <div>
-                <label className="text-sm font-semibold text-gray-700 block mb-1">Google Maps</label>
-                <a 
+                <label className="text-sm font-semibold text-gray-700 block mb-1">
+                  Google Maps
+                </label>
+                <a
                   href={currentRestaurant.googleMapLink}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -773,23 +953,37 @@ export default function AdminDashboard() {
 
           {/* Statistics */}
           <div className="bg-white rounded-xl p-4 shadow-sm mb-4">
-            <h3 className="text-lg font-bold text-gray-900 mb-4">Quick Stats</h3>
+            <h3 className="text-lg font-bold text-gray-900 mb-4">
+              Quick Stats
+            </h3>
             <div className="grid grid-cols-3 gap-4">
               <div className="text-center">
                 <p className="text-2xl font-bold text-gray-900">
-                  {dishes.filter(d => d.restaurantId === currentRestaurant.id).length}
+                  {
+                    dishes.filter(
+                      (d) => d.restaurantId === currentRestaurant.id
+                    ).length
+                  }
                 </p>
                 <p className="text-sm text-gray-700 mt-1">Total Dishes</p>
               </div>
               <div className="text-center">
                 <p className="text-2xl font-bold text-green-600">
-                  {dishes.filter(d => d.restaurantId === currentRestaurant.id && d.isVeg).length}
+                  {
+                    dishes.filter(
+                      (d) => d.restaurantId === currentRestaurant.id && d.isVeg
+                    ).length
+                  }
                 </p>
                 <p className="text-sm text-gray-700 mt-1">Veg Dishes</p>
               </div>
               <div className="text-center">
                 <p className="text-2xl font-bold text-red-600">
-                  {dishes.filter(d => d.restaurantId === currentRestaurant.id && !d.isVeg).length}
+                  {
+                    dishes.filter(
+                      (d) => d.restaurantId === currentRestaurant.id && !d.isVeg
+                    ).length
+                  }
                 </p>
                 <p className="text-sm text-gray-700 mt-1">Non-Veg</p>
               </div>
@@ -811,22 +1005,18 @@ export default function AdminDashboard() {
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg z-50">
         <div className="flex">
           <button
-            onClick={() => setActiveTab('menu')}
+            onClick={() => setActiveTab("menu")}
             className={`flex-1 flex flex-col items-center justify-center py-3 transition-colors ${
-              activeTab === 'menu' 
-                ? 'text-orange-600' 
-                : 'text-gray-600'
+              activeTab === "menu" ? "text-orange-600" : "text-gray-600"
             }`}
           >
             <Menu size={24} />
             <span className="text-xs font-medium mt-1">Menu</span>
           </button>
           <button
-            onClick={() => setActiveTab('profile')}
+            onClick={() => setActiveTab("profile")}
             className={`flex-1 flex flex-col items-center justify-center py-3 transition-colors ${
-              activeTab === 'profile' 
-                ? 'text-orange-600' 
-                : 'text-gray-600'
+              activeTab === "profile" ? "text-orange-600" : "text-gray-600"
             }`}
           >
             <User size={24} />
