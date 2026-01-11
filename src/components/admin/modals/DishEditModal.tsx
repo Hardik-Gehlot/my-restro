@@ -1,75 +1,237 @@
-"use client";
+'use client';
+import { useState, Fragment } from 'react';
+import { Dialog, Transition } from '@headlessui/react';
+import { Trash2, X } from 'lucide-react';
 
-import { useState } from "react";
+// Edit Dish Modal Component
+const DishEditModal = ({ dish, onClose, onSave }) => {
+    const [form, setForm] = useState(dish);
 
-export default function DishEditModal({ dish, onClose, onSave }: any) {
-  const [form, setForm] = useState(dish);
+    const update = (key, value) => {
+        setForm(prev => ({ ...prev, [key]: value }));
+    };
 
-  const update = (key: string, value: any) => {
-    setForm((prev) => ({ ...prev, [key]: value }));
-  };
+    const updateVariation = (index, field, value) => {
+        const newVariations = [...form.variations];
+        newVariations[index][field] = field === 'price' ? Number(value) : value;
+        setForm(prev => ({ ...prev, variations: newVariations }));
+    };
 
-  const handleSubmit = () => {
-    onSave(form);
-  };
+    const addVariation = () => {
+        setForm(prev => ({
+            ...prev,
+            variations: [...prev.variations, { size: "medium", price: 0 }]
+        }));
+    };
 
-  return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-white p-6 rounded-xl w-full max-w-lg shadow-xl">
+    const removeVariation = (index) => {
+        setForm(prev => ({
+            ...prev,
+            variations: prev.variations.filter((_, i) => i !== index)
+        }));
+    };
 
-        <h2 className="text-xl font-bold text-gray-900 mb-4">Edit Dish</h2>
+    const handleSubmit = () => {
+        onSave(form);
+    };
 
-        <div className="space-y-3">
-          <input
-            value={form.name}
-            onChange={(e) => update("name", e.target.value)}
-            className="w-full border p-2 rounded-lg"
-          />
+    return (
+        <Transition.Root show={true} as={Fragment}>
+            <Dialog as="div" className="relative z-50" onClose={onClose}>
+                <Transition.Child
+                    as={Fragment}
+                    enter="ease-out duration-300"
+                    enterFrom="opacity-0"
+                    enterTo="opacity-100"
+                    leave="ease-in duration-200"
+                    leaveFrom="opacity-100"
+                    leaveTo="opacity-0"
+                >
+                    <div className="fixed inset-0 bg-black/60" />
+                </Transition.Child>
 
-          <input
-            value={form.image}
-            onChange={(e) => update("image", e.target.value)}
-            className="w-full border p-2 rounded-lg"
-          />
+                <div className="fixed inset-0 overflow-hidden">
+                    <div className="absolute inset-0 overflow-hidden">
+                        <div className="pointer-events-none fixed inset-y-0 right-0 flex max-w-full sm:pl-16">
+                            <Transition.Child
+                                as={Fragment}
+                                enter="transform transition ease-in-out duration-500 sm:duration-700"
+                                enterFrom="translate-y-full sm:translate-y-0 sm:translate-x-full"
+                                enterTo="translate-y-0 sm:translate-x-0"
+                                leave="transform transition ease-in-out duration-500 sm:duration-700"
+                                leaveFrom="translate-y-0 sm:translate-x-0"
+                                leaveTo="translate-y-full sm:translate-y-0 sm:translate-x-full"
+                            >
+                                <Dialog.Panel className="pointer-events-auto w-screen max-w-2xl">
+                                    <div className="flex h-full flex-col overflow-y-scroll bg-white shadow-xl">
+                                        <div className="flex-1">
+                                            {/* Header */}
+                                            <div className="bg-gray-50 px-4 py-6 sm:px-6">
+                                                <div className="flex items-start justify-between space-x-3">
+                                                    <div className="space-y-1">
+                                                        <Dialog.Title className="text-lg font-medium text-gray-900">
+                                                            Edit Dish
+                                                        </Dialog.Title>
+                                                    </div>
+                                                    <div className="flex h-7 items-center">
+                                                        <button
+                                                            type="button"
+                                                            className="text-gray-400 hover:text-gray-500"
+                                                            onClick={onClose}
+                                                        >
+                                                            <span className="sr-only">Close panel</span>
+                                                            <X className="h-6 w-6" />
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
 
-          <input
-            type="number"
-            value={form.price}
-            onChange={(e) => update("price", +e.target.value)}
-            className="w-full border p-2 rounded-lg"
-          />
+                                            {/* Form */}
+                                            <div className="space-y-6 py-6 sm:space-y-0 sm:divide-y sm:divide-gray-200 sm:py-0">
+                                                <div className="space-y-4 px-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:px-6 sm:py-5">
+                                                    <div>
+                                                        <label className="block text-sm font-semibold text-gray-900 mb-1">Dish Name</label>
+                                                    </div>
+                                                    <div className="sm:col-span-2">
+                                                        <input
+                                                            value={form.name}
+                                                            onChange={(e) => update("name", e.target.value)}
+                                                            className="w-full border border-gray-300 p-3 rounded-lg text-gray-900"
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="space-y-4 px-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:px-6 sm:py-5">
+                                                    <div>
+                                                        <label className="block text-sm font-semibold text-gray-900 mb-1">Image URL</label>
+                                                    </div>
+                                                    <div className="sm:col-span-2">
+                                                        <input
+                                                            value={form.image}
+                                                            onChange={(e) => update("image", e.target.value)}
+                                                            className="w-full border border-gray-300 p-3 rounded-lg text-gray-900"
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="space-y-4 px-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:px-6 sm:py-5">
+                                                    <div>
+                                                        <label className="block text-sm font-semibold text-gray-900 mb-1">Description</label>
+                                                    </div>
+                                                    <div className="sm:col-span-2">
+                                                        <textarea
+                                                            value={form.description}
+                                                            onChange={(e) => update("description", e.target.value)}
+                                                            className="w-full border border-gray-300 p-3 rounded-lg text-gray-900 min-h-[80px]"
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="space-y-4 px-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:px-6 sm:py-5">
+                                                    <div>
+                                                        <label className="block text-sm font-semibold text-gray-900 mb-1">Category</label>
+                                                    </div>
+                                                    <div className="sm:col-span-2">
+                                                        <select
+                                                            value={form.category}
+                                                            onChange={(e) => update("category", e.target.value)}
+                                                            className="w-full border border-gray-300 p-3 rounded-lg text-gray-900"
+                                                        >
+                                                            <option>Pizza</option>
+                                                            <option>Pasta</option>
+                                                            <option>Burgers</option>
+                                                            <option>Sides</option>
+                                                            <option>Beverages</option>
+                                                            <option>Desserts</option>
+                                                            <option>Starters</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div className="space-y-4 px-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:px-6 sm:py-5">
+                                                    <div>
+                                                        <label className="block text-sm font-semibold text-gray-900 mb-1">Type</label>
+                                                    </div>
+                                                    <div className="sm:col-span-2">
+                                                        <select
+                                                            value={form.isVeg}
+                                                            onChange={(e) => update("isVeg", e.target.value === 'true')}
+                                                            className="w-full border border-gray-300 p-3 rounded-lg text-gray-900"
+                                                        >
+                                                            <option value="true">Veg</option>
+                                                            <option value="false">Non-Veg</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div className="space-y-4 px-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:px-6 sm:py-5">
+                                                    <div>
+                                                        <label className="block text-sm font-semibold text-gray-900">Price Variations</label>
+                                                    </div>
+                                                    <div className="sm:col-span-2">
+                                                        <button
+                                                            onClick={addVariation}
+                                                            className="text-orange-600 text-sm font-medium hover:text-orange-700"
+                                                        >
+                                                            + Add Size
+                                                        </button>
+                                                        {form.variations.map((variation, index) => (
+                                                          <div key={index} className="flex gap-2 mb-2">
+                                                              <select
+                                                                  value={variation.size}
+                                                                  onChange={(e) => updateVariation(index, 'size', e.target.value)}
+                                                                  className="flex-1 border border-gray-300 p-2 rounded-lg text-gray-900"
+                                                              >
+                                                                  <option value="small">Small</option>
+                                                                  <option value="medium">Medium</option>
+                                                                  <option value="large">Large</option>
+                                                                  <option value="half">Half</option>
+                                                                  <option value="full">Full</option>
+                                                              </select>
+                                                              <input
+                                                                  type="number"
+                                                                  value={variation.price}
+                                                                  onChange={(e) => updateVariation(index, 'price', e.target.value)}
+                                                                  className="flex-1 border border-gray-300 p-2 rounded-lg text-gray-900"
+                                                              />
+                                                              {form.variations.length > 1 && (
+                                                                  <button
+                                                                      onClick={() => removeVariation(index)}
+                                                                      className="text-red-600 hover:text-red-700 px-2"
+                                                                  >
+                                                                      <Trash2 size={18} />
+                                                                  </button>
+                                                              )}
+                                                          </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
 
-          <textarea
-            value={form.description}
-            onChange={(e) => update("description", e.target.value)}
-            className="w-full border p-2 rounded-lg"
-          />
+                                        {/* Action buttons */}
+                                        <div className="flex-shrink-0 border-t border-gray-200 px-4 py-5 sm:px-6">
+                                            <div className="flex justify-end space-x-3">
+                                                <button
+                                                    type="button"
+                                                    className="rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
+                                                    onClick={onClose}
+                                                >
+                                                    Cancel
+                                                </button>
+                                                <button
+                                                    type="submit"
+                                                    className="inline-flex justify-center rounded-md border border-transparent bg-orange-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
+                                                    onClick={handleSubmit}
+                                                >
+                                                    Save Changes
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </Dialog.Panel>
+                            </Transition.Child>
+                        </div>
+                    </div>
+                </div>
+            </Dialog>
+        </Transition.Root>
+    )
+};
 
-          <select
-            value={form.category}
-            onChange={(e) => update("category", e.target.value)}
-            className="w-full border p-2 rounded-lg"
-          >
-            <option>Food</option>
-            <option>Drinks</option>
-            <option>Dessert</option>
-          </select>
-        </div>
-
-        <div className="flex justify-end gap-3 mt-6">
-          <button onClick={onClose} className="px-4 py-2 rounded-lg bg-gray-200">
-            Cancel
-          </button>
-
-          <button
-            onClick={handleSubmit}
-            className="px-4 py-2 rounded-lg bg-orange-600 text-white"
-          >
-            Save Changes
-          </button>
-        </div>
-
-      </div>
-    </div>
-  );
-}
+export default DishEditModal;

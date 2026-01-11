@@ -8,9 +8,12 @@ interface Session {
   expiresAt: number;
 }
 
+const isBrowser = typeof window !== 'undefined';
+
 export const auth = {
   // Save session to localStorage
-  saveSession: (user: AdminUser) => {
+  saveSession: (user: any) => {
+    if (!isBrowser) return;
     const session: Session = {
       userId: user.id,
       email: user.email,
@@ -22,6 +25,7 @@ export const auth = {
 
   // Get current session
   getSession: (): Session | null => {
+    if (!isBrowser) return null;
     const sessionStr = localStorage.getItem(SESSION_KEY);
     if (!sessionStr) return null;
 
@@ -38,16 +42,19 @@ export const auth = {
 
   // Clear session
   clearSession: () => {
+    if (!isBrowser) return;
     localStorage.removeItem(SESSION_KEY);
   },
 
   // Check if user is authenticated
   isAuthenticated: (): boolean => {
+    if (!isBrowser) return false;
     return auth.getSession() !== null;
   },
 
   // Get restaurant ID from session
   getRestaurantId: (): string | null => {
+    if (!isBrowser) return null;
     const session = auth.getSession();
     return session?.restaurantId || null;
   }

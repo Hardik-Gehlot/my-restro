@@ -1,0 +1,129 @@
+'use client';
+
+import { Fragment } from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { Dialog, Transition } from '@headlessui/react';
+import { FiGrid, FiUser, FiLogOut, FiX } from 'react-icons/fi';
+
+const Sidebar = ({ restaurant, open, setOpen }) => {
+  const pathname = usePathname();
+
+  const navLinks = [
+    { href: '/admin/dashboard/menu', icon: FiGrid, label: 'Menu' },
+    { href: '/admin/dashboard/profile', icon: FiUser, label: 'Profile' },
+  ];
+
+  const handleLogout = () => {
+    if (confirm('Are you sure you want to logout?')) {
+      alert('Logged out successfully!');
+      // Add actual logout logic here
+    }
+  };
+
+  const sidebarContent = (
+    <div className="bg-white h-full flex flex-col shadow-lg overflow-y-auto">
+      <div className="p-6 text-center border-b">
+        <div className="w-24 h-24 rounded-full mx-auto mb-3 overflow-hidden border-2 border-orange-200">
+          <img 
+            src={restaurant?.logo}
+            alt={restaurant?.name}
+            className="w-full h-full object-cover"
+          />
+        </div>
+        <h2 className="text-xl font-bold text-gray-800">{restaurant?.name}</h2>
+        <p className="text-sm text-gray-600">{restaurant?.tagline}</p>
+      </div>
+
+      <nav className="flex-1 mt-6">
+        <ul>
+          {navLinks.map((link) => (
+            <li key={link.href} className="px-4 mb-2">
+              <Link
+                href={link.href}
+                onClick={() => setOpen(false)}
+                className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 font-medium ${
+                  pathname.startsWith(link.href)
+                    ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-md'
+                    : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'
+                }`}
+              >
+                <link.icon className="w-6 h-6" />
+                <span>{link.label}</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </nav>
+
+      <div className="p-6 border-t">
+        <button
+          onClick={handleLogout}
+          className="w-full flex items-center justify-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 font-medium text-red-600 bg-red-50 hover:bg-red-100"
+        >
+          <FiLogOut className="w-6 h-6" />
+          <span>Logout</span>
+        </button>
+      </div>
+    </div>
+  );
+
+  return (
+    <>
+      {/* Mobile sidebar */}
+      <Transition.Root show={open} as={Fragment}>
+        <Dialog as="div" className="relative z-40 lg:hidden" onClose={setOpen}>
+          <Transition.Child
+            as={Fragment}
+            enter="transition-opacity ease-linear duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="transition-opacity ease-linear duration-300"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div className="fixed inset-0 bg-gray-600 bg-opacity-75" />
+          </Transition.Child>
+
+          <div className="fixed inset-0 flex z-40">
+            <Transition.Child
+              as={Fragment}
+              enter="transition ease-in-out duration-300 transform"
+              enterFrom="-translate-x-full"
+              enterTo="translate-x-0"
+              leave="transition ease-in-out duration-300 transform"
+              leaveFrom="translate-x-0"
+              leaveTo="-translate-x-full"
+            >
+              <Dialog.Panel className="relative flex-1 flex flex-col max-w-xs w-full">
+                <div className="absolute top-0 right-0 -mr-12 pt-2">
+                  <button
+                    type="button"
+                    className="ml-1 flex items-center justify-center h-10 w-10 rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
+                    onClick={() => setOpen(false)}
+                  >
+                    <span className="sr-only">Close sidebar</span>
+                    <FiX className="h-6 w-6 text-white" aria-hidden="true" />
+                  </button>
+                </div>
+                {sidebarContent}
+              </Dialog.Panel>
+            </Transition.Child>
+            <div className="flex-shrink-0 w-14" aria-hidden="true">
+              {/* Dummy element to force sidebar to shrink to fit close icon */}
+            </div>
+          </div>
+        </Dialog>
+      </Transition.Root>
+
+      {/* Static sidebar for desktop */}
+      <div className="hidden lg:flex lg:flex-shrink-0 lg:fixed lg:inset-y-0">
+        <div className="flex flex-col w-64">
+          {sidebarContent}
+        </div>
+      </div>
+    </>
+  );
+};
+
+export default Sidebar;

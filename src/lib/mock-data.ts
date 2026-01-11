@@ -17,6 +17,11 @@ export interface Restaurant {
   googleMapLink: string;
   googleRatingLink: string;
   aboutus: string;
+  instagramLink?: string;
+  facebookLink?: string;
+  twitterLink?: string;
+  linkedinLink?: string;
+  youtubeLink?: string;
 }
 
 export interface DishVariation {
@@ -64,9 +69,13 @@ const mockRestaurants: Restaurant[] = [
     coverImage:
       "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=1200&h=400&fit=crop",
     googleMapLink: "https://maps.google.com/?q=Pizza+Paradise+Mumbai",
-    googleRatingLink:
-      "https://www.google.com/maps/search/Pizza+Paradise/@19.0760,72.8777,12z",
+    googleRatingLink: "https://g.page/r/CZ_rBKUCHEbzEBM/review",
     aboutus: "empty",
+    instagramLink: "https://www.instagram.com/pizzaparadise",
+    facebookLink: "https://www.facebook.com/pizzaparadise",
+    twitterLink: "https://twitter.com/pizzaparadise",
+    linkedinLink: "",
+    youtubeLink: "",
   },
   {
     id: "spice_route_456",
@@ -77,9 +86,13 @@ const mockRestaurants: Restaurant[] = [
     coverImage:
       "https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=1200&h=400&fit=crop",
     googleMapLink: "https://maps.google.com/?q=Spice+Route+Bangalore",
-    googleRatingLink:
-      "https://www.google.com/maps/search/Spice+Route/@12.9716,77.5946,12z",
+    googleRatingLink: "https://g.page/r/CZ_rBKUCHEbzEBM/review",
     aboutus: "empty",
+    instagramLink: "https://www.instagram.com/spiceroute",
+    facebookLink: "https://www.facebook.com/spiceroute",
+    twitterLink: "",
+    linkedinLink: "",
+    youtubeLink: "",
   },
   {
     id: "burger_hub_789",
@@ -90,9 +103,13 @@ const mockRestaurants: Restaurant[] = [
     coverImage:
       "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=1200&h=400&fit=crop",
     googleMapLink: "https://maps.google.com/?q=Burger+Hub+Delhi",
-    googleRatingLink:
-      "https://www.google.com/maps/search/Burger+Hub/@28.7041,77.1025,12z",
+    googleRatingLink: "https://g.page/r/CZ_rBKUCHEbzEBM/review",
     aboutus: "empty",
+    instagramLink: "",
+    facebookLink: "",
+    twitterLink: "https://twitter.com/burgerhub",
+    linkedinLink: "",
+    youtubeLink: "",
   },
 ];
 
@@ -102,7 +119,7 @@ const mockRestaurants: Restaurant[] = [
 
 const mockDishes: Dish[] = [
   // ========================================
-  // PIZZA PARADISE - 3 Dishes
+  // PIZZA PARADISE - 13 Dishes
   // ========================================
   {
     id: "dish_001",
@@ -151,7 +168,130 @@ const mockDishes: Dish[] = [
       { size: "full", price: 329 },
     ],
   },
-
+  {
+    id: "dish_023",
+    restaurantId: "pizza_paradise_123",
+    isVeg: true,
+    name: "Garlic Bread",
+    image: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse1.mm.bing.net%2Fth%2Fid%2FOIP.zugnBMjoapkoTeeXBtOfTgHaHa%3Fpid%3DApi&f=1&ipt=e9c4759547cc6fa1f73a7eaab7a6d229ed48defcc937a3275b04063d66622eed&ipo=images",
+    category: "Starters",
+    description: "Toasted bread with garlic, butter, and herbs.",
+    variations: [
+      { size: "full", price: 149 },
+    ],
+  },
+  {
+    id: "dish_024",
+    restaurantId: "pizza_paradise_123",
+    isVeg: true,
+    name: "Bruschetta",
+    image: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse3.mm.bing.net%2Fth%2Fid%2FOIP.56QN47F0wfCsj02D6TrB5gHaLI%3Fpid%3DApi&f=1&ipt=9a81f61f553a99282be3d013336fb6c50d316628b5438f571a8bfc25dae2d1ff&ipo=images",
+    category: "Starters",
+    description: "Grilled bread topped with fresh tomatoes, garlic, basil, and olive oil.",
+    variations: [
+      { size: "full", price: 179 },
+    ],
+  },
+  {
+    id: "dish_025",
+    restaurantId: "pizza_paradise_123",
+    isVeg: false,
+    name: "Chicken Wings",
+    image: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse3.mm.bing.net%2Fth%2Fid%2FOIP.Zun97KETf-DQXz6QHlgPLwHaJQ%3Fpid%3DApi&f=1&ipt=a85c70c1d1e9293824c4cd209192974b560be5a38d2e1636d22ccf2c5e3c0cfb&ipo=images",
+    category: "Starters",
+    description: "Spicy chicken wings tossed in BBQ sauce.",
+    variations: [
+      { size: "half", price: 229 },
+      { size: "full", price: 399 },
+    ],
+  },
+  {
+    id: "dish_026",
+    restaurantId: "pizza_paradise_123",
+    isVeg: true,
+    name: "Tiramisu",
+    image: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse2.mm.bing.net%2Fth%2Fid%2FOIP.afkJmGx3I-7jhD8skzwX7gHaHa%3Fpid%3DApi&f=1&ipt=af7387da00d15933ae2e0404ee2a855e579609a6fc868757c139236e2b2b2432&ipo=images",
+    category: "Desserts",
+    description: "Classic Italian dessert with layers of coffee-soaked ladyfingers and mascarpone cheese.",
+    variations: [
+      { size: "full", price: 249 },
+    ],
+  },
+  {
+    id: "dish_027",
+    restaurantId: "pizza_paradise_123",
+    isVeg: true,
+    name: "Panna Cotta",
+    image: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse1.mm.bing.net%2Fth%2Fid%2FOIP.K5hoQ1fGr_gPR6RXdRU9CQHaE8%3Fpid%3DApi&f=1&ipt=5b35bc5e900fbcf3de98205fce85c97257b5ba394f11968483922783105ac99c&ipo=images",
+    category: "Desserts",
+    description: "Creamy Italian dessert with a caramel topping.",
+    variations: [
+      { size: "full", price: 199 },
+    ],
+  },
+  {
+    id: "dish_028",
+    restaurantId: "pizza_paradise_123",
+    isVeg: true,
+    name: "Virgin Mojito",
+    image: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse1.mm.bing.net%2Fth%2Fid%2FOIP.rZSRYjUuhkqfNpURMBwuUwHaJ3%3Fpid%3DApi&f=1&ipt=181ddf8cc32fc50a0128981d4fa4b001a8e94fb5c2316cecb00c7d691fcf8ef1&ipo=images",
+    category: "Beverages",
+    description: "A refreshing drink with mint, lime, and soda.",
+    variations: [
+      { size: "full", price: 149 },
+    ],
+  },
+  {
+    id: "dish_029",
+    restaurantId: "pizza_paradise_123",
+    isVeg: true,
+    name: "Iced Tea",
+    image: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse2.mm.bing.net%2Fth%2Fid%2FOIP.9UnCwliuBu5MvuliPpuGHQHaIy%3Fpid%3DApi&f=1&ipt=9dd921ad57de5766eb3fbf69bf3758ce08770020c7cca14ba5afb232aebaa2d4&ipo=images",
+    category: "Beverages",
+    description: "Chilled tea with a hint of lemon.",
+    variations: [
+      { size: "full", price: 129 },
+    ],
+  },
+  {
+    id: "dish_030",
+    restaurantId: "pizza_paradise_123",
+    isVeg: true,
+    name: "Veggie Supreme Pizza",
+    image: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse2.mm.bing.net%2Fth%2Fid%2FOIP.MQMM4f3jXsZf_9HDvPhqXgHaGo%3Fpid%3DApi&f=1&ipt=e43dd9aa6c1882f05992710efe8dd896ca735c6dbb1208911d9eccddc4226421&ipo=images",
+    category: "Pizza",
+    description: "A pizza loaded with all your favorite veggies.",
+    variations: [
+      { size: "small", price: 299 },
+      { size: "medium", price: 449 },
+      { size: "large", price: 549 },
+    ],
+  },
+  {
+    id: "dish_031",
+    restaurantId: "pizza_paradise_123",
+    isVeg: false,
+    name: "Chicken Alfredo Pasta",
+    image: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse1.mm.bing.net%2Fth%2Fid%2FOIP.dL5xpgsXtle4oNoVW0JpzAHaJQ%3Fpid%3DApi&f=1&ipt=66c98c742d332656ba5cfc71d1a1530bec7827bc2b57b41c244ddab9c8072ecd&ipo=images",
+    category: "Pasta",
+    description: "Creamy fettuccine pasta with grilled chicken.",
+    variations: [
+      { size: "half", price: 249 },
+      { size: "full", price: 429 },
+    ],
+  },
+  {
+    id: "dish_032",
+    restaurantId: "pizza_paradise_123",
+    isVeg: true,
+    name: "Chocolate Lava Cake",
+    image: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse1.mm.bing.net%2Fth%2Fid%2FOIP.poUqyp3SvzoREQZ1ByAs0AHaHa%3Fcb%3Ddefcachec2%26pid%3DApi&f=1&ipt=5552bdd977d77f6125fd9f16ec3eda73fee8e05190db30a2551a20c189482f76&ipo=images",
+    category: "Desserts",
+    description: "Warm chocolate cake with a gooey molten center.",
+    variations: [
+      { size: "full", price: 179 },
+    ],
+  },
   // ========================================
   // SPICE ROUTE - 3 Dishes
   // ========================================
