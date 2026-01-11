@@ -1,4 +1,4 @@
-const SESSION_KEY = 'admin_session';
+const SESSION_KEY = "admin_session";
 const SESSION_DURATION = 24 * 60 * 60 * 1000; // 24 hours
 
 interface Session {
@@ -8,10 +8,12 @@ interface Session {
   expiresAt: number;
 }
 
+const isBrowser = typeof window !== "undefined";
+
 export const auth = {
-  // Save session to localStorage (client only)
-  saveSession: (user: AdminUser) => {
-    if (typeof window === "undefined") return; // <--- guard
+  // Save session to localStorage
+  saveSession: (user: any) => {
+    if (!isBrowser) return;
     const session: Session = {
       userId: user.id,
       email: user.email,
@@ -23,7 +25,7 @@ export const auth = {
 
   // Get current session (client only)
   getSession: (): Session | null => {
-    if (typeof window === "undefined") return null; // <--- guard
+    if (!isBrowser) return null;
     const sessionStr = localStorage.getItem(SESSION_KEY);
     if (!sessionStr) return null;
 
@@ -40,20 +42,20 @@ export const auth = {
 
   // Clear session (client only)
   clearSession: () => {
-    if (typeof window === "undefined") return; // <--- guard
+    if (!isBrowser) return;
     localStorage.removeItem(SESSION_KEY);
   },
 
   // Check if user is authenticated (client only)
   isAuthenticated: (): boolean => {
-    if (typeof window === "undefined") return false;
+    if (!isBrowser) return false;
     return auth.getSession() !== null;
   },
 
   // Get restaurant ID from session (client only)
   getRestaurantId: (): string | null => {
-    if (typeof window === "undefined") return null;
+    if (!isBrowser) return null;
     const session = auth.getSession();
     return session?.restaurantId || null;
-  }
+  },
 };
