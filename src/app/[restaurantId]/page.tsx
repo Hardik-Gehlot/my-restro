@@ -96,6 +96,13 @@ export default function RestaurantDetailPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+      {/* Advertisement Section - Top (rest-1) */}
+      {/* {topAd && (
+        <div className="px-4 pt-4 mb-6">
+          <Advertisement ad={topAd} variant="banner" />
+        </div>
+      )} */}
+
       {/* Header Image Section */}
       <div className="relative h-56 bg-gray-900">
         <Image
@@ -134,7 +141,7 @@ export default function RestaurantDetailPage() {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <FiInstagram className="w-6 h-6 text-gray-600 hover:text-pink-500 transition-colors" />
+                <FiInstagram className="w-6 h-6 text-pink-500 hover:text-pink-700 transition-colors" />
               </a>
             )}
             {restaurant.facebookLink && (
@@ -143,7 +150,7 @@ export default function RestaurantDetailPage() {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <FiFacebook className="w-6 h-6 text-gray-600 hover:text-blue-600 transition-colors" />
+                <FiFacebook className="w-6 h-6 text-blue-600 hover:text-blue-800 transition-colors" />
               </a>
             )}
             {restaurant.twitterLink && (
@@ -152,7 +159,7 @@ export default function RestaurantDetailPage() {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <FiTwitter className="w-6 h-6 text-gray-600 hover:text-blue-400 transition-colors" />
+                <FiTwitter className="w-6 h-6 text-blue-400 hover:text-blue-600 transition-colors" />
               </a>
             )}
             {restaurant.linkedinLink && (
@@ -161,7 +168,7 @@ export default function RestaurantDetailPage() {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <FiLinkedin className="w-6 h-6 text-gray-600 hover:text-blue-700 transition-colors" />
+                <FiLinkedin className="w-6 h-6 text-blue-700 hover:text-blue-900 transition-colors" />
               </a>
             )}
             {restaurant.youtubeLink && (
@@ -170,35 +177,36 @@ export default function RestaurantDetailPage() {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <FiYoutube className="w-6 h-6 text-gray-600 hover:text-red-600 transition-colors" />
+                <FiYoutube className="w-6 h-6 text-red-600 hover:text-red-800 transition-colors" />
               </a>
             )}
           </div>
 
-          {restaurant.googleRatingLink && (
-            <a
-              href={restaurant.googleRatingLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center space-x-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all"
-            >
-              <FiStar className="w-5 h-5" />
-              <span>Rate us on Google</span>
-              <FiExternalLink className="w-4 h-4" />
-            </a>
-          )}
-        </div>
+          <div className="flex space-x-4 mb-6">
+            {restaurant.googleRatingLink && (
+              <a
+                href={restaurant.googleRatingLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 inline-flex items-center justify-center space-x-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all"
+              >
+                <FiStar className="w-5 h-5" />
+                <span>Rate us on Google</span>
+                <FiExternalLink className="w-4 h-4" />
+              </a>
+            )}
 
-        {/* View Menu Button - PRIMARY CTA */}
-        <Link
-          href={`/menu/${restaurant.id}`}
-          className="block w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white py-4 rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl transition-all text-center mb-4 group"
-        >
-          <div className="flex items-center justify-center space-x-3">
-            <FiMenu className="w-6 h-6 group-hover:scale-110 transition-transform" />
-            <span>View Full Menu</span>
+            <Link
+              href={`/menu/${restaurant.id}`}
+              className="flex-1 block bg-gradient-to-r from-green-500 to-emerald-600 text-white py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all text-center group"
+            >
+              <div className="flex items-center justify-center space-x-3">
+                <FiMenu className="w-6 h-6 group-hover:scale-110 transition-transform" />
+                <span>View Full Menu</span>
+              </div>
+            </Link>
           </div>
-        </Link>
+        </div>
       </div>
 
       {/* Contact Information Card */}
