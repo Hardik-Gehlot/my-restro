@@ -5,13 +5,16 @@ import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import {
-  FiShare2,
   FiPhone,
   FiMapPin,
   FiExternalLink,
   FiStar,
   FiMenu,
   FiInstagram,
+  FiFacebook,
+  FiTwitter,
+  FiLinkedin,
+  FiYoutube,
 } from "react-icons/fi";
 import { db, Restaurant, Advertisement as AdType } from "@/lib/mock-data";
 import Advertisement from "@/components/shared/Advertisement";
@@ -41,20 +44,6 @@ export default function RestaurantDetailPage() {
     setRestaurant(restaurantData);
     setAds(adsData);
     setLoading(false);
-  };
-
-  const handleShare = async () => {
-    if (navigator.share && restaurant) {
-      try {
-        await navigator.share({
-          title: restaurant.name,
-          text: restaurant.tagline,
-          url: window.location.href,
-        });
-      } catch (err) {
-        console.log("Share cancelled");
-      }
-    }
   };
 
   const handleCall = () => {
@@ -107,13 +96,6 @@ export default function RestaurantDetailPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-      {/* Advertisement Section - Top (rest-1) */}
-      {/* {topAd && (
-        <div className="px-4 pt-4 mb-6">
-          <Advertisement ad={topAd} variant="banner" />
-        </div>
-      )} */}
-
       {/* Header Image Section */}
       <div className="relative h-56 bg-gray-900">
         <Image
@@ -123,16 +105,6 @@ export default function RestaurantDetailPage() {
           className="object-cover opacity-90"
           priority
         />
-
-        {/* Header Overlay with Share */}
-        <div className="absolute top-0 left-0 right-0 flex items-center justify-end p-4 bg-gradient-to-b from-black/50 to-transparent">
-          <button
-            onClick={handleShare}
-            className="p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition-all"
-          >
-            <FiShare2 className="w-6 h-6 text-gray-800" />
-          </button>
-        </div>
 
         {/* Logo Floating at Bottom */}
         <div className="absolute -bottom-12 left-4">
@@ -155,19 +127,64 @@ export default function RestaurantDetailPage() {
           </h1>
           <p className="text-base text-gray-600 mb-3">{restaurant.tagline}</p>
 
-          {/* Google Rating */}
+          <div className="flex items-center space-x-4 mb-4">
+            {restaurant.instagramLink && (
+              <a
+                href={restaurant.instagramLink}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <FiInstagram className="w-6 h-6 text-gray-600 hover:text-pink-500 transition-colors" />
+              </a>
+            )}
+            {restaurant.facebookLink && (
+              <a
+                href={restaurant.facebookLink}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <FiFacebook className="w-6 h-6 text-gray-600 hover:text-blue-600 transition-colors" />
+              </a>
+            )}
+            {restaurant.twitterLink && (
+              <a
+                href={restaurant.twitterLink}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <FiTwitter className="w-6 h-6 text-gray-600 hover:text-blue-400 transition-colors" />
+              </a>
+            )}
+            {restaurant.linkedinLink && (
+              <a
+                href={restaurant.linkedinLink}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <FiLinkedin className="w-6 h-6 text-gray-600 hover:text-blue-700 transition-colors" />
+              </a>
+            )}
+            {restaurant.youtubeLink && (
+              <a
+                href={restaurant.youtubeLink}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <FiYoutube className="w-6 h-6 text-gray-600 hover:text-red-600 transition-colors" />
+              </a>
+            )}
+          </div>
+
           {restaurant.googleRatingLink && (
             <a
               href={restaurant.googleRatingLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center space-x-2 bg-white border-2 border-gray-200 px-4 py-2 rounded-lg hover:border-orange-300 transition-all"
+              className="inline-flex items-center space-x-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all"
             >
-              <FiStar className="w-5 h-5 text-yellow-500 fill-yellow-500" />
-              <span className="text-sm font-semibold text-gray-800">
-                Rate us on Google
-              </span>
-              <FiExternalLink className="w-4 h-4 text-gray-500" />
+              <FiStar className="w-5 h-5" />
+              <span>Rate us on Google</span>
+              <FiExternalLink className="w-4 h-4" />
             </a>
           )}
         </div>
@@ -182,29 +199,7 @@ export default function RestaurantDetailPage() {
             <span>View Full Menu</span>
           </div>
         </Link>
-
-        {/* Social Media Links */}
-        <div className="grid grid-cols-1 gap-3 mb-6">
-          {restaurant.instagramLink && (
-            <a
-              href={restaurant.instagramLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center justify-center space-x-2 bg-gradient-to-r from-pink-500 to-purple-600 text-white py-3 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all"
-            >
-              <FiInstagram className="w-5 h-5" />
-              <span>Instagram</span>
-            </a>
-          )}
-
       </div>
-
-      {/* Advertisement Section - Mid (rest-2) */}
-      {/* {midAd && (
-        <div className="px-4 mb-6">
-          <Advertisement ad={midAd} variant="banner" />
-        </div>
-      )} */}
 
       {/* Contact Information Card */}
       <div className="px-4 mb-6">
