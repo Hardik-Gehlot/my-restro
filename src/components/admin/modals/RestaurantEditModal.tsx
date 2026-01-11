@@ -1,84 +1,258 @@
-"use client";
+'use client';
+import { useState, Fragment } from 'react';
+import { Dialog, Transition } from '@headlessui/react';
+import { X } from 'lucide-react';
 
-import { useState } from "react";
 
-export default function RestaurantEditModal({ restaurant, onClose, onSave }: any) {
-  const [form, setForm] = useState(restaurant);
+const RestaurantEditModal = ({ restaurant, onClose, onSave }) => {
+    const [form, setForm] = useState(restaurant);
 
-  const update = (key: string, value: any) => {
-    setForm((prev: any) => ({ ...prev, [key]: value }));
-  };
+    const update = (key, value) => {
+        setForm(prev => ({ ...prev, [key]: value }));
+    };
 
-  const handleSubmit = () => {
-    onSave(form);
-  };
+    const handleSubmit = () => {
+        onSave(form);
+    };
 
-  return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-white p-6 rounded-xl w-full max-w-lg shadow-xl">
-        
-        <h2 className="text-xl font-bold text-gray-900 mb-4">
-          Edit Restaurant Details
-        </h2>
+    return (
+        <Transition.Root show={true} as={Fragment}>
+            <Dialog as="div" className="relative z-50" onClose={onClose}>
+                <Transition.Child
+                    as={Fragment}
+                    enter="ease-out duration-300"
+                    enterFrom="opacity-0"
+                    enterTo="opacity-100"
+                    leave="ease-in duration-200"
+                    leaveFrom="opacity-100"
+                    leaveTo="opacity-0"
+                >
+                    <div className="fixed inset-0 bg-black/60" />
+                </Transition.Child>
 
-        <div className="space-y-3">
-          <input
-            value={form.name}
-            onChange={(e) => update("name", e.target.value)}
-            placeholder="Restaurant Name"
-            className="w-full border p-2 rounded-lg"
-          />
+                <div className="fixed inset-0 overflow-hidden">
+                    <div className="absolute inset-0 overflow-hidden">
+                        <div className="pointer-events-none fixed inset-y-0 right-0 flex max-w-full sm:pl-16">
+                            <Transition.Child
+                                as={Fragment}
+                                enter="transform transition ease-in-out duration-500 sm:duration-700"
+                                enterFrom="translate-y-full sm:translate-y-0 sm:translate-x-full"
+                                enterTo="translate-y-0 sm:translate-x-0"
+                                leave="transform transition ease-in-out duration-500 sm:duration-700"
+                                leaveFrom="translate-y-0 sm:translate-x-0"
+                                leaveTo="translate-y-full sm:translate-y-0 sm:translate-x-full"
+                            >
+                                <Dialog.Panel className="pointer-events-auto w-screen max-w-2xl">
+                                    <div className="flex h-full flex-col overflow-y-scroll bg-white shadow-xl">
+                                        <div className="flex-1">
+                                            {/* Header */}
+                                            <div className="bg-gray-50 px-4 py-6 sm:px-6">
+                                                <div className="flex items-start justify-between space-x-3">
+                                                    <div className="space-y-1">
+                                                        <Dialog.Title className="text-lg font-medium text-gray-900">
+                                                            Edit Restaurant Details
+                                                        </Dialog.Title>
+                                                    </div>
+                                                    <div className="flex h-7 items-center">
+                                                        <button
+                                                            type="button"
+                                                            className="text-gray-400 hover:text-gray-500"
+                                                            onClick={onClose}
+                                                        >
+                                                            <span className="sr-only">Close panel</span>
+                                                            <X className="h-6 w-6" />
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
 
-          <input
-            value={form.image}
-            onChange={(e) => update("image", e.target.value)}
-            placeholder="Image URL"
-            className="w-full border p-2 rounded-lg"
-          />
+                                            {/* Form */}
+                                            <div className="space-y-6 py-6 sm:space-y-0 sm:divide-y sm:divide-gray-200 sm:py-0">
+                                                <div className="space-y-4 px-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:px-6 sm:py-5">
+                                                    <div>
+                                                        <label className="block text-sm font-semibold text-gray-900 mb-1">Restaurant Name</label>
+                                                    </div>
+                                                    <div className="sm:col-span-2">
+                                                        <input
+                                                            value={form.name}
+                                                            onChange={(e) => update("name", e.target.value)}
+                                                            className="w-full border border-gray-300 p-3 rounded-lg text-gray-900"
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="space-y-4 px-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:px-6 sm:py-5">
+                                                    <div>
+                                                        <label className="block text-sm font-semibold text-gray-900 mb-1">Tagline</label>
+                                                    </div>
+                                                    <div className="sm:col-span-2">
+                                                        <input
+                                                            value={form.tagline}
+                                                            onChange={(e) => update("tagline", e.target.value)}
+                                                            className="w-full border border-gray-300 p-3 rounded-lg text-gray-900"
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="space-y-4 px-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:px-6 sm:py-5">
+                                                    <div>
+                                                        <label className="block text-sm font-semibold text-gray-900 mb-1">Mobile Number</label>
+                                                    </div>
+                                                    <div className="sm:col-span-2">
+                                                        <input
+                                                            value={form.mobileNo}
+                                                            onChange={(e) => update("mobileNo", e.target.value)}
+                                                            className="w-full border border-gray-300 p-3 rounded-lg text-gray-900"
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="space-y-4 px-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:px-6 sm:py-5">
+                                                    <div>
+                                                        <label className="block text-sm font-semibold text-gray-900 mb-1">Logo URL</label>
+                                                    </div>
+                                                    <div className="sm:col-span-2">
+                                                        <input
+                                                            value={form.logo}
+                                                            onChange={(e) => update("logo", e.target.value)}
+                                                            className="w-full border border-gray-300 p-3 rounded-lg text-gray-900"
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="space-y-4 px-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:px-6 sm:py-5">
+                                                    <div>
+                                                        <label className="block text-sm font-semibold text-gray-900 mb-1">Cover Image URL</label>
+                                                    </div>
+                                                    <div className="sm:col-span-2">
+                                                        <input
+                                                            value={form.coverImage}
+                                                            onChange={(e) => update("coverImage", e.target.value)}
+                                                            className="w-full border border-gray-300 p-3 rounded-lg text-gray-900"
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="space-y-4 px-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:px-6 sm:py-5">
+                                                    <div>
+                                                        <label className="block text-sm font-semibold text-gray-900 mb-1">About Us</label>
+                                                    </div>
+                                                    <div className="sm:col-span-2">
+                                                        <textarea
+                                                            value={form.aboutus}
+                                                            onChange={(e) => update("aboutus", e.target.value)}
+                                                            className="w-full border border-gray-300 p-3 rounded-lg text-gray-900 min-h-[100px]"
+                                                        />
+                                                    </div>
+                                                </div>
+                                                                                                 <div className="space-y-4 px-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:px-6 sm:py-5">
+                                                                                                    <div>
+                                                                                                        <label className="block text-sm font-semibold text-gray-900 mb-1">Google Maps Link</label>
+                                                                                                    </div>
+                                                                                                    <div className="sm:col-span-2">
+                                                                                                        <input
+                                                                                                            value={form.googleMapLink}
+                                                                                                            onChange={(e) => update("googleMapLink", e.target.value)}
+                                                                                                            className="w-full border border-gray-300 p-3 rounded-lg text-gray-900"
+                                                                                                        />
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                                <div className="space-y-4 px-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:px-6 sm:py-5">
+                                                                                                    <div>
+                                                                                                        <label className="block text-sm font-semibold text-gray-900 mb-1">Google Rating Link</label>
+                                                                                                    </div>
+                                                                                                    <div className="sm:col-span-2">
+                                                                                                        <input
+                                                                                                            value={form.googleRatingLink}
+                                                                                                            onChange={(e) => update("googleRatingLink", e.target.value)}
+                                                                                                            className="w-full border border-gray-300 p-3 rounded-lg text-gray-900"
+                                                                                                        />
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                                <div className="space-y-4 px-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:px-6 sm:py-5">
+                                                                                                    <div>
+                                                                                                        <label className="block text-sm font-semibold text-gray-900 mb-1">Instagram Link</label>
+                                                                                                    </div>
+                                                                                                    <div className="sm:col-span-2">
+                                                                                                        <input
+                                                                                                            value={form.instagramLink}
+                                                                                                            onChange={(e) => update("instagramLink", e.target.value)}
+                                                                                                            className="w-full border border-gray-300 p-3 rounded-lg text-gray-900"
+                                                                                                        />
+                                                                                                    </div>
+                                                                                                </div>                                                <div className="space-y-4 px-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:px-6 sm:py-5">
+                                                    <div>
+                                                        <label className="block text-sm font-semibold text-gray-900 mb-1">Facebook Link</label>
+                                                    </div>
+                                                    <div className="sm:col-span-2">
+                                                        <input
+                                                            value={form.facebookLink}
+                                                            onChange={(e) => update("facebookLink", e.target.value)}
+                                                            className="w-full border border-gray-300 p-3 rounded-lg text-gray-900"
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="space-y-4 px-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:px-6 sm:py-5">
+                                                    <div>
+                                                        <label className="block text-sm font-semibold text-gray-900 mb-1">Twitter Link</label>
+                                                    </div>
+                                                    <div className="sm:col-span-2">
+                                                        <input
+                                                            value={form.twitterLink}
+                                                            onChange={(e) => update("twitterLink", e.target.value)}
+                                                            className="w-full border border-gray-300 p-3 rounded-lg text-gray-900"
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="space-y-4 px-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:px-6 sm:py-5">
+                                                    <div>
+                                                        <label className="block text-sm font-semibold text-gray-900 mb-1">LinkedIn Link</label>
+                                                    </div>
+                                                    <div className="sm:col-span-2">
+                                                        <input
+                                                            value={form.linkedinLink}
+                                                            onChange={(e) => update("linkedinLink", e.target.value)}
+                                                            className="w-full border border-gray-300 p-3 rounded-lg text-gray-900"
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="space-y-4 px-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:px-6 sm:py-5">
+                                                    <div>
+                                                        <label className="block text-sm font-semibold text-gray-900 mb-1">YouTube Link</label>
+                                                    </div>
+                                                    <div className="sm:col-span-2">
+                                                        <input
+                                                            value={form.youtubeLink}
+                                                            onChange={(e) => update("youtubeLink", e.target.value)}
+                                                            className="w-full border border-gray-300 p-3 rounded-lg text-gray-900"
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
 
-          <input
-            value={form.address}
-            onChange={(e) => update("address", e.target.value)}
-            placeholder="Address"
-            className="w-full border p-2 rounded-lg"
-          />
-
-          <input
-            value={form.phone}
-            onChange={(e) => update("phone", e.target.value)}
-            placeholder="Phone Number"
-            className="w-full border p-2 rounded-lg"
-          />
-
-          <textarea
-            value={form.description}
-            onChange={(e) => update("description", e.target.value)}
-            placeholder="Description"
-            className="w-full border p-2 rounded-lg"
-          />
-
-          <textarea
-            value={form.openHours}
-            onChange={(e) => update("openHours", e.target.value)}
-            placeholder="Open Hours"
-            className="w-full border p-2 rounded-lg"
-          />
-        </div>
-
-        {/* Buttons */}
-        <div className="flex justify-end gap-3 mt-6">
-          <button onClick={onClose} className="px-4 py-2 rounded-lg bg-gray-200">
-            Cancel
-          </button>
-
-          <button
-            onClick={handleSubmit}
-            className="px-4 py-2 rounded-lg bg-orange-600 text-white"
-          >
-            Save Changes
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
+                                        {/* Action buttons */}
+                                        <div className="flex-shrink-0 border-t border-gray-200 px-4 py-5 sm:px-6">
+                                            <div className="flex justify-end space-x-3">
+                                                <button
+                                                    type="button"
+                                                    className="rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
+                                                    onClick={onClose}
+                                                >
+                                                    Cancel
+                                                </button>
+                                                <button
+                                                    type="submit"
+                                                    className="inline-flex justify-center rounded-md border border-transparent bg-orange-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
+                                                    onClick={handleSubmit}
+                                                >
+                                                    Save Changes
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </Dialog.Panel>
+                            </Transition.Child>
+                        </div>
+                    </div>
+                </div>
+            </Dialog>
+        </Transition.Root>
+    )
+};
+export default RestaurantEditModal;

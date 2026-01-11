@@ -156,18 +156,20 @@ export default function RestaurantDetailPage() {
           <p className="text-base text-gray-600 mb-3">{restaurant.tagline}</p>
 
           {/* Google Rating */}
-          <a
-            href={restaurant.googleRatingLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center space-x-2 bg-white border-2 border-gray-200 px-4 py-2 rounded-lg hover:border-orange-300 transition-all"
-          >
-            <FiStar className="w-5 h-5 text-yellow-500 fill-yellow-500" />
-            <span className="text-sm font-semibold text-gray-800">
-              Rate us on Google
-            </span>
-            <FiExternalLink className="w-4 h-4 text-gray-500" />
-          </a>
+          {restaurant.googleRatingLink && (
+            <a
+              href={restaurant.googleRatingLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center space-x-2 bg-white border-2 border-gray-200 px-4 py-2 rounded-lg hover:border-orange-300 transition-all"
+            >
+              <FiStar className="w-5 h-5 text-yellow-500 fill-yellow-500" />
+              <span className="text-sm font-semibold text-gray-800">
+                Rate us on Google
+              </span>
+              <FiExternalLink className="w-4 h-4 text-gray-500" />
+            </a>
+          )}
         </div>
 
         {/* View Menu Button - PRIMARY CTA */}
@@ -183,16 +185,18 @@ export default function RestaurantDetailPage() {
 
         {/* Social Media Links */}
         <div className="grid grid-cols-1 gap-3 mb-6">
-          <a
-            href={restaurant.googleRatingLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center justify-center space-x-2 bg-gradient-to-r from-pink-500 to-purple-600 text-white py-3 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all"
-          >
-            <FiInstagram className="w-5 h-5" />
-            <span>Instagram</span>
-          </a>
-        </div>
+          {restaurant.instagramLink && (
+            <a
+              href={restaurant.instagramLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center space-x-2 bg-gradient-to-r from-pink-500 to-purple-600 text-white py-3 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all"
+            >
+              <FiInstagram className="w-5 h-5" />
+              <span>Instagram</span>
+            </a>
+          )}
+
       </div>
 
       {/* Advertisement Section - Mid (rest-2) */}
