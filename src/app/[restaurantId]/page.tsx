@@ -17,7 +17,6 @@ import {
   FiYoutube,
 } from "react-icons/fi";
 import { db, Restaurant, Advertisement as AdType } from "@/lib/mock-data";
-import Advertisement from "@/components/shared/Advertisement";
 
 export default function RestaurantDetailPage() {
   const params = useParams();
