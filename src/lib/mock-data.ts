@@ -38,6 +38,7 @@ export interface Dish {
   category: string;
   description: string;
   variations: DishVariation[];
+  isAvailable: boolean;
 }
 
 export interface Advertisement {
@@ -131,6 +132,7 @@ const mockDishes: Dish[] = [
     category: "Pizza",
     description:
       "Classic Italian pizza with San Marzano tomatoes, fresh mozzarella, basil leaves, and extra virgin olive oil on a wood-fired crust.",
+    isAvailable: true,
     variations: [
       { size: "small", price: 249 },
       { size: "medium", price: 349 },
@@ -147,6 +149,7 @@ const mockDishes: Dish[] = [
     category: "Pizza",
     description:
       "Loaded with premium pepperoni slices, mozzarella cheese, oregano, and our signature pizza sauce.",
+    isAvailable: true,
     variations: [
       { size: "small", price: 299 },
       { size: "medium", price: 449 },
@@ -163,6 +166,7 @@ const mockDishes: Dish[] = [
     category: "Pasta",
     description:
       "Creamy fettuccine pasta tossed in rich Alfredo sauce with parmesan cheese and Italian herbs.",
+    isAvailable: true,
     variations: [
       { size: "half", price: 199 },
       { size: "full", price: 329 },
@@ -176,6 +180,7 @@ const mockDishes: Dish[] = [
     image: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse1.mm.bing.net%2Fth%2Fid%2FOIP.zugnBMjoapkoTeeXBtOfTgHaHa%3Fpid%3DApi&f=1&ipt=e9c4759547cc6fa1f73a7eaab7a6d229ed48defcc937a3275b04063d66622eed&ipo=images",
     category: "Starters",
     description: "Toasted bread with garlic, butter, and herbs.",
+    isAvailable: true,
     variations: [
       { size: "full", price: 149 },
     ],
@@ -188,6 +193,7 @@ const mockDishes: Dish[] = [
     image: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse3.mm.bing.net%2Fth%2Fid%2FOIP.56QN47F0wfCsj02D6TrB5gHaLI%3Fpid%3DApi&f=1&ipt=9a81f61f553a99282be3d013336fb6c50d316628b5438f571a8bfc25dae2d1ff&ipo=images",
     category: "Starters",
     description: "Grilled bread topped with fresh tomatoes, garlic, basil, and olive oil.",
+    isAvailable: true,
     variations: [
       { size: "full", price: 179 },
     ],
@@ -200,6 +206,7 @@ const mockDishes: Dish[] = [
     image: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse3.mm.bing.net%2Fth%2Fid%2FOIP.Zun97KETf-DQXz6QHlgPLwHaJQ%3Fpid%3DApi&f=1&ipt=a85c70c1d1e9293824c4cd209192974b560be5a38d2e1636d22ccf2c5e3c0cfb&ipo=images",
     category: "Starters",
     description: "Spicy chicken wings tossed in BBQ sauce.",
+    isAvailable: true,
     variations: [
       { size: "half", price: 229 },
       { size: "full", price: 399 },
@@ -213,6 +220,7 @@ const mockDishes: Dish[] = [
     image: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse2.mm.bing.net%2Fth%2Fid%2FOIP.afkJmGx3I-7jhD8skzwX7gHaHa%3Fpid%3DApi&f=1&ipt=af7387da00d15933ae2e0404ee2a855e579609a6fc868757c139236e2b2b2432&ipo=images",
     category: "Desserts",
     description: "Classic Italian dessert with layers of coffee-soaked ladyfingers and mascarpone cheese.",
+    isAvailable: true,
     variations: [
       { size: "full", price: 249 },
     ],
@@ -225,6 +233,7 @@ const mockDishes: Dish[] = [
     image: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse1.mm.bing.net%2Fth%2Fid%2FOIP.K5hoQ1fGr_gPR6RXdRU9CQHaE8%3Fpid%3DApi&f=1&ipt=5b35bc5e900fbcf3de98205fce85c97257b5ba394f11968483922783105ac99c&ipo=images",
     category: "Desserts",
     description: "Creamy Italian dessert with a caramel topping.",
+    isAvailable: false,
     variations: [
       { size: "full", price: 199 },
     ],
@@ -237,6 +246,7 @@ const mockDishes: Dish[] = [
     image: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse1.mm.bing.net%2Fth%2Fid%2FOIP.rZSRYjUuhkqfNpURMBwuUwHaJ3%3Fpid%3DApi&f=1&ipt=181ddf8cc32fc50a0128981d4fa4b001a8e94fb5c2316cecb00c7d691fcf8ef1&ipo=images",
     category: "Beverages",
     description: "A refreshing drink with mint, lime, and soda.",
+    isAvailable: true,
     variations: [
       { size: "full", price: 149 },
     ],
@@ -249,6 +259,7 @@ const mockDishes: Dish[] = [
     image: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse2.mm.bing.net%2Fth%2Fid%2FOIP.9UnCwliuBu5MvuliPpuGHQHaIy%3Fpid%3DApi&f=1&ipt=9dd921ad57de5766eb3fbf69bf3758ce08770020c7cca14ba5afb232aebaa2d4&ipo=images",
     category: "Beverages",
     description: "Chilled tea with a hint of lemon.",
+    isAvailable: true,
     variations: [
       { size: "full", price: 129 },
     ],
@@ -261,6 +272,7 @@ const mockDishes: Dish[] = [
     image: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse2.mm.bing.net%2Fth%2Fid%2FOIP.MQMM4f3jXsZf_9HDvPhqXgHaGo%3Fpid%3DApi&f=1&ipt=e43dd9aa6c1882f05992710efe8dd896ca735c6dbb1208911d9eccddc4226421&ipo=images",
     category: "Pizza",
     description: "A pizza loaded with all your favorite veggies.",
+    isAvailable: true,
     variations: [
       { size: "small", price: 299 },
       { size: "medium", price: 449 },
@@ -275,6 +287,7 @@ const mockDishes: Dish[] = [
     image: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse1.mm.bing.net%2Fth%2Fid%2FOIP.dL5xpgsXtle4oNoVW0JpzAHaJQ%3Fpid%3DApi&f=1&ipt=66c98c742d332656ba5cfc71d1a1530bec7827bc2b57b41c244ddab9c8072ecd&ipo=images",
     category: "Pasta",
     description: "Creamy fettuccine pasta with grilled chicken.",
+    isAvailable: true,
     variations: [
       { size: "half", price: 249 },
       { size: "full", price: 429 },
@@ -288,6 +301,7 @@ const mockDishes: Dish[] = [
     image: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse1.mm.bing.net%2Fth%2Fid%2FOIP.poUqyp3SvzoREQZ1ByAs0AHaHa%3Fcb%3Ddefcachec2%26pid%3DApi&f=1&ipt=5552bdd977d77f6125fd9f16ec3eda73fee8e05190db30a2551a20c189482f76&ipo=images",
     category: "Desserts",
     description: "Warm chocolate cake with a gooey molten center.",
+    isAvailable: true,
     variations: [
       { size: "full", price: 179 },
     ],
@@ -305,6 +319,7 @@ const mockDishes: Dish[] = [
     category: "Main Course",
     description:
       "Tender chicken pieces cooked in a creamy tomato gravy with butter, cream, and aromatic spices. A North Indian classic.",
+    isAvailable: true,
     variations: [
       { size: "half", price: 299 },
       { size: "full", price: 479 },
@@ -320,6 +335,7 @@ const mockDishes: Dish[] = [
     category: "Main Course",
     description:
       "Grilled cottage cheese cubes in a rich, spiced tomato-onion gravy with bell peppers and aromatic Indian spices.",
+    isAvailable: true,
     variations: [
       { size: "half", price: 249 },
       { size: "full", price: 399 },
@@ -335,6 +351,7 @@ const mockDishes: Dish[] = [
     category: "Rice",
     description:
       "Fragrant basmati rice layered with marinated chicken, saffron, fried onions, and traditional Hyderabadi spices. Served with raita.",
+    isAvailable: false,
     variations: [
       { size: "half", price: 249 },
       { size: "full", price: 429 },
@@ -354,6 +371,7 @@ const mockDishes: Dish[] = [
     category: "Burgers",
     description:
       "Juicy beef patty with lettuce, tomato, onions, pickles, cheese, and our special sauce in a toasted sesame bun.",
+    isAvailable: true,
     variations: [
       { size: "small", price: 179 },
       { size: "medium", price: 249 },
@@ -370,6 +388,7 @@ const mockDishes: Dish[] = [
     category: "Burgers",
     description:
       "Crispy vegetable patty with fresh lettuce, tomatoes, grilled onions, cheese, and mayo in a whole wheat bun.",
+    isAvailable: true,
     variations: [
       { size: "small", price: 149 },
       { size: "medium", price: 199 },
@@ -386,6 +405,7 @@ const mockDishes: Dish[] = [
     category: "Burgers",
     description:
       "Crispy fried chicken breast with spicy mayo, jalapeños, lettuce, and cheese in a brioche bun.",
+    isAvailable: true,
     variations: [
       { size: "small", price: 169 },
       { size: "medium", price: 229 },
@@ -402,6 +422,7 @@ const mockDishes: Dish[] = [
     category: "Burgers",
     description:
       "Beef patty topped with crispy bacon, BBQ sauce, cheddar cheese, onion rings, and coleslaw.",
+    isAvailable: true,
     variations: [
       { size: "medium", price: 279 },
       { size: "large", price: 369 },
@@ -417,6 +438,7 @@ const mockDishes: Dish[] = [
     category: "Burgers",
     description:
       "Grilled paneer tikka patty with mint chutney, onions, tomatoes, and lettuce in a tandoori bun.",
+    isAvailable: false,
     variations: [
       { size: "small", price: 159 },
       { size: "medium", price: 219 },
@@ -433,6 +455,7 @@ const mockDishes: Dish[] = [
     category: "Sides",
     description:
       "Crispy golden french fries seasoned with salt and herbs. Perfect side for your burger!",
+    isAvailable: true,
     variations: [
       { size: "small", price: 79 },
       { size: "medium", price: 99 },
@@ -449,6 +472,7 @@ const mockDishes: Dish[] = [
     category: "Sides",
     description:
       "Crispy fries loaded with melted cheese sauce, jalapeños, and spring onions.",
+    isAvailable: true,
     variations: [
       { size: "medium", price: 149 },
       { size: "large", price: 199 },
@@ -464,6 +488,7 @@ const mockDishes: Dish[] = [
     category: "Sides",
     description:
       "Crispy fried chicken wings tossed in your choice of BBQ, Buffalo, or Peri-Peri sauce.",
+    isAvailable: true,
     variations: [
       { size: "small", price: 179 },
       { size: "medium", price: 249 },
@@ -479,6 +504,7 @@ const mockDishes: Dish[] = [
       "https://images.unsplash.com/photo-1639024471283-03518883512d?w=600&h=400&fit=crop",
     category: "Sides",
     description: "Crispy battered onion rings served with tangy dipping sauce.",
+    isAvailable: true,
     variations: [
       { size: "small", price: 99 },
       { size: "medium", price: 139 },
@@ -494,6 +520,7 @@ const mockDishes: Dish[] = [
     category: "Beverages",
     description:
       "Thick and creamy chocolate milkshake topped with whipped cream and chocolate syrup.",
+    isAvailable: true,
     variations: [
       { size: "small", price: 119 },
       { size: "medium", price: 149 },
@@ -510,6 +537,7 @@ const mockDishes: Dish[] = [
     category: "Beverages",
     description:
       "Fresh strawberry milkshake blended with vanilla ice cream and topped with whipped cream.",
+    isAvailable: true,
     variations: [
       { size: "small", price: 129 },
       { size: "medium", price: 159 },
@@ -526,6 +554,7 @@ const mockDishes: Dish[] = [
     category: "Beverages",
     description:
       "Refreshing mango smoothie made with fresh mangoes, yogurt, and a touch of honey.",
+    isAvailable: true,
     variations: [
       { size: "small", price: 119 },
       { size: "medium", price: 149 },
@@ -541,6 +570,7 @@ const mockDishes: Dish[] = [
     category: "Salads",
     description:
       "Fresh romaine lettuce, croutons, parmesan cheese, and Caesar dressing.",
+    isAvailable: true,
     variations: [
       { size: "small", price: 149 },
       { size: "large", price: 229 },
@@ -556,6 +586,7 @@ const mockDishes: Dish[] = [
     category: "Salads",
     description:
       "Mixed greens with grilled chicken breast, cherry tomatoes, cucumber, and balsamic vinaigrette.",
+    isAvailable: true,
     variations: [
       { size: "small", price: 199 },
       { size: "large", price: 279 },
@@ -571,6 +602,7 @@ const mockDishes: Dish[] = [
     category: "Appetizers",
     description:
       "Crispy tortilla chips topped with melted cheese, jalapeños, salsa, and sour cream.",
+    isAvailable: true,
     variations: [
       { size: "small", price: 159 },
       { size: "medium", price: 219 },
@@ -587,6 +619,7 @@ const mockDishes: Dish[] = [
     category: "Desserts",
     description:
       "Warm chocolate brownie topped with vanilla ice cream, chocolate sauce, and nuts.",
+    isAvailable: false,
     variations: [
       { size: "small", price: 129 },
       { size: "large", price: 189 },
