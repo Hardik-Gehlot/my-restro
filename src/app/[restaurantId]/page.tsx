@@ -16,6 +16,7 @@ import {
   FiLinkedin,
   FiYoutube,
 } from "react-icons/fi";
+import { BiSolidDish } from "react-icons/bi";
 import { db, Restaurant, Advertisement as AdType } from "@/lib/mock-data";
 
 export default function RestaurantDetailPage() {
@@ -123,16 +124,8 @@ export default function RestaurantDetailPage() {
             />
           </div>
         </div>
-      </div>
 
-      {/* Restaurant Info Section */}
-      <div className="px-4 pt-16 pb-6">
-        <div className="mb-4">
-          <h1 className="text-2xl font-bold text-gray-900 mb-1">
-            {restaurant.name}
-          </h1>
-          <p className="text-base text-gray-600 mb-3">{restaurant.tagline}</p>
-
+        <div className="absolute -bottom-16 right-6">
           <div className="flex items-center space-x-4 mb-4">
             {restaurant.instagramLink && (
               <a
@@ -180,8 +173,20 @@ export default function RestaurantDetailPage() {
               </a>
             )}
           </div>
+        </div>
+      </div>
 
-          <div className="flex space-x-4 mb-6">
+      {/* Restaurant Info Section */}
+      <div className="px-4 pt-16 pb-6">
+        <div className="mb-4">
+          <h1 className="text-2xl font-bold text-gray-900 mb-1">
+            {restaurant.name}
+          </h1>
+          <p className="text-base text-gray-600 mb-3">{restaurant.tagline}</p>
+
+          
+
+          <div className="flex gap-4 mb-6 flex-col md:flex-row">
             {restaurant.googleRatingLink && (
               <a
                 href={restaurant.googleRatingLink}
@@ -200,8 +205,8 @@ export default function RestaurantDetailPage() {
               className="flex-1 block bg-gradient-to-r from-green-500 to-emerald-600 text-white py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all text-center group"
             >
               <div className="flex items-center justify-center space-x-3">
-                <FiMenu className="w-6 h-6 group-hover:scale-110 transition-transform" />
-                <span>View Full Menu</span>
+                <BiSolidDish className="w-6 h-6 group-hover:scale-110 transition-transform" />
+                <span>View Menu</span>
               </div>
             </Link>
           </div>
@@ -277,29 +282,32 @@ export default function RestaurantDetailPage() {
         </div>
       </div>
 
-      {/* Quick Actions - Sticky Bottom Bar (Mobile) */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-2xl lg:hidden z-40">
-        <div className="flex items-center">
-          <button
-            onClick={handleCall}
-            className="flex-1 flex items-center justify-center space-x-2 py-4 text-gray-700 font-semibold hover:bg-gray-50 transition-colors border-r border-gray-200"
-          >
-            <FiPhone className="w-5 h-5" />
-            <span>Call</span>
-          </button>
-
-          <Link
-            href={`/menu/${restaurant.id}`}
-            className="flex-1 flex items-center justify-center space-x-2 py-4 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold hover:from-orange-600 hover:to-red-600 transition-all"
-          >
-            <FiMenu className="w-5 h-5" />
-            <span>View Menu</span>
-          </Link>
+      <footer className="bg-gray-100 border-t border-gray-200">
+      <div className="max-w-7xl mx-auto px-4 py-6 flex flex-col items-center gap-2 text-center">
+        
+        {/* Logo / Brand */}
+        <div className="flex items-center gap-2 text-2xl font-semibold text-gray-800">
+          <BiSolidDish className="text-3xl" />
+          <span>DineOnline</span>
         </div>
-      </div>
 
-      {/* Bottom Spacer for Sticky Bar */}
-      <div className="h-32 lg:hidden"></div>
+        {/* Divider */}
+        <div className="w-24 h-px bg-gray-300 my-1" />
+
+        {/* Copyright */}
+        <p className="text-sm text-gray-600">
+          © {new Date().getFullYear()} DineOnline. All rights reserved.
+        </p>
+
+        {/* Contact Developer */}
+        <button
+          className="text-sm text-gray-500 hover:text-gray-700 transition"
+          onClick={() => window.location.href = "mailto:developer@dineonline.com"}
+        >
+          Contact Developer
+        </button>
+      </div>
+    </footer>
     </div>
   );
 }
