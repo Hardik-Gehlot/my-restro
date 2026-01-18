@@ -12,70 +12,69 @@ import {
 } from "react-icons/fi";
 import { BiSolidDish } from "react-icons/bi";
 import { motion, AnimatePresence } from "framer-motion";
-import { db, Restaurant, Dish } from "@/lib/mock-data";
-import { smoothScrollTo } from "@/utils/helpers";
+import { Restaurant, Dish } from "@/lib/mock-data";
+import { getRestaurantDataWithMenu, smoothScrollTo } from "@/utils/helpers";
+import Footer from "@/components/shared/Footer";
+import FilterModel from "@/components/shared/FilterModel";
 
-
-// ====================================================================
-// Header Component
-// ====================================================================
+interface MenuHeaderProp {
+  restaurantName: string;
+  searchQuery: string;
+  setSearchQuery: React.Dispatch<React.SetStateAction<string>>;
+  activeFiltersCount: number;
+  onFilterClick: () => void;
+}
 const MenuHeader = ({
   restaurantName,
   searchQuery,
   setSearchQuery,
   onFilterClick,
   activeFiltersCount,
-}) => {
+}: MenuHeaderProp) => {
   const router = useRouter();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-const [isScrolled, setIsScrolled] = useState(false);
-const searchInputRef = useRef<HTMLInputElement>(null);
-
-
-useEffect(() => {
-  const handleScroll = () => {
-    setIsSearchOpen(true);
-    setIsScrolled(window.scrollY > 50);
-    searchInputRef.current?.blur();
-  };
-
-  window.addEventListener("scroll", handleScroll, { passive: true });
-  return () => window.removeEventListener("scroll", handleScroll);
-}, []);
-
+  const [isScrolled, setIsScrolled] = useState(false);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (!isScrolled && !isSearchOpen && searchQuery) {
-      setSearchQuery("");
-    }
-  }, [isScrolled, isSearchOpen, searchQuery, setSearchQuery]);
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+      if (window.scrollY > 50) {
+        searchInputRef.current?.blur();
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // useEffect(() => {
+  //   if (!isSearchOpen && searchQuery) {
+  //     setSearchQuery("");
+  //   }
+  // }, [isSearchOpen, searchQuery]);
 
   const showSearchBar = isSearchOpen;
 
-
   const openSearch = () => {
-  setIsSearchOpen(true);
-  requestAnimationFrame(() => {
-    searchInputRef.current?.focus();
-  });
-};
+    setIsSearchOpen(true);
+    requestAnimationFrame(() => {
+      searchInputRef.current?.focus();
+    });
+  };
 
-const closeSearch = () => {
-  setIsSearchOpen(false);
-  setSearchQuery("");
-  searchInputRef.current?.blur();
-};
+  const closeSearch = () => {
+    setIsSearchOpen(false);
+    setSearchQuery("");
+    searchInputRef.current?.blur();
+  };
 
   return (
-    <div className="sticky top-0 z-40 bg-white border-b border-gray-200">
+    <div className="sticky top-0 z-40 bg-white/40 backdrop-blur-lg border-b border-white/60 shadow-lg">
       <div className="flex items-center justify-between px-2 sm:px-4 py-3 h-16 transition-all relative overflow-hidden">
         <motion.button
           onClick={() => router.back()}
-          className="p-2 hover:bg-gray-100 rounded-lg transition-colors z-10"
-          animate={{
-            opacity: showSearchBar ? 0.5 : 1,
-            scale: showSearchBar ? 0.95 : 1,
-          }}
+          className="p-2 hover:bg-white/50 rounded-lg transition-colors z-10"
         >
           <FiArrowLeft className="w-6 h-6 text-gray-700" />
         </motion.button>
@@ -100,7 +99,7 @@ const closeSearch = () => {
                 exit={{ scale: 0, opacity: 0 }}
                 transition={{ duration: 0.2 }}
                 onClick={openSearch}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                className="p-2 hover:bg-white/50 rounded-lg transition-colors"
               >
                 <FiSearch className="w-6 h-6 text-gray-700" />
               </motion.button>
@@ -109,7 +108,7 @@ const closeSearch = () => {
 
           <button
             onClick={onFilterClick}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors relative"
+            className="p-2 hover:bg-white/50 rounded-lg transition-colors relative"
           >
             <FiFilter className="w-6 h-6 text-gray-700" />
             {activeFiltersCount > 0 && (
@@ -127,7 +126,7 @@ const closeSearch = () => {
               exit={{ scaleX: 0, opacity: 0 }}
               transition={{ duration: 0.35, ease: [0.25, 1, 0.5, 1] }}
               style={{ transformOrigin: "100% 50%" }}
-              className="absolute top-0 left-12 sm:left-16 right-12 sm:right-16 h-full bg-white flex items-center"
+              className="absolute top-0 left-12 sm:left-16 right-12 sm:right-16 h-full bg-white/90 backdrop-blur-sm flex items-center"
             >
               <div className="relative w-full">
                 <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-green-600 w-5 h-5" />
@@ -156,18 +155,49 @@ const closeSearch = () => {
   );
 };
 
-// ====================================================================
-// Main Page Component
-// ====================================================================
+interface DishDescriptionProps {
+  description: string;
+}
+
+function DishDescription({ description }: DishDescriptionProps) {
+  const [expanded, setExpanded] = useState(false);
+  const [showMore, setShowMore] = useState(false);
+  const textRef = useRef<HTMLSpanElement>(null);
+
+  useEffect(() => {
+    if (textRef.current) {
+      const el = textRef.current;
+      setShowMore(el.scrollHeight > el.clientHeight);
+    }
+  }, [description]);
+
+  return (
+    <p className="relative text-sm text-gray-600 mt-1">
+      <span
+        ref={textRef}
+        className={expanded ? "" : "line-clamp-2"}
+      >
+        {description}
+      </span>
+
+      {!expanded && showMore && (
+        <button
+          onClick={() => setExpanded(true)}
+          className="absolute bottom-0 right-1 pl-2 bg-white ml-1 text-orange-500 font-medium hover:underline"
+        >
+          more
+        </button>
+      )}
+    </p>
+  );
+}
+
 export default function MenuPage() {
   const params = useParams();
   const restaurantId = params.restaurantId as string;
-
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [dishes, setDishes] = useState<Dish[]>([]);
   const [loading, setLoading] = useState(true);
-
-  // UI State
   const [searchQuery, setSearchQuery] = useState("");
   const [dietFilter, setDietFilter] = useState<"all" | "veg" | "nonveg">("all");
   const [showAvailableOnly, setShowAvailableOnly] = useState(false);
@@ -175,21 +205,16 @@ export default function MenuPage() {
     [key: string]: boolean;
   }>({});
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
-
-  // Filter Modal
+  const [selectedDish, setSelectedDish] = useState<Dish | null>(null);
   const [showFilterModal, setShowFilterModal] = useState(false);
-
-  // Refs for scrolling
   const categoryRefs = useRef<{ [key: string]: HTMLElement | null }>({});
 
   const loadData = useCallback(async () => {
     setLoading(true);
-    const [restaurantData, dishesData] = await Promise.all([
-      db.getRestaurantById(restaurantId),
-      db.getDishesByRestaurant(restaurantId),
-    ]);
+    const { restaurant: restaurantData, menu: menuData } =
+      await getRestaurantDataWithMenu(restaurantId);
     setRestaurant(restaurantData);
-    setDishes(dishesData);
+    setDishes(menuData ?? []);
     setLoading(false);
   }, [restaurantId]);
 
@@ -204,7 +229,8 @@ export default function MenuPage() {
       filtered = filtered.filter(
         (dish) =>
           dish.name.toLowerCase().includes(query) ||
-          dish.description.toLowerCase().includes(query)
+          dish.description.toLowerCase().includes(query) ||
+          dish.category.toLowerCase().includes(query),
       );
     }
     if (dietFilter === "veg") {
@@ -216,23 +242,29 @@ export default function MenuPage() {
       filtered = filtered.filter((dish) => dish.isAvailable !== false);
     }
 
-    return filtered.reduce((acc, dish) => {
-      const category = dish.category || "Other";
-      if (!acc[category]) {
-        acc[category] = [];
-      }
-      acc[category].push(dish);
-      return acc;
-    }, {} as { [key: string]: Dish[] });
+    return filtered.reduce(
+      (acc, dish) => {
+        const category = dish.category || "Other";
+        if (!acc[category]) {
+          acc[category] = [];
+        }
+        acc[category].push(dish);
+        return acc;
+      },
+      {} as { [key: string]: Dish[] },
+    );
   }, [dishes, searchQuery, dietFilter, showAvailableOnly]);
 
   const categories = Object.keys(groupedAndFilteredDishes);
 
   useEffect(() => {
-    const initialOpenState = categories.reduce((acc, category) => {
-      acc[category] = true;
-      return acc;
-    }, {} as { [key: string]: boolean });
+    const initialOpenState = categories.reduce(
+      (acc, category) => {
+        acc[category] = true;
+        return acc;
+      },
+      {} as { [key: string]: boolean },
+    );
     setOpenCategories(initialOpenState);
   }, [dishes]);
 
@@ -242,10 +274,11 @@ export default function MenuPage() {
 
   const handleCategoryClick = (category: string) => {
     setIsCategoryModalOpen(false);
+    setOpenCategories((prev) => ({ ...prev, [category]: true }));
     setTimeout(() => {
       const element = categoryRefs.current[category];
       if (element) {
-        const yOffset = -80; // height of header + some margin
+        const yOffset = -80;
         const y =
           element.getBoundingClientRect().top + window.pageYOffset + yOffset;
         smoothScrollTo(y, 300);
@@ -253,16 +286,19 @@ export default function MenuPage() {
     }, 300);
   };
 
-  const activeFiltersCount = [
-    dietFilter !== "all",
-    showAvailableOnly,
-  ].filter(Boolean).length;
+  const activeFiltersCount = [dietFilter !== "all", showAvailableOnly].filter(
+    Boolean,
+  ).length;
+
+  const handleBackdropClick = () => {
+    setIsCategoryModalOpen(false);
+  };
 
   if (loading) return <div>Loading...</div>;
   if (!restaurant) return <div>Not found</div>;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       <MenuHeader
         restaurantName={restaurant.name}
         searchQuery={searchQuery}
@@ -288,11 +324,11 @@ export default function MenuPage() {
               key={category}
               id={category}
               ref={(el) => (categoryRefs.current[category] = el)}
-              className="mb-4 bg-white rounded-xl shadow-md overflow-hidden"
+              className="mb-4 bg-white/40 backdrop-blur-lg rounded-xl shadow-xl border border-white/60 overflow-hidden"
             >
               <button
                 onClick={() => toggleCategory(category)}
-                className="w-full flex items-center justify-between px-4 py-3"
+                className="w-full flex items-center justify-between px-4 py-3 hover:bg-white/30 transition-colors"
               >
                 <h3 className="text-lg font-bold text-gray-900">{category}</h3>
                 <motion.div
@@ -323,12 +359,12 @@ export default function MenuPage() {
                         key={dish.id}
                         className={`flex p-4 ${
                           index < groupedAndFilteredDishes[category].length - 1
-                            ? "border-b border-gray-100"
+                            ? "border-b border-white/40"
                             : ""
                         }`}
                       >
                         <div className="flex-1 min-w-0 pr-4">
-                          <h4 className="text-base font-bold text-gray-800 flex items-center gap-2">
+                          <h4 className="flex-wrap text-base font-bold text-gray-800 flex items-center gap-2">
                             <div
                               className={`w-4 h-4 border ${
                                 dish.isVeg
@@ -345,22 +381,32 @@ export default function MenuPage() {
                             {dish.name}
                             {dish.isAvailable === false && (
                               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-semibold bg-gray-300/50 text-gray-600 border border-gray-300">
-                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                                <svg
+                                  className="w-3 h-3"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"
+                                  />
                                 </svg>
                                 Unavailable
                               </span>
                             )}
                           </h4>
-                          
-                          <div className="flex flex-wrap items-center gap-2 mt-2">
+
+                          <div className="flex flex-wrap items-center gap-1.5 mt-2">
                             {dish.variations.map((v, i) => (
                               <div
                                 key={i}
-                                className="bg-gray-100 px-2 py-0.5 rounded"
+                                className="bg-gray-200 px-1 py-0.3 rounded"
                               >
                                 <span className="text-xs font-semibold text-gray-700 capitalize">
-                                  {v.size}
+                                  {v.size}:
                                 </span>
                                 <span className="text-xs font-bold text-orange-600 ml-1">
                                   ₹{v.price}
@@ -368,9 +414,8 @@ export default function MenuPage() {
                               </div>
                             ))}
                           </div>
-                          <p className="text-sm text-gray-600 mt-1 line-clamp-2">
-                            {dish.description}
-                          </p>
+                          <DishDescription description={dish.description} />
+
                         </div>
                         <div className="relative w-28 h-28 flex-shrink-0 rounded-lg overflow-hidden">
                           <Image
@@ -388,26 +433,31 @@ export default function MenuPage() {
             </div>
           ))
         )}
-        <div className="h-24" /> {/* Spacer for FAB */}
       </div>
 
       {/* Category Modal */}
       <AnimatePresence>
         {isCategoryModalOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex justify-end p-4"
-          >
+          <>
             <motion.div
-              initial={{ x: "100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "100%" }}
-              transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="bg-white fixed bottom-20 right-6 rounded-lg shadow-xl w-full max-w-xs h-fit overflow-y-auto"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex justify-end p-4"
+              onClick={handleBackdropClick}
+              style={{ touchAction: "none" }}
+            />
+            <motion.div
+              initial={{ x: "100%", opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: "100%", opacity: 0.5 }}
+              transition={{
+                type: "tween",
+                duration: 0.3,
+                ease: "easeInOut",
+              }}
+              className="bg-white fixed z-50 bottom-20 right-6 rounded-lg shadow-xl w-full max-w-xs h-fit overflow-y-auto"
             >
-              {/* No Heading */}
               <div className="p-2">
                 {categories.map((category) => (
                   <button
@@ -423,12 +473,12 @@ export default function MenuPage() {
                 ))}
               </div>
             </motion.div>
-          </motion.div>
+          </>
         )}
       </AnimatePresence>
 
       {/* Floating Action Button */}
-      {searchQuery === "" && (
+      {searchQuery === "" && dishes?.length > 0 && (
         <button
           onClick={() => setIsCategoryModalOpen(!isCategoryModalOpen)}
           className="fixed bottom-6 right-6 bg-black text-white rounded-lg shadow-lg z-50 flex items-center justify-center px-3 py-2 text-sm"
@@ -463,216 +513,16 @@ export default function MenuPage() {
         </button>
       )}
 
-      {/* Enhanced Filter Modal */}
-      <AnimatePresence>
-        {showFilterModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-end sm:items-center sm:justify-center"
-            onClick={() => setShowFilterModal(false)}
-          >
-            <motion.div
-              initial={{ y: "100%", opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: "100%", opacity: 0 }}
-              transition={{ type: "spring", damping: 30, stiffness: 300 }}
-              onClick={(e) => e.stopPropagation()}
-              className="bg-white/95 backdrop-blur-xl w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden border border-white/20"
-            >
-              {/* Header */}
-              <div className="flex items-center justify-between p-6 border-b border-gray-200/50">
-                <h2 className="text-2xl font-bold text-gray-900">Filters</h2>
-                <button
-                  onClick={() => setShowFilterModal(false)}
-                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-                >
-                  <FiX className="w-6 h-6 text-gray-600" />
-                </button>
-              </div>
+      <FilterModel
+        showFilterModal={showFilterModal}
+        setShowFilterModal={setShowFilterModal}
+        dietFilter={dietFilter}
+        setDietFilter={setDietFilter}
+        showAvailableOnly={showAvailableOnly}
+        setShowAvailableOnly={setShowAvailableOnly}
+      />
 
-              <div className="p-6 space-y-8">
-                {/* Diet Preference Section */}
-                <div>
-                  <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">
-                    Diet Preference
-                  </h3>
-                  <div className="flex gap-3">
-                    {/* Veg Chip */}
-                    <motion.button
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => setDietFilter("veg")}
-                      className={`flex-1 relative overflow-hidden rounded-2xl p-4 transition-all duration-300 ${
-                        dietFilter === "veg"
-                          ? "bg-gradient-to-br from-green-500 to-green-600 text-white shadow-lg shadow-green-500/30"
-                          : "bg-white/60 backdrop-blur-md text-gray-700 border border-gray-200/50 hover:bg-white/80"
-                      }`}
-                    >
-                      <div className="flex flex-col items-center gap-2">
-                        <div
-                          className={`text-3xl ${
-                            dietFilter === "veg" ? "animate-bounce" : ""
-                          }`}
-                        >
-                          🌿
-                        </div>
-                        <span className="text-sm font-semibold">Veg</span>
-                      </div>
-                      {dietFilter === "veg" && (
-                        <motion.div
-                          layoutId="dietSelector"
-                          className="absolute inset-0 border-2 border-white/40 rounded-2xl pointer-events-none"
-                          transition={{
-                            type: "spring",
-                            stiffness: 300,
-                            damping: 30,
-                          }}
-                        />
-                      )}
-                    </motion.button>
-
-                    {/* Both Chip */}
-                    <motion.button
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => setDietFilter("all")}
-                      className={`flex-1 relative overflow-hidden rounded-2xl p-4 transition-all duration-300 ${
-                        dietFilter === "all"
-                          ? "bg-gradient-to-br from-orange-500 to-orange-600 text-white shadow-lg shadow-orange-500/30"
-                          : "bg-white/60 backdrop-blur-md text-gray-700 border border-gray-200/50 hover:bg-white/80"
-                      }`}
-                    >
-                      <div className="flex flex-col items-center gap-2">
-                        <div
-                          className={`text-3xl ${
-                            dietFilter === "all" ? "animate-bounce" : ""
-                          }`}
-                        >
-                          🍽️
-                        </div>
-                        <span className="text-sm font-semibold">Both</span>
-                      </div>
-                      {dietFilter === "all" && (
-                        <motion.div
-                          layoutId="dietSelector"
-                          className="absolute inset-0 border-2 border-white/40 rounded-2xl pointer-events-none"
-                          transition={{
-                            type: "spring",
-                            stiffness: 300,
-                            damping: 30,
-                          }}
-                        />
-                      )}
-                    </motion.button>
-
-                    {/* Non-Veg Chip */}
-                    <motion.button
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => setDietFilter("nonveg")}
-                      className={`flex-1 relative overflow-hidden rounded-2xl p-4 transition-all duration-300 ${
-                        dietFilter === "nonveg"
-                          ? "bg-gradient-to-br from-red-500 to-red-600 text-white shadow-lg shadow-red-500/30"
-                          : "bg-white/60 backdrop-blur-md text-gray-700 border border-gray-200/50 hover:bg-white/80"
-                      }`}
-                    >
-                      <div className="flex flex-col items-center gap-2">
-                        <div
-                          className={`text-3xl ${
-                            dietFilter === "nonveg" ? "animate-bounce" : ""
-                          }`}
-                        >
-                          🍗
-                        </div>
-                        <span className="text-sm font-semibold">Non-Veg</span>
-                      </div>
-                      {dietFilter === "nonveg" && (
-                        <motion.div
-                          layoutId="dietSelector"
-                          className="absolute inset-0 border-2 border-white/40 rounded-2xl pointer-events-none"
-                          transition={{
-                            type: "spring",
-                            stiffness: 300,
-                            damping: 30,
-                          }}
-                        />
-                      )}
-                    </motion.button>
-                  </div>
-                </div>
-
-                {/* Availability Section */}
-                <div>
-                  <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">
-                    Availability
-                  </h3>
-                  <motion.button
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => setShowAvailableOnly(!showAvailableOnly)}
-                    className={`w-full relative overflow-hidden rounded-2xl p-5 transition-all duration-300 ${
-                      showAvailableOnly
-                        ? "bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/30"
-                        : "bg-white/60 backdrop-blur-md text-gray-700 border border-gray-200/50 hover:bg-white/80"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="text-2xl">✨</div>
-                        <span className="font-semibold">
-                          Show Available Only
-                        </span>
-                      </div>
-                      <div
-                        className={`w-12 h-6 rounded-full relative transition-all duration-300 ${
-                          showAvailableOnly
-                            ? "bg-white/30"
-                            : "bg-gray-300/50"
-                        }`}
-                      >
-                        <motion.div
-                          animate={{
-                            x: showAvailableOnly ? 24 : 0,
-                          }}
-                          transition={{
-                            type: "spring",
-                            stiffness: 500,
-                            damping: 30,
-                          }}
-                          className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full ${
-                            showAvailableOnly
-                              ? "bg-white"
-                              : "bg-white"
-                          } shadow-md`}
-                        />
-                      </div>
-                    </div>
-                  </motion.button>
-                </div>
-              </div>
-
-              {/* Footer */}
-              <div className="p-6 border-t border-gray-200/50 bg-gray-50/50">
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => {
-                      setDietFilter("all");
-                      setShowAvailableOnly(false);
-                    }}
-                    className="flex-1 py-3 px-4 rounded-xl font-semibold text-gray-700 bg-white/80 backdrop-blur-md border border-gray-200/50 hover:bg-white transition-all"
-                  >
-                    Clear All
-                  </button>
-                  <button
-                    onClick={() => setShowFilterModal(false)}
-                    className="flex-1 py-3 px-4 rounded-xl font-semibold text-white bg-gradient-to-r from-orange-500 to-orange-600 shadow-lg shadow-orange-500/30 hover:shadow-xl hover:shadow-orange-500/40 transition-all"
-                  >
-                    Apply Filters
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {dishes?.length > 0 && <Footer />}
     </div>
   );
 }
