@@ -12,10 +12,11 @@ import {
 } from "react-icons/fi";
 import { BiSolidDish } from "react-icons/bi";
 import { motion, AnimatePresence } from "framer-motion";
-import { Restaurant, Dish } from "@/lib/mock-data";
-import { getRestaurantDataWithMenu, smoothScrollTo } from "@/utils/helpers";
+import { smoothScrollTo } from "@/utils/helpers";
 import Footer from "@/components/shared/Footer";
 import FilterModel from "@/components/shared/FilterModel";
+import { Dish, Restaurant } from "@/types";
+import { db } from "@/app/database";
 
 interface MenuHeaderProp {
   restaurantName: string;
@@ -212,7 +213,7 @@ export default function MenuPage() {
   const loadData = useCallback(async () => {
     setLoading(true);
     const { restaurant: restaurantData, menu: menuData } =
-      await getRestaurantDataWithMenu(restaurantId);
+      await db.getRestaurantDataWithMenu(restaurantId);
     setRestaurant(restaurantData);
     setDishes(menuData ?? []);
     setLoading(false);

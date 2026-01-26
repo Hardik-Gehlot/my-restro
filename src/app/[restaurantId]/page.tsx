@@ -16,8 +16,9 @@ import {
   FiYoutube,
 } from "react-icons/fi";
 import { BiSolidDish } from "react-icons/bi";
-import { db, Restaurant} from "@/lib/mock-data";
 import Footer from "@/components/shared/Footer";
+import { Restaurant } from "@/types";
+import { db } from "../database";
 
 export default function RestaurantDetailPage() {
   const params = useParams();
@@ -33,34 +34,9 @@ export default function RestaurantDetailPage() {
 
   const loadData = async () => {
     setLoading(true);
-
-    const cachedData = localStorage.getItem('restaurantData');
-    
-    if (cachedData) {
-      try {
-        const parsed = JSON.parse(cachedData);
-        if (parsed.restaurantId === restaurantId && parsed.restaurant) {
-          setRestaurant(parsed.restaurant);
-          setLoading(false);
-          return;
-        }
-      } catch (e) {
-        console.error('Error parsing cached data:', e);
-      }
-    }
-
-    const [restaurantData] = await Promise.all([
-      db.getRestaurantById(restaurantId),
-    ]);
-
-    setRestaurant(restaurantData);
-    if (restaurantData) {
-      localStorage.setItem('restaurantData', JSON.stringify({
-        restaurantId: restaurantId,
-        restaurant: restaurantData,
-        timestamp: Date.now()
-      }));
-    }
+    const { restaurant } =
+      await db.getRestaurantDataWithMenu(restaurantId);
+    setRestaurant(restaurant);
     setLoading(false);
   };
 
@@ -99,7 +75,6 @@ export default function RestaurantDetailPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-
       {/* Header Image Section */}
       <div className="relative h-56 bg-gray-900">
         <Image
@@ -211,84 +186,80 @@ export default function RestaurantDetailPage() {
       {/* Contact Information Card */}
       {restaurant.mobileNo && restaurant.googleMapLink && (
         <div className="px-4 mb-6">
-        <div className="bg-white/40 backdrop-blur-lg rounded-3xl border border-white/60 shadow-xl p-6">
-          <h2 className="text-xl font-bold text-gray-800 mb-5">
-            Contact Information
-          </h2>
+          <div className="bg-white/40 backdrop-blur-lg rounded-3xl border border-white/60 shadow-xl p-6">
+            <h2 className="text-xl font-bold text-gray-800 mb-5">
+              Contact Information
+            </h2>
 
-          <div className="space-y-3">
-            {/* Phone */}
-            { restaurant.mobileNo &&
-              (
+            <div className="space-y-3">
+              {/* Phone */}
+              {restaurant.mobileNo && (
                 <a
-              href={`tel:${restaurant.mobileNo}`}
-              className="flex items-start space-x-4 p-4 bg-white/50 backdrop-blur-sm rounded-2xl border border-white/60 hover:bg-white/70 transition-all group hover:scale-[1.02]"
-            >
-              <div className="p-3 bg-gradient-to-br from-orange-400 to-orange-600 rounded-xl group-hover:scale-110 transition-transform shadow-lg">
-                <FiPhone className="w-5 h-5 text-white" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
-                  Phone Number
-                </p>
-                <p className="text-base font-semibold text-gray-800">
-                  {restaurant.mobileNo}
-                </p>
-              </div>
-            </a>
-              )
-            }
+                  href={`tel:${restaurant.mobileNo}`}
+                  className="flex items-start space-x-4 p-4 bg-white/50 backdrop-blur-sm rounded-2xl border border-white/60 hover:bg-white/70 transition-all group hover:scale-[1.02]"
+                >
+                  <div className="p-3 bg-gradient-to-br from-orange-400 to-orange-600 rounded-xl group-hover:scale-110 transition-transform shadow-lg">
+                    <FiPhone className="w-5 h-5 text-white" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
+                      Phone Number
+                    </p>
+                    <p className="text-base font-semibold text-gray-800">
+                      {restaurant.mobileNo}
+                    </p>
+                  </div>
+                </a>
+              )}
 
-            {/* Location */}
-            {restaurant.googleMapLink && (
-              <a
-              href={restaurant.googleMapLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-start space-x-4 p-4 bg-white/50 backdrop-blur-sm rounded-2xl border border-white/60 hover:bg-white/70 transition-all group hover:scale-[1.02]"
-            >
-              <div className="p-3 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl group-hover:scale-110 transition-transform shadow-lg">
-                <FiMapPin className="w-5 h-5 text-white" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
-                  Location
-                </p>
-                <p className="text-base font-semibold text-gray-800">
-                  View on Google Maps
-                </p>
-                <p className="text-sm text-gray-600 mt-1 flex items-center">
-                  Get directions
-                  <FiExternalLink className="w-3 h-3 ml-1" />
-                </p>
-              </div>
-            </a>
-            )}
+              {/* Location */}
+              {restaurant.googleMapLink && (
+                <a
+                  href={restaurant.googleMapLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-start space-x-4 p-4 bg-white/50 backdrop-blur-sm rounded-2xl border border-white/60 hover:bg-white/70 transition-all group hover:scale-[1.02]"
+                >
+                  <div className="p-3 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl group-hover:scale-110 transition-transform shadow-lg">
+                    <FiMapPin className="w-5 h-5 text-white" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
+                      Location
+                    </p>
+                    <p className="text-base font-semibold text-gray-800">
+                      View on Google Maps
+                    </p>
+                    <p className="text-sm text-gray-600 mt-1 flex items-center">
+                      Get directions
+                      <FiExternalLink className="w-3 h-3 ml-1" />
+                    </p>
+                  </div>
+                </a>
+              )}
+            </div>
           </div>
         </div>
-      </div>
       )}
-      
 
       {/* About Section */}
       {restaurant.aboutus && (
         <div className="px-4 mb-6">
-        <div className="bg-white/40 backdrop-blur-lg rounded-3xl border border-white/60 shadow-xl p-6">
-          <h2 className="text-xl font-bold text-gray-800 mb-4">About Us</h2>
-          <p className="text-base text-gray-700 leading-relaxed">
-            Welcome to{" "}
-            <span className="font-semibold text-gray-900">
-              {restaurant.name}
-            </span>
-            <br />
+          <div className="bg-white/40 backdrop-blur-lg rounded-3xl border border-white/60 shadow-xl p-6">
+            <h2 className="text-xl font-bold text-gray-800 mb-4">About Us</h2>
+            <p className="text-base text-gray-700 leading-relaxed">
+              Welcome to{" "}
+              <span className="font-semibold text-gray-900">
+                {restaurant.name}
+              </span>
+              <br />
               {restaurant.aboutus}
-          </p>
+            </p>
+          </div>
         </div>
-      </div>
       )}
-      
 
-      <Footer/>
+      <Footer />
     </div>
   );
 }

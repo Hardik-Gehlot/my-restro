@@ -1,66 +1,44 @@
-// ==========================================
-// FILE: src/lib/mock-data.ts
-// Complete Mock Data for Restaurants & Dishes
-// ==========================================
+import { Dish, Restaurant, User } from "@/types";
 
-// ==========================================
-// INTERFACES
-// ==========================================
+export const mockCategories: Category[] = [
+  {
+    id: 'cat-1',
+    name: 'Pizza',
+    restaurantId: 'pizza_paradise_123'
+  },
+  {
+    id: 'cat-2',
+    name: 'Pasta',
+    restaurantId: 'pizza_paradise_123'
+  },
+  {
+    id: 'cat-3',
+    name: 'Desserts',
+    restaurantId: 'pizza_paradise_123'
+  },
+  {
+    id: 'cat-4',
+    name: 'Beverages',
+    restaurantId: 'pizza_paradise_123'
+  },
+  {
+    id: 'cat-5',
+    name: 'Starters',
+    restaurantId: 'pizza_paradise_123'
+  },
+  {
+    id: 'cat-5',
+    name: 'Seafood',
+    restaurantId: 'burger_hub_789'
+  },
+  {
+    id: 'cat-6',
+    name: 'Pasta',
+    restaurantId: 'burger_hub_789'
+  }
+];
 
-export interface Restaurant {
-  id: string;
-  name: string;
-  tagline: string;
-  mobileNo: string;
-  logo: string;
-  coverImage: string;
-  googleMapLink: string;
-  googleRatingLink: string;
-  aboutus: string;
-  instagramLink?: string;
-  facebookLink?: string;
-  twitterLink?: string;
-  linkedinLink?: string;
-  youtubeLink?: string;
-}
-
-export interface DishVariation {
-  size: "half" | "full" | "small" | "medium" | "large";
-  price: number;
-}
-
-export interface Dish {
-  id: string;
-  restaurantId: string;
-  isVeg: boolean;
-  name: string;
-  image: string;
-  category: string;
-  description: string;
-  variations: DishVariation[];
-  isAvailable: boolean;
-}
-
-export interface Advertisement {
-  id: string;
-  title: string;
-  description: string;
-  image: string;
-  ctaText: string;
-  ctaLink: string;
-  advertiser: string;
-  isActive: boolean;
-  position: string; // Changed: 'rest-1', 'rest-2', 'menu-1', 'home-1', etc.
-  targetAudience?: string[];
-  impressions: number;
-  clicks: number;
-}
-
-// ==========================================
-// RESTAURANT DATA (3 Restaurants)
-// ==========================================
-
-const mockRestaurants: Restaurant[] = [
+export const mockRestaurants: Restaurant[] = [
   {
     id: "pizza_paradise_123",
     name: "Pizza Paradise",
@@ -77,6 +55,8 @@ const mockRestaurants: Restaurant[] = [
     twitterLink: "https://twitter.com/pizzaparadise",
     linkedinLink: "",
     youtubeLink: "",
+    active_pan: "basic",
+  plan_expiry: "21 Jan 2027"
   },
   {
     id: "spice_route_456",
@@ -94,6 +74,8 @@ const mockRestaurants: Restaurant[] = [
     twitterLink: "",
     linkedinLink: "",
     youtubeLink: "",
+        active_pan: "basic",
+  plan_expiry: "21 Jan 2027"
   },
   {
     id: "burger_hub_789",
@@ -111,17 +93,12 @@ const mockRestaurants: Restaurant[] = [
     twitterLink: "https://twitter.com/burgerhub",
     linkedinLink: "",
     youtubeLink: "",
+        active_pan: "basic",
+  plan_expiry: "21 Jan 2027"
   },
 ];
 
-// ==========================================
-// DISHES DATA
-// ==========================================
-
-const mockDishes: Dish[] = [
-  // ========================================
-  // PIZZA PARADISE - 13 Dishes
-  // ========================================
+export const mockDishes: Dish[] = [
   {
     id: "dish_001",
     restaurantId: "pizza_paradise_123",
@@ -627,92 +604,11 @@ const mockDishes: Dish[] = [
   },
 ];
 
-// ==========================================
-// ADVERTISEMENT DATA
-// ==========================================
-
-const mockAdvertisements: Advertisement[] = [
-  {
-    id: "ad_001",
-    title: "Get 50% Off on First Order!",
-    description:
-      "Download FoodHub app and get exclusive discounts on your favorite restaurants",
-    image:
-      "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=1200&h=300&fit=crop",
-    ctaText: "Download Now",
-    ctaLink: "https://example.com/foodhub-app",
-    advertiser: "FoodHub",
-    isActive: true,
-    position: "rest-1", // Top of restaurant page
-    targetAudience: ["food-lovers", "app-users"],
-    impressions: 15420,
-    clicks: 892,
-  },
-  {
-    id: "ad_002",
-    title: "Premium Kitchen Appliances - Up to 40% Off",
-    description: "Upgrade your kitchen with latest appliances from KitchenPro",
-    image:
-      "https://images.unsplash.com/photo-1556911220-bff31c812dba?w=1200&h=300&fit=crop",
-    ctaText: "Shop Now",
-    ctaLink: "https://example.com/kitchenpro",
-    advertiser: "KitchenPro",
-    isActive: true,
-    position: "rest-2", // Mid-section of restaurant page
-    targetAudience: ["restaurant-owners", "chefs"],
-    impressions: 8765,
-    clicks: 543,
-  },
-  {
-    id: "ad_003",
-    title: "Master Chef Cooking Classes",
-    description:
-      "Learn professional cooking techniques from expert chefs. Join now!",
-    image:
-      "https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=1200&h=300&fit=crop",
-    ctaText: "Enroll Today",
-    ctaLink: "https://example.com/cooking-classes",
-    advertiser: "CulinaryAcademy",
-    isActive: true,
-    position: "menu-1", // Menu page top
-    targetAudience: ["food-enthusiasts", "home-cooks"],
-    impressions: 12340,
-    clicks: 678,
-  },
-  {
-    id: "ad_004",
-    title: "Fresh Ingredients Delivered Daily",
-    description:
-      "Farm-fresh vegetables and premium ingredients at your doorstep",
-    image:
-      "https://images.unsplash.com/photo-1542838132-92c53300491e?w=400&h=300&fit=crop",
-    ctaText: "Order Now",
-    ctaLink: "https://example.com/fresh-delivery",
-    advertiser: "FreshFarm",
-    isActive: true,
-    position: "home-1", // Homepage
-    targetAudience: ["health-conscious", "organic-lovers"],
-    impressions: 9876,
-    clicks: 432,
-  },
-];
-
-export interface AdminUser {
-  id: string;
-  email: string;
-  password: string; // In production, this would be hashed
-  restaurantId: string;
-  name: string;
-  role: "admin";
-  createdAt: string;
-}
-
-// Mock admin users
-const mockAdminUsers: AdminUser[] = [
+export const mockUsers: User[] = [
   {
     id: "admin_001",
-    email: "admin@pizzaparadise.com",
-    password: "pizza123", // In production: hashed password
+    email: "pizzaparadise@admin.com",
+    password: "$2b$10$dGq18bgdY46i0S0JYWnksOwA18vWtmb2Xj8ejXxiDIEL2x6z8CaGG", // admin123
     restaurantId: "pizza_paradise_123",
     name: "Pizza Paradise Admin",
     role: "admin",
@@ -720,8 +616,8 @@ const mockAdminUsers: AdminUser[] = [
   },
   {
     id: "admin_002",
-    email: "admin@spiceroute.com",
-    password: "spice123",
+    email: "spice@admin.com",
+    password: "$2b$10$dGq18bgdY46i0S0JYWnksOwA18vWtmb2Xj8ejXxiDIEL2x6z8CaGG", //admin123
     restaurantId: "spice_route_456",
     name: "Spice Route Admin",
     role: "admin",
@@ -729,221 +625,11 @@ const mockAdminUsers: AdminUser[] = [
   },
   {
     id: "admin_003",
-    email: "admin@admin.com",
-    password: "admin123",
+    email: "burgehub@admin.com",
+    password: "$2b$10$dGq18bgdY46i0S0JYWnksOwA18vWtmb2Xj8ejXxiDIEL2x6z8CaGG", //admin123
     restaurantId: "burger_hub_789",
     name: "Burger Hub Admin",
     role: "admin",
     createdAt: "2024-01-01T00:00:00Z",
   },
 ];
-// ==========================================
-// DATABASE FUNCTIONS
-// ==========================================
-
-export const db = {
-  // Admin authentication
-  loginAdmin: async (
-    email: string,
-    password: string
-  ): Promise<AdminUser | null> => {
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    const user = mockAdminUsers.find(
-      (u) => u.email === email && u.password === password
-    );
-    return user || null;
-  },
-
-  // Get admin by restaurant ID
-  getAdminByRestaurantId: async (
-    restaurantId: string
-  ): Promise<AdminUser | null> => {
-    await new Promise((resolve) => setTimeout(resolve, 300));
-    return mockAdminUsers.find((u) => u.restaurantId === restaurantId) || null;
-  },
-
-  // Update restaurant
-  updateRestaurant: async (
-    id: string,
-    data: Partial<Restaurant>
-  ): Promise<Restaurant | null> => {
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    const restaurant = mockRestaurants.find((r) => r.id === id);
-    if (restaurant) {
-      Object.assign(restaurant, data);
-      return restaurant;
-    }
-    return null;
-  },
-
-  // Update dish
-  updateDish: async (id: string, data: Partial<Dish>): Promise<Dish | null> => {
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    const dish = mockDishes.find((d) => d.id === id);
-    if (dish) {
-      Object.assign(dish, data);
-      return dish;
-    }
-    return null;
-  },
-
-  // Delete dish
-  deleteDish: async (id: string): Promise<boolean> => {
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    const index = mockDishes.findIndex((d) => d.id === id);
-    if (index !== -1) {
-      mockDishes.splice(index, 1);
-      return true;
-    }
-    return false;
-  },
-
-  // Add dish
-  addDish: async (dish: Omit<Dish, "id">): Promise<Dish> => {
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    const newDish = {
-      ...dish,
-      id: `dish_${Date.now()}`,
-    };
-    mockDishes.push(newDish);
-    return newDish;
-  },
-  // Get all restaurants
-  getRestaurants: async (): Promise<Restaurant[]> => {
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    return mockRestaurants;
-  },
-
-  // Get restaurant by ID
-  getRestaurantById: async (id: string): Promise<Restaurant | null> => {
-    await new Promise((resolve) => setTimeout(resolve, 300));
-    return mockRestaurants.find((r) => r.id === id) || null;
-  },
-
-  // Get dishes by restaurant ID
-  getDishesByRestaurant: async (restaurantId: string): Promise<Dish[]> => {
-    await new Promise((resolve) => setTimeout(resolve, 300));
-    return mockDishes.filter((d) => d.restaurantId === restaurantId);
-  },
-
-  // Get dish by ID
-  getDishById: async (id: string): Promise<Dish | null> => {
-    await new Promise((resolve) => setTimeout(resolve, 300));
-    return mockDishes.find((d) => d.id === id) || null;
-  },
-
-  // Search dishes
-  searchDishes: async (
-    restaurantId: string,
-    query: string
-  ): Promise<Dish[]> => {
-    await new Promise((resolve) => setTimeout(resolve, 300));
-    const lowerQuery = query.toLowerCase();
-    return mockDishes.filter(
-      (d) =>
-        d.restaurantId === restaurantId &&
-        (d.name.toLowerCase().includes(lowerQuery) ||
-          d.description.toLowerCase().includes(lowerQuery) ||
-          d.category.toLowerCase().includes(lowerQuery))
-    );
-  },
-
-  // Filter dishes by category
-  getDishesByCategory: async (
-    restaurantId: string,
-    category: string
-  ): Promise<Dish[]> => {
-    await new Promise((resolve) => setTimeout(resolve, 300));
-    return mockDishes.filter(
-      (d) => d.restaurantId === restaurantId && d.category === category
-    );
-  },
-
-  // Filter dishes by veg/non-veg
-  getDishesByVegType: async (
-    restaurantId: string,
-    isVeg: boolean
-  ): Promise<Dish[]> => {
-    await new Promise((resolve) => setTimeout(resolve, 300));
-    return mockDishes.filter(
-      (d) => d.restaurantId === restaurantId && d.isVeg === isVeg
-    );
-  },
-
-  // Get all unique categories for a restaurant
-  getCategories: async (restaurantId: string): Promise<string[]> => {
-    await new Promise((resolve) => setTimeout(resolve, 300));
-    const dishes = mockDishes.filter((d) => d.restaurantId === restaurantId);
-    const categories = [...new Set(dishes.map((d) => d.category))];
-    return categories;
-  },
-
-  // Get advertisements
-  getAdvertisements: async (
-    position?: "top" | "sidebar" | "bottom"
-  ): Promise<Advertisement[]> => {
-    await new Promise((resolve) => setTimeout(resolve, 300));
-    let ads = mockAdvertisements.filter((ad) => ad.isActive);
-
-    if (position) {
-      ads = ads.filter((ad) => ad.position === position);
-    }
-
-    return ads.sort(() => Math.random() - 0.5);
-  },
-
-  // Track ad impression
-  trackAdImpression: async (adId: string): Promise<void> => {
-    await new Promise((resolve) => setTimeout(resolve, 100));
-    const ad = mockAdvertisements.find((a) => a.id === adId);
-    if (ad) {
-      ad.impressions++;
-      console.log(`Ad impression tracked: ${adId}`);
-    }
-  },
-
-  // Track ad click
-  trackAdClick: async (adId: string): Promise<void> => {
-    await new Promise((resolve) => setTimeout(resolve, 100));
-    const ad = mockAdvertisements.find((a) => a.id === adId);
-    if (ad) {
-      ad.clicks++;
-      console.log(`Ad click tracked: ${adId}`);
-    }
-  },
-};
-
-// ==========================================
-// EXPORT SUMMARY
-// ==========================================
-
-/*
-SUMMARY OF MOCK DATA:
-
-RESTAURANTS (3):
-1. Pizza Paradise (pizza_paradise_123) - 3 dishes
-2. Spice Route (spice_route_456) - 3 dishes  
-3. Burger Hub (burger_hub_789) - 16 dishes
-
-TOTAL DISHES: 22
-
-CATEGORIES:
-- Pizza (2 dishes)
-- Pasta (1 dish)
-- Main Course (2 dishes)
-- Rice (1 dish)
-- Burgers (5 dishes)
-- Sides (4 dishes)
-- Beverages (3 dishes)
-- Salads (2 dishes)
-- Appetizers (1 dish)
-- Desserts (1 dish)
-
-PRICE VARIATIONS:
-- Half/Full (for Indian dishes)
-- Small/Medium/Large (for pizzas, burgers, sides, beverages)
-
-VEG vs NON-VEG:
-- Vegetarian dishes: 14
-- Non-vegetarian dishes: 8
-*/

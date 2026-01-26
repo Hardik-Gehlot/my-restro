@@ -1,5 +1,3 @@
-import { db } from './mock-data';
-
 import { Clock, Globe, Store,Wifi } from 'lucide-react';
 
 export const featuresSection = {
@@ -60,11 +58,6 @@ export const pricingSection = {
   const whatsappNumber = "919096706395";
   const whatsappMessage = "Hi! I'm interested in getting a digital menu for my restaurant.";
  export const whatsappLink = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`;
+
+export const RESTAURANT_CACHE_DURATION = 7 * 24 * 60 * 60 * 1000;
  
- 
-export async function fetchAllRestaurantData(restaurantId: string) {
-  const restaurant = await db.getRestaurantById(restaurantId);
-  const dishes = await db.getDishesByRestaurant(restaurantId);
-  
-  return { restaurant, dishes };
-}

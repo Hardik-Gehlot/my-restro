@@ -1,54 +1,99 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Edit2, Instagram, Facebook, Twitter, Linkedin, Youtube, MapPin } from 'lucide-react';
-import { db } from '@/lib/mock-data';
 import RestaurantEditModal from '@/components/admin/modals/RestaurantEditModal';
 import ProtectedRoute from '@/components/admin/ProtectedRoute';
-import { fetchAllRestaurantData } from '@/lib/common-data';
 import { useToast } from '@/components/shared/CustomToast';
+import { db } from '@/app/database';
+import { ApiResponse, Dish, KEYS, Restaurant } from '@/types';
+import { useRouter } from 'next/navigation';
 
 export default function ProfilePage() {
-  const [restaurant, setRestaurant] = useState(null);
+  const router = useRouter();
+  const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [editingRestaurant, setEditingRestaurant] = useState(null);
   const { showToast } = useToast();
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchRestaurant = async () => {
+    const fetchData = async () => {
       try {
-        // In a real app, you'd get the logged-in user's restaurant ID
-        const restaurantId = "pizza_paradise_123";
-        const { restaurant: fetchedRestaurant } = await fetchAllRestaurantData(restaurantId);
-        setRestaurant(fetchedRestaurant);
+        const token = sessionStorage.getItem(KEYS.JWT_TOKEN);
+        
+        if (!token || token.length === 0) {
+          console.log('No token found in menu page, redirecting to login');
+          router.push('/admin/login');
+          return;
+        }
+        
+        const data: ApiResponse = await db.getAdminRestaurantDataWithMenu(token);
+        console.log('Fetched restaurant data admin profile:', data);
+        if (data.status === 'error') {
+          if (typeof data?.message === 'string') {
+            showToast(data.message, 'error');
+          } else {
+            showToast("Failed to fetch restaurant data.", 'error');
+          }
+          sessionStorage.removeItem(KEYS.JWT_TOKEN);
+          router.push('/admin/login');
+          return;
+        }
+        
+        if (data.data) {
+          setRestaurant(data.data.restaurantData);
+          setIsLoading(false);
+        } else {
+          showToast("No data received from server.", 'error');
+          router.push('/admin/login');
+        }
       } catch (error) {
+        console.error('Error fetching data:', error);
         showToast("Failed to fetch restaurant data.", 'error');
+        sessionStorage.removeItem(KEYS.JWT_TOKEN);
+        router.push('/admin/login');
       }
     };
-    fetchRestaurant();
+    
+    fetchData();
   }, []);
 
-  const handleUpdateRestaurant = async (updatedRestaurant) => {
-    try {
-      const savedRestaurant = await db.updateRestaurant(updatedRestaurant.id, updatedRestaurant);
-      setRestaurant(savedRestaurant);
-      setEditingRestaurant(null);
-      showToast("Restaurant details updated successfully!", 'success');
-    } catch (error) {
-      showToast("Failed to update restaurant details.", 'error');
+  const handleUpdateRestaurant = async (updatedRestaurant: Restaurant) => {
+  try {
+    const token = sessionStorage.getItem(KEYS.JWT_TOKEN);
+    if (!token) {
+      showToast("Authentication required. Please login again.", 'error');
+      router.push('/admin/login');
+      return;
     }
-  };
+
+    const response = await db.updateRestaurant(token, updatedRestaurant);
+    
+    if (response.status === 'error') {
+      showToast(response.message || "Failed to update restaurant details.", 'error');
+      return;
+    }
+
+    setRestaurant(updatedRestaurant);
+    setEditingRestaurant(null);
+    showToast("Restaurant details updated successfully!", 'success');
+  } catch (error) {
+    console.error('Error updating restaurant:', error);
+    showToast("Failed to update restaurant details.", 'error');
+  }
+};
 
   if (!restaurant) {
     return (
-      <ProtectedRoute>
+      <div>
         <div className="flex items-center justify-center h-screen">
           <div className="animate-spin w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full"></div>
         </div>
-      </ProtectedRoute>
+      </div>
     );
   }
 
   return (
-    <ProtectedRoute>
+    <div>
       <div className="p-4 sm:p-6">
         {/* Restaurant Cover */}
         <div className="bg-white rounded-xl overflow-hidden shadow-sm mb-4">
@@ -180,6 +225,6 @@ export default function ProfilePage() {
           />
         )}
       </div>
-    </ProtectedRoute>
+    </div>
   );
 }

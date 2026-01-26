@@ -3,8 +3,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { FiMail, FiLock, FiAlertCircle, FiAward } from 'react-icons/fi';
-import { db } from '@/lib/mock-data';
-import { auth } from '@/lib/auth';
+import { db } from '@/app/database';
+import { KEYS } from '@/types';
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -13,29 +13,29 @@ export default function AdminLoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
-
-    try {
-      const user = await db.loginAdmin(email, password);
-      
-      if (user) {
-        // Save session
-        auth.saveSession(user);
-        
-        // Redirect to dashboard
-        router.push('/admin/dashboard');
-      } else {
-        setError('Invalid email or password');
+    const handleSubmit = async (e: React.MouseEvent) => {
+      e.preventDefault();
+      if (!email || !password) {
+        setError('Please enter both email and password');
+        return;
       }
-    } catch (err) {
-      setError('An error occurred. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
+      setError('');
+      setLoading(true);
+      try {
+        const response = await db.login(email,password);
+  
+        if (response.status==='error') {
+          setError(response.data || 'Login failed');
+          setLoading(false);
+          return;
+        }
+        sessionStorage.setItem(KEYS.JWT_TOKEN, response.data);
+        router.push('/admin/dashboard/menu');
+      } catch (err) {
+        setError('An error occurred. Please try again.');
+        setLoading(false);
+      }
+    };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-amber-50 flex items-center justify-center p-4">

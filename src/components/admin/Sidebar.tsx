@@ -4,20 +4,25 @@ import { Fragment } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Dialog, Transition } from '@headlessui/react';
-import { FiGrid, FiUser, FiLogOut, FiX } from 'react-icons/fi';
+import { FiUser, FiLogOut, FiX } from 'react-icons/fi';
+import { BiSolidDish } from "react-icons/bi";
+import { HiMiniRectangleStack } from "react-icons/hi2";
+import { IoIosSettings } from "react-icons/io";
+import { db } from '@/app/database';
 
 const Sidebar = ({ restaurant, open, setOpen }) => {
   const pathname = usePathname();
 
   const navLinks = [
-    { href: '/admin/dashboard/menu', icon: FiGrid, label: 'Menu' },
     { href: '/admin/dashboard/profile', icon: FiUser, label: 'Profile' },
+    { href: '/admin/dashboard/menu', icon: BiSolidDish, label: 'Menu' },
+    { href: '/admin/dashboard/category', icon: HiMiniRectangleStack, label: 'Category' },
+    { href: '/admin/dashboard/setting', icon: IoIosSettings, label: 'Settings' },
   ];
 
   const handleLogout = () => {
     if (confirm('Are you sure you want to logout?')) {
-      alert('Logged out successfully!');
-      // Add actual logout logic here
+      db.logout();
     }
   };
 
