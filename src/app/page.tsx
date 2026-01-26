@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react';
-import { Menu, X, ChevronRight, Check } from 'lucide-react';
-import { featuresSection,whatsappLink,pricingSection } from '@/lib/common-data';
+import { Icons } from '@/lib/icons';
+import { featuresSection,whatsappLink,pricingSection, WEBSITE_DETAILS } from '@/lib/common-data';
 export default function DigitalMenuLanding() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -20,7 +20,7 @@ export default function DigitalMenuLanding() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="flex justify-between items-center h-16">
             <div className="text-xl sm:text-2xl font-bold text-orange-600 cursor-pointer" onClick={() => scrollToSection('home')}>
-              DineOnline
+              {WEBSITE_DETAILS.name}
             </div>
 
             {/* Mobile menu button */}
@@ -28,7 +28,7 @@ export default function DigitalMenuLanding() {
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="sm:hidden p-2"
             >
-              {isMenuOpen ? <X size={24} className='text-black' /> : <Menu size={24} className='text-black' />}
+              {isMenuOpen ? <Icons.X size={24} className='text-black' /> : <Icons.Menu size={24} className='text-black' />}
             </button>
 
             {/* Desktop menu */}
@@ -97,7 +97,7 @@ export default function DigitalMenuLanding() {
               className="inline-flex items-center px-8 py-4 bg-orange-600 text-white font-semibold rounded-lg hover:bg-orange-700 transition shadow-lg hover:shadow-xl"
             >
               Get Your Digital Menu
-              <ChevronRight className="ml-2" size={20} />
+              <Icons.ChevronRight className="ml-2" size={20} />
             </a>
           </div>
         </div>
@@ -184,7 +184,7 @@ export default function DigitalMenuLanding() {
                 <ul className="space-y-4">
                   {plan.features.map((feature) => (
                     <li key={feature} className="flex items-start">
-                      <Check
+                      <Icons.Check
                         className="text-green-500 mr-3 mt-1 flex-shrink-0"
                         size={20}
                       />
@@ -200,7 +200,7 @@ export default function DigitalMenuLanding() {
                   className='mt-8 w-full flex items-center justify-center px-6 py-4 font-semibold rounded-lg transition shadow-lg hover:shadow-xl bg-orange-600 text-white hover:bg-orange-700'
                 >
                   {plan.ctaText}
-                  <ChevronRight className="ml-2" size={20} />
+                  <Icons.ChevronRight className="ml-2" size={20} />
                 </a>
               </div>
             </div>
@@ -214,7 +214,7 @@ export default function DigitalMenuLanding() {
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 mb-8">
             <div>
-              <h3 className="text-xl font-bold text-orange-500 mb-4">DineOnline</h3>
+              <h3 className="text-xl font-bold text-orange-500 mb-4">{WEBSITE_DETAILS.name}</h3>
               <p className="text-gray-400">
                 Bringing restaurants online with modern digital menu solutions.
               </p>
@@ -252,7 +252,7 @@ export default function DigitalMenuLanding() {
             </div>
           </div>
           <div className="border-t border-gray-800 pt-8 text-center text-gray-400">
-            <p>© {new Date().getFullYear()} DineDigital. All rights reserved.</p>
+            <p>© {new Date().getFullYear()} {WEBSITE_DETAILS.name}. All rights reserved.</p>
           </div>
         </div>
       </footer>

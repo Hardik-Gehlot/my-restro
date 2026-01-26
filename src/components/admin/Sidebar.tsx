@@ -4,20 +4,17 @@ import { Fragment } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Dialog, Transition } from '@headlessui/react';
-import { FiUser, FiLogOut, FiX } from 'react-icons/fi';
-import { BiSolidDish } from "react-icons/bi";
-import { HiMiniRectangleStack } from "react-icons/hi2";
-import { IoIosSettings } from "react-icons/io";
+import { Icons } from '@/lib/icons';
 import { db } from '@/app/database';
 
 const Sidebar = ({ restaurant, open, setOpen }) => {
   const pathname = usePathname();
 
   const navLinks = [
-    { href: '/admin/dashboard/profile', icon: FiUser, label: 'Profile' },
-    { href: '/admin/dashboard/menu', icon: BiSolidDish, label: 'Menu' },
-    { href: '/admin/dashboard/category', icon: HiMiniRectangleStack, label: 'Category' },
-    { href: '/admin/dashboard/setting', icon: IoIosSettings, label: 'Settings' },
+    { href: '/admin/dashboard/profile', icon: Icons.FiUser, label: 'Profile' },
+    { href: '/admin/dashboard/menu', icon: Icons.BiSolidDish, label: 'Menu' },
+    { href: '/admin/dashboard/category', icon: Icons.HiMiniRectangleStack, label: 'Category' },
+    { href: '/admin/dashboard/setting', icon: Icons.IoIosSettings, label: 'Settings' },
   ];
 
   const handleLogout = () => {
@@ -66,7 +63,7 @@ const Sidebar = ({ restaurant, open, setOpen }) => {
           onClick={handleLogout}
           className="w-full flex items-center justify-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 font-medium text-red-600 bg-red-50 hover:bg-red-100"
         >
-          <FiLogOut className="w-6 h-6" />
+          <Icons.FiLogOut className="w-6 h-6" />
           <span>Logout</span>
         </button>
       </div>
@@ -108,7 +105,7 @@ const Sidebar = ({ restaurant, open, setOpen }) => {
                     onClick={() => setOpen(false)}
                   >
                     <span className="sr-only">Close sidebar</span>
-                    <FiX className="h-6 w-6 text-white" aria-hidden="true" />
+                    <Icons.FiX className="h-6 w-6 text-white" aria-hidden="true" />
                   </button>
                 </div>
                 {sidebarContent}

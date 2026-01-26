@@ -1,4 +1,6 @@
-import { BiSolidDish } from "react-icons/bi";
+import { Icons } from "@/lib/icons";
+import { WEBSITE_DETAILS } from "@/lib/common-data";
+
 export default function Footer() {
   return (
       <footer className="bg-white/30 backdrop-blur-md border-t border-white/60 mt-8">
@@ -6,8 +8,8 @@ export default function Footer() {
           
           {/* Logo / Brand */}
           <div className="flex items-center gap-2 text-2xl font-semibold text-gray-800">
-            <BiSolidDish className="text-3xl text-orange-500" />
-            <span>DineOnline</span>
+            <Icons.BiSolidDish className="text-3xl text-orange-500" />
+            <span>{WEBSITE_DETAILS.name}</span>
           </div>
 
           {/* Divider */}
@@ -15,7 +17,7 @@ export default function Footer() {
 
           {/* Copyright */}
           <p className="text-sm text-gray-600">
-            © {new Date().getFullYear()} DineOnline. All rights reserved.
+            © {new Date().getFullYear()} {WEBSITE_DETAILS.name}. All rights reserved.
           </p>
 
           {/* Contact Developer */}

@@ -3,6 +3,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { mockUsers } from '@/lib/mock-data';
 import { JWTPayload } from '@/types';
+import { JWT_EXPIRY } from '@/lib/common-data';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
 
@@ -34,7 +35,7 @@ export async function POST(request: NextRequest) {
       email: user.email,
       restaurantId: user.restaurantId
     };
-    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '1d' });
     return NextResponse.json({ token }, { status: 200 });
   } catch (error) {
     console.error('Login error:', error);

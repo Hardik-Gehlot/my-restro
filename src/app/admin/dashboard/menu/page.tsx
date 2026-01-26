@@ -1,12 +1,12 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Plus, Edit2, Trash2, Search, ChevronUp } from "lucide-react";
+import { Icons } from "@/lib/icons";
 import AddDishModal from "@/components/admin/modals/AddDishModal";
 import DishEditModal from "@/components/admin/modals/DishEditModal";
 import { Disclosure, Transition } from "@headlessui/react";
 import { useToast } from "@/components/shared/CustomToast";
 import { db } from "@/app/database";
-import { ApiResponse, Dish, KEYS, Restaurant } from "@/types";
+import { ApiResponse, Dish, KEYS, Restaurant, Category } from "@/types";
 import { useRouter } from "next/navigation";
 
 interface DishesByCategory {
@@ -19,6 +19,7 @@ export default function AdminDashboard() {
     null,
   );
   const [dishes, setDishes] = useState<Dish[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingDish, setEditingDish] = useState<Dish | null>(null);
@@ -54,7 +55,9 @@ export default function AdminDashboard() {
 
         if (data.data) {
           setCurrentRestaurant(data.data.restaurantData);
+          setCurrentRestaurant(data.data.restaurantData);
           setDishes(data.data.menuData || []);
+          setCategories(data.data.categoriesData || []);
           setIsLoading(false);
         } else {
           showToast("No data received from server.", "error");
@@ -160,7 +163,7 @@ export default function AdminDashboard() {
         >
           <div className="px-4 sm:px-6 lg:px-8 py-3">
             <div className="relative">
-              <Search
+              <Icons.Search
                 className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 z-10"
                 size={20}
               />
@@ -205,7 +208,7 @@ export default function AdminDashboard() {
           {Object.keys(dishesByCategory).length === 0 ? (
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
               <div className="inline-flex items-center justify-center w-16 h-16 bg-orange-100 rounded-full mb-4">
-                <Plus size={28} className="text-orange-600" />
+                <Icons.Plus size={28} className="text-orange-600" />
               </div>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
                 No dishes yet
@@ -218,7 +221,7 @@ export default function AdminDashboard() {
                 className="inline-flex items-center gap-2 px-6 py-3 bg-orange-600 text-white 
                        font-semibold rounded-lg hover:bg-orange-700 transition-colors"
               >
-                <Plus size={20} />
+                <Icons.Plus size={20} />
                 Add First Dish
               </button>
             </div>
@@ -255,7 +258,7 @@ export default function AdminDashboard() {
                         <span className="text-lg font-bold text-gray-900">
                           {category}
                         </span>
-                        <ChevronUp
+                        <Icons.ChevronUp
                           className={`${
                             open ? "" : "transform rotate-180"
                           } w-5 h-5 text-orange-600 transition-transform`}
@@ -335,7 +338,7 @@ export default function AdminDashboard() {
                                   className="flex-1 flex items-center justify-center gap-2 py-3 
                                          text-blue-600 hover:bg-blue-50 transition-colors font-medium"
                                 >
-                                  <Edit2 size={18} />
+                                  <Icons.Edit2 size={18} />
                                   Edit
                                 </button>
                                 <button
@@ -343,7 +346,7 @@ export default function AdminDashboard() {
                                   className="flex-1 flex items-center justify-center gap-2 py-3 
                                          text-red-600 hover:bg-red-50 transition-colors border-l font-medium"
                                 >
-                                  <Trash2 size={18} />
+                                  <Icons.Trash2 size={18} />
                                   Delete
                                 </button>
                               </div>
@@ -366,7 +369,7 @@ export default function AdminDashboard() {
           onClick={() => setShowAddModal(true)}
           className="fixed bottom-6 right-6 bg-orange-600 text-white rounded-lg shadow-lg z-50 flex items-center justify-center px-3 py-2 text-sm"
         >
-          <Plus size={20} />
+          <Icons.Plus size={20} />
           <span>Add Dish</span>
         </button>
       </div>
@@ -377,6 +380,7 @@ export default function AdminDashboard() {
           onClose={() => setShowAddModal(false)}
           onSave={handleAddDish}
           restaurantId={currentRestaurant?.id}
+          categories={categories}
         />
       )}
       {editingDish && (
@@ -384,6 +388,7 @@ export default function AdminDashboard() {
           dish={editingDish}
           onClose={() => setEditingDish(null)}
           onSave={handleEditDish}
+          categories={categories}
         />
       )}
     </div>

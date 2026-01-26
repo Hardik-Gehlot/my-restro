@@ -66,6 +66,7 @@ export interface ApiResponse {
     restaurantData?: Restaurant | null;
     menuData?: Dish[];
     categoriesData?: Category[];
+    token?: string;
   };
 }
 

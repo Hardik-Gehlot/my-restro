@@ -1,7 +1,7 @@
 'use server';
 import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
-import { mockUsers,mockRestaurants, mockDishes } from '@/lib/mock-data';
+import { mockUsers,mockRestaurants, mockDishes, mockCategories } from '@/lib/mock-data';
 import { JWTPayload } from '@/types';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
@@ -40,11 +40,13 @@ export async function GET(request: NextRequest) {
       );
     }
     const dishes = mockDishes.filter(d => d.restaurantId === restaurant.id);
+    const cetegories = mockCategories.filter(c => c.restaurantId === restaurant.id);
     const { name,email} = user;
     return NextResponse.json({
       user: {name,email},
       restaurantData:restaurant,
-      menuData:dishes
+      menuData:dishes,
+      categoriesData:cetegories
     }, { status: 200 });
   } catch (error) {
     console.error('Get restaurant data error:', error);

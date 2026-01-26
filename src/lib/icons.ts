@@ -1,0 +1,69 @@
+import { 
+  Clock, 
+  Globe, 
+  Store, 
+  Wifi, 
+  Plus, 
+  Edit2, 
+  Trash2, 
+  X, 
+  Search, 
+  ChevronUp,
+  User,
+  LogOut,
+  MapPin,
+  Phone,
+  Mail,
+  Facebook,
+  Twitter,
+  Instagram,
+  Linkedin,
+  Menu,
+  ChevronRight,
+  Check,
+  Lock,
+  Loader2
+} from 'lucide-react';
+
+import { FiUser, FiLogOut, FiX, FiAward, FiArrowLeft } from 'react-icons/fi';
+import { BiSolidDish } from "react-icons/bi";
+import { HiMiniRectangleStack } from "react-icons/hi2";
+import { IoIosSettings } from "react-icons/io";
+
+export const Icons = {
+  // Lucide
+  Clock,
+  Globe,
+  Store,
+  Wifi,
+  Plus,
+  Edit2,
+  Trash2,
+  X,
+  Search,
+  ChevronUp,
+  ChevronRight,
+  Check,
+  User,
+  LogOut,
+  MapPin,
+  Phone,
+  Mail,
+  Facebook,
+  Twitter,
+  Instagram,
+  Linkedin,
+  Menu,
+  Lock,
+  Loader2,
+
+  // React Icons
+  FiUser,
+  FiLogOut,
+  FiX,
+  FiAward,
+  FiArrowLeft,
+  BiSolidDish,
+  HiMiniRectangleStack,
+  IoIosSettings
+};

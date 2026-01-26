@@ -1,29 +1,34 @@
-import { Clock, Globe, Store,Wifi } from 'lucide-react';
+import { Icons } from './icons';
+
+export const WEBSITE_DETAILS = {
+  name: 'MenuDigital',
+  icon: Icons.Store
+};
 
 export const featuresSection = {
-  heading: 'Why Choose MenuDigital?',
+  heading: `Why Choose ${WEBSITE_DETAILS.name}?`,
   subHeading: 'Everything you need to take your restaurant online',
   items: [
     {
       title: 'Quick Setup',
       description: 'Get online in minutes with our easy setup process',
-      icon: Clock,
+      icon: Icons.Clock,
     },
     {
       title: 'QR Code Access',
       description: 'Contactless menu viewing for modern dining',
-      icon: Globe,
+      icon: Icons.Globe,
     },
     {
       title: 'Easy Management',
       description: 'Update your menu anytime, anywhere',
-      icon: Store,
+      icon: Icons.Store,
     },
     {
       title: 'NFC Integration',
       description:
         'Allow customers to access your digital menu instantly with a simple NFC tap',
-      icon: Wifi,
+      icon: Icons.Wifi,
     },
   ],
 };
@@ -60,4 +65,5 @@ export const pricingSection = {
  export const whatsappLink = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`;
 
 export const RESTAURANT_CACHE_DURATION = 7 * 24 * 60 * 60 * 1000;
+export const JWT_EXPIRY = 24 * 60 * 60 * 1000; //one day
  

@@ -1,15 +1,15 @@
 'use client';
 import { useState, Fragment } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
-import { Trash2, X } from 'lucide-react';
+import { Icons } from '@/lib/icons';
 
 // Add Dish Modal Component
-const AddDishModal = ({ onClose, onSave, restaurantId }) => {
+const AddDishModal = ({ onClose, onSave, restaurantId, categories }) => {
     const [form, setForm] = useState({
         name: "",
         description: "",
         image: "",
-        category: "Pizza",
+        category: categories.length > 0 ? categories[0].name : "",
         isVeg: true,
         variations: [{ size: "small", price: 0 }]
     });
@@ -95,7 +95,7 @@ const AddDishModal = ({ onClose, onSave, restaurantId }) => {
                                                             onClick={onClose}
                                                         >
                                                             <span className="sr-only">Close panel</span>
-                                                            <X className="h-6 w-6" />
+                                                            <Icons.X className="h-6 w-6" />
                                                         </button>
                                                     </div>
                                                 </div>
@@ -152,13 +152,11 @@ const AddDishModal = ({ onClose, onSave, restaurantId }) => {
                                                             onChange={(e) => update("category", e.target.value)}
                                                             className="w-full border border-gray-300 p-3 rounded-lg text-gray-900"
                                                         >
-                                                            <option>Pizza</option>
-                                                            <option>Pasta</option>
-                                                            <option>Burgers</option>
-                                                            <option>Sides</option>
-                                                            <option>Beverages</option>
-                                                            <option>Desserts</option>
-                                                            <option>Starters</option>
+                                                            {categories.map((category) => (
+                                                                <option key={category.id} value={category.name}>
+                                                                    {category.name}
+                                                                </option>
+                                                            ))}
                                                         </select>
                                                     </div>
                                                 </div>
@@ -213,7 +211,7 @@ const AddDishModal = ({ onClose, onSave, restaurantId }) => {
                                                                       onClick={() => removeVariation(index)}
                                                                       className="text-red-600 hover:text-red-700 px-2"
                                                                   >
-                                                                      <Trash2 size={18} />
+                                                                      <Icons.Trash2 size={18} />
                                                                   </button>
                                                               )}
                                                           </div>

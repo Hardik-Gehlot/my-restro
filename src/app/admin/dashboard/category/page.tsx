@@ -1,7 +1,7 @@
 
 'use client';
 import { useState, useEffect } from 'react';
-import { Plus, Edit2, Trash2, X } from 'lucide-react';
+import { Icons } from '@/lib/icons';
 import { useToast } from '@/components/shared/CustomToast';
 import { db } from '@/app/database';
 import { Category, KEYS } from '@/types';
@@ -60,7 +60,7 @@ export default function CategoriesPage() {
       return;
     }
 
-    setCategories([...categories, response.data!.category]);
+    setCategories([...categories, response.data!]);
     setShowAddModal(false);
     setCategoryName('');
     showToast('Category added successfully!', 'success');
@@ -82,7 +82,7 @@ export default function CategoriesPage() {
       return;
     }
 
-    setCategories(categories.map(c => c.id === editingCategory.id ? response.data!.category : c));
+    setCategories(categories.map(c => c.id === editingCategory.id ? response.data! : c));
     setEditingCategory(null);
     setCategoryName('');
     showToast('Category updated successfully!', 'success');
@@ -140,7 +140,7 @@ export default function CategoriesPage() {
               className="flex items-center gap-2 px-6 py-3 bg-orange-600 text-white 
                        font-semibold rounded-lg hover:bg-orange-700 transition-colors"
             >
-              <Plus size={20} />
+              <Icons.Plus size={20} />
               Add Category
             </button>
           </div>
@@ -148,10 +148,10 @@ export default function CategoriesPage() {
 
         {/* Categories List */}
         <div className="space-y-3">
-          {categories.length === 0 ? (
+          {categories && categories.length === 0 ? (
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
               <div className="inline-flex items-center justify-center w-16 h-16 bg-orange-100 rounded-full mb-4">
-                <Plus size={28} className="text-orange-600" />
+                <Icons.Plus size={28} className="text-orange-600" />
               </div>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">No categories yet</h3>
               <p className="text-gray-600 mb-6">Create your first category to organize your menu</p>
@@ -160,12 +160,12 @@ export default function CategoriesPage() {
                 className="inline-flex items-center gap-2 px-6 py-3 bg-orange-600 text-white 
                          font-semibold rounded-lg hover:bg-orange-700 transition-colors"
               >
-                <Plus size={20} />
+                <Icons.Plus size={20} />
                 Add First Category
               </button>
             </div>
           ) : (
-            categories.map((category) => (
+            categories.filter(c => c).map((category) => (
               <div key={category.id} className="bg-white rounded-xl shadow-sm border border-gray-200 
                                               hover:shadow-md hover:border-orange-200 transition-all">
                 <div className="flex items-center justify-between p-4">
@@ -177,14 +177,14 @@ export default function CategoriesPage() {
                       className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                       title="Edit category"
                     >
-                      <Edit2 size={18} />
+                      <Icons.Edit2 size={18} />
                     </button>
                     <button
                       onClick={() => handleDeleteCategory(category.id)}
                       className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                       title="Delete category"
                     >
-                      <Trash2 size={18} />
+                      <Icons.Trash2 size={18} />
                     </button>
                   </div>
                 </div>
@@ -196,9 +196,9 @@ export default function CategoriesPage() {
 
       {/* Add/Edit Modal */}
       {(showAddModal || editingCategory) && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 text-gray-800">
           <div className="bg-white rounded-xl shadow-xl max-w-md w-full">
-            <div className="flex items-center justify-between p-6 border-b">
+            <div className="flex items-center justify-between p-6">
               <h2 className="text-xl font-bold text-gray-900">
                 {editingCategory ? 'Edit Category' : 'Add Category'}
               </h2>
@@ -206,11 +206,11 @@ export default function CategoriesPage() {
                 onClick={closeModal}
                 className="text-gray-400 hover:text-gray-600 transition-colors"
               >
-                <X size={24} />
+                <Icons.X size={24} />
               </button>
             </div>
 
-            <div className="p-6">
+            <div className="p-4">
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Category Name
               </label>
@@ -225,7 +225,7 @@ export default function CategoriesPage() {
               />
             </div>
 
-            <div className="flex gap-3 p-6 border-t">
+            <div className="flex gap-3 p-4">
               <button
                 onClick={closeModal}
                 className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 font-semibold 
