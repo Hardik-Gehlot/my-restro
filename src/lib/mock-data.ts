@@ -55,7 +55,7 @@ export const mockRestaurants: Restaurant[] = [
     twitterLink: "https://twitter.com/pizzaparadise",
     linkedinLink: "",
     youtubeLink: "",
-    active_pan: "basic",
+    active_plan: "basic",
   plan_expiry: "21 Jan 2027"
   },
   {
@@ -74,8 +74,8 @@ export const mockRestaurants: Restaurant[] = [
     twitterLink: "",
     linkedinLink: "",
     youtubeLink: "",
-        active_pan: "basic",
-  plan_expiry: "21 Jan 2027"
+    active_plan: "basic",
+    plan_expiry: "21 Jan 2027"
   },
   {
     id: "burger_hub_789",
@@ -93,8 +93,8 @@ export const mockRestaurants: Restaurant[] = [
     twitterLink: "https://twitter.com/burgerhub",
     linkedinLink: "",
     youtubeLink: "",
-        active_pan: "basic",
-  plan_expiry: "21 Jan 2027"
+    active_plan: "basic",
+    plan_expiry: "21 Jan 2027"
   },
 ];
 
