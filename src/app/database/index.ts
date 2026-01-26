@@ -4,6 +4,7 @@ import {
 import { mockDishes, mockRestaurants, mockUsers } from "@/lib/mock-data";
 import { supabaseDatabase } from "@/lib/supabase";
 import { AdminRestaurantCacheData, ApiResponse, Category, Dish, KEYS, Restaurant, RestaurantCacheData, User } from "@/types";
+import { idb } from "@/lib/indexeddb";
 
 export const db = {
   updateRestaurant: async (
@@ -83,9 +84,9 @@ export const db = {
     restaurantId: string,
   ): Promise<{ restaurant: Restaurant | null; menu: Dish[] }> => {
     try {
-      const cachedData = localStorage.getItem(KEYS.RESTAURANT_DATA);
+      const cachedData = await idb.get(KEYS.RESTAURANT_DATA);
       if (cachedData) {
-        const parsed: RestaurantCacheData = JSON.parse(cachedData);
+        const parsed: RestaurantCacheData = cachedData;
         if (parsed.restaurantData.id === restaurantId) {
           const now = Date.now();
           if (now - parsed.timestamp < RESTAURANT_CACHE_DURATION) {
@@ -106,7 +107,7 @@ export const db = {
           menuData,
           timestamp: Date.now(),
         };
-        localStorage.setItem(KEYS.RESTAURANT_DATA, JSON.stringify(cacheData));
+        await idb.set(KEYS.RESTAURANT_DATA, cacheData);
       }
 
       return {
@@ -148,7 +149,7 @@ export const db = {
   },
   logout: async (): Promise<{ status: string, message: string }> => {
     sessionStorage.removeItem(KEYS.JWT_TOKEN);
-    localStorage.removeItem(KEYS.ADMIN_RESTAURANT_DATA);
+    await idb.clearAuthData();
     return {
       status: "success",
       message: "Logged out successfully"
@@ -168,11 +169,11 @@ export const db = {
       };
     }
     try {
-      const RestaurantCacheData = localStorage.getItem(KEYS.ADMIN_RESTAURANT_DATA);
+      const RestaurantCacheData = await idb.get(KEYS.ADMIN_RESTAURANT_DATA);
       if (RestaurantCacheData) {
         return {
           status: "success",
-          data: JSON.parse(RestaurantCacheData),
+          data: RestaurantCacheData,
         };
       }
       const response = await fetch("/api/restaurant", {
@@ -190,15 +191,13 @@ export const db = {
           data: data.error,
         };
       }
-      localStorage.setItem(
-        KEYS.ADMIN_RESTAURANT_DATA,
-        JSON.stringify({
-          restaurantData: data.restaurantData,
-          menuData: data.menuData,
-          categoriesData: data.categoriesData,
-          timestamp: Date.now(),
-        }),
-      );
+      const cacheData = {
+        restaurantData: data.restaurantData,
+        menuData: data.menuData,
+        categoriesData: data.categoriesData,
+        timestamp: Date.now(),
+      };
+      await idb.set(KEYS.ADMIN_RESTAURANT_DATA, cacheData);
       return {
         status: "success",
         data: {
@@ -216,10 +215,10 @@ export const db = {
   },
   getCategories: async (token: string): Promise<ApiResponse> => {
     try {
-      const cachedData = localStorage.getItem(KEYS.ADMIN_RESTAURANT_DATA);
+      const cachedData = await idb.get(KEYS.ADMIN_RESTAURANT_DATA);
 
       if (cachedData) {
-        const parsedData = JSON.parse(cachedData) as AdminRestaurantCacheData;
+        const parsedData = cachedData as AdminRestaurantCacheData;
         if (parsedData.categoriesData) {
           console.log('Returning categories from cache');
           return {
@@ -245,11 +244,11 @@ export const db = {
           message: data.error || 'Failed to fetch categories',
         };
       }
-      const existingData = localStorage.getItem(KEYS.ADMIN_RESTAURANT_DATA);
-      const restaurantData = existingData ? JSON.parse(existingData) : {};
+      const existingData = await idb.get(KEYS.ADMIN_RESTAURANT_DATA);
+      const restaurantData = existingData || {};
 
       restaurantData.categoriesData = data.categoriesData;
-      localStorage.setItem(KEYS.ADMIN_RESTAURANT_DATA, JSON.stringify(restaurantData));
+      await idb.set(KEYS.ADMIN_RESTAURANT_DATA, restaurantData);
 
       return {
         status: 'success',
@@ -285,12 +284,12 @@ export const db = {
           message: data.error || 'Failed to add category',
         };
       }
-      const cachedData = localStorage.getItem(KEYS.ADMIN_RESTAURANT_DATA);
+      const cachedData = await idb.get(KEYS.ADMIN_RESTAURANT_DATA);
       if (cachedData) {
-        const parsedData = JSON.parse(cachedData);
+        const parsedData = cachedData;
         if (parsedData.categoriesData) {
           parsedData.categoriesData.push(data.category);
-          localStorage.setItem(KEYS.ADMIN_RESTAURANT_DATA, JSON.stringify(parsedData));
+          await idb.set(KEYS.ADMIN_RESTAURANT_DATA, parsedData);
         }
       }
 
@@ -327,15 +326,15 @@ export const db = {
         };
       }
 
-      // Update localStorage
-      const cachedData = localStorage.getItem(KEYS.ADMIN_RESTAURANT_DATA);
+      // Update IndexedDB
+      const cachedData = await idb.get(KEYS.ADMIN_RESTAURANT_DATA);
       if (cachedData) {
-        const parsedData = JSON.parse(cachedData);
+        const parsedData = cachedData;
         if (parsedData.categoriesData) {
           const index = parsedData.categoriesData.findIndex((c: Category) => c.id === categoryId);
           if (index !== -1) {
             parsedData.categoriesData[index] = data.category;
-            localStorage.setItem(KEYS.ADMIN_RESTAURANT_DATA, JSON.stringify(parsedData));
+            await idb.set(KEYS.ADMIN_RESTAURANT_DATA, parsedData);
           }
         }
       }
@@ -373,13 +372,13 @@ export const db = {
         };
       }
 
-      // Update localStorage
-      const cachedData = localStorage.getItem(KEYS.ADMIN_RESTAURANT_DATA);
+      // Update IndexedDB
+      const cachedData = await idb.get(KEYS.ADMIN_RESTAURANT_DATA);
       if (cachedData) {
-        const parsedData = JSON.parse(cachedData) as AdminRestaurantCacheData;
+        const parsedData = cachedData as AdminRestaurantCacheData;
         if (parsedData.categoriesData) {
           parsedData.categoriesData = parsedData.categoriesData.filter((c: Category) => c.id !== categoryId);
-          localStorage.setItem(KEYS.ADMIN_RESTAURANT_DATA, JSON.stringify(parsedData));
+          await idb.set(KEYS.ADMIN_RESTAURANT_DATA, parsedData);
         }
       }
 
@@ -419,7 +418,7 @@ export const db = {
       return {
         status: 'success',
         message: 'Password changed successfully',
-        data: {token: data.token}
+        data: { token: data.token }
       };
     } catch (error) {
       console.error('Error changing password:', error);

@@ -2,17 +2,49 @@
 import { useState, Fragment } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { X } from 'lucide-react';
+import { Restaurant } from '@/types';
 
+interface RestaurantEditModalProps {
+    restaurant: Restaurant;
+    onClose: () => void;
+    onSave: (restaurant: Restaurant) => void;
+}
 
-const RestaurantEditModal = ({ restaurant, onClose, onSave }) => {
+const RestaurantEditModal = ({ restaurant, onClose, onSave }: RestaurantEditModalProps) => {
     const [form, setForm] = useState(restaurant);
+    const [errors, setErrors] = useState<{ name?: string; mobileNo?: string }>({});
 
-    const update = (key, value) => {
+    const update = (key: keyof Restaurant, value: string) => {
         setForm(prev => ({ ...prev, [key]: value }));
+        // Clear error for this field when user starts typing
+        if (errors[key as 'name' | 'mobileNo']) {
+            setErrors(prev => ({ ...prev, [key]: undefined }));
+        }
+    };
+
+    const validateForm = (): boolean => {
+        const newErrors: { name?: string; mobileNo?: string } = {};
+
+        // Validate restaurant name
+        if (!form.name || form.name.trim() === '') {
+            newErrors.name = 'Restaurant name is required';
+        }
+
+        // Validate mobile number
+        if (!form.mobileNo || form.mobileNo.trim() === '') {
+            newErrors.mobileNo = 'Mobile number is required';
+        } else if (!/^\d{10}$/.test(form.mobileNo.trim())) {
+            newErrors.mobileNo = 'Mobile number must be exactly 10 digits';
+        }
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
     };
 
     const handleSubmit = () => {
-        onSave(form);
+        if (validateForm()) {
+            onSave(form);
+        }
     };
 
     return (
@@ -76,8 +108,13 @@ const RestaurantEditModal = ({ restaurant, onClose, onSave }) => {
                                                         <input
                                                             value={form.name}
                                                             onChange={(e) => update("name", e.target.value)}
-                                                            className="w-full border border-gray-300 p-3 rounded-lg text-gray-900"
+                                                            className={`w-full border p-3 rounded-lg text-gray-900 ${
+                                                                errors.name ? 'border-red-500' : 'border-gray-300'
+                                                            }`}
                                                         />
+                                                        {errors.name && (
+                                                            <p className="mt-1 text-sm text-red-600">{errors.name}</p>
+                                                        )}
                                                     </div>
                                                 </div>
                                                 <div className="space-y-4 px-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:px-6 sm:py-5">
@@ -100,8 +137,14 @@ const RestaurantEditModal = ({ restaurant, onClose, onSave }) => {
                                                         <input
                                                             value={form.mobileNo}
                                                             onChange={(e) => update("mobileNo", e.target.value)}
-                                                            className="w-full border border-gray-300 p-3 rounded-lg text-gray-900"
+                                                            className={`w-full border p-3 rounded-lg text-gray-900 ${
+                                                                errors.mobileNo ? 'border-red-500' : 'border-gray-300'
+                                                            }`}
+                                                            placeholder="10 digit mobile number"
                                                         />
+                                                        {errors.mobileNo && (
+                                                            <p className="mt-1 text-sm text-red-600">{errors.mobileNo}</p>
+                                                        )}
                                                     </div>
                                                 </div>
                                                 <div className="space-y-4 px-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:px-6 sm:py-5">
