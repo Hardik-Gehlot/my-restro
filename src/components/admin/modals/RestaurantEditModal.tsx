@@ -11,7 +11,20 @@ interface RestaurantEditModalProps {
 }
 
 const RestaurantEditModal = ({ restaurant, onClose, onSave }: RestaurantEditModalProps) => {
-    const [form, setForm] = useState(restaurant);
+    const [form, setForm] = useState<Restaurant>({
+        ...restaurant,
+        tagline: restaurant.tagline || '',
+        logo: restaurant.logo || '',
+        coverImage: restaurant.coverImage || '',
+        aboutus: restaurant.aboutus || '',
+        googleMapLink: restaurant.googleMapLink || '',
+        googleRatingLink: restaurant.googleRatingLink || '',
+        instagramLink: restaurant.instagramLink || '',
+        facebookLink: restaurant.facebookLink || '',
+        twitterLink: restaurant.twitterLink || '',
+        linkedinLink: restaurant.linkedinLink || '',
+        youtubeLink: restaurant.youtubeLink || '',
+    });
     const [errors, setErrors] = useState<{ name?: string; mobileNo?: string }>({});
 
     const update = (key: keyof Restaurant, value: string) => {

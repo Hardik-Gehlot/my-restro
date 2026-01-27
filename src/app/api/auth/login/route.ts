@@ -47,7 +47,8 @@ export async function POST(request: NextRequest) {
     const payload: JWTPayload = {
       userId: user.id,
       email: user.email,
-      restaurantId: user.restaurant_id
+      restaurantId: user.restaurant_id,
+      role: user.role
     };
 
     const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });

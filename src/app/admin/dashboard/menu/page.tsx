@@ -55,7 +55,6 @@ export default function AdminDashboard() {
 
         if (data.data) {
           setCurrentRestaurant(data.data.restaurantData);
-          setCurrentRestaurant(data.data.restaurantData);
           setDishes(data.data.menuData || []);
           setCategories(data.data.categoriesData || []);
           setIsLoading(false);

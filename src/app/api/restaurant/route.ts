@@ -41,15 +41,18 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Fetch restaurant with menu and categories
+    // Fetch restaurant with menu and categories (Optimized column selection)
     const { data: restaurant, error: restaurantError } = await supabase
       .from('restaurants')
       .select(`
-        *,
-        categories (*),
+        id, name, tagline, mobile_no, logo, cover_image, google_map_link, google_rating_link, about_us, 
+        instagram_link, facebook_link, twitter_link, linkedin_link, youtube_link,
+        active_plan, plan_expiry,
+        categories (id, name, restaurant_id),
         dishes (
-          *,
-          dish_variations (*)
+          id, restaurant_id, category_id, name, description, image, is_veg, is_available,
+          categories (name),
+          dish_variations (id, size, price)
         )
       `)
       .eq('id', payload.restaurantId)
@@ -69,9 +72,11 @@ export async function GET(request: NextRequest) {
       isVeg: dish.is_veg,
       name: dish.name,
       image: dish.image || '',
-      category: dish.category_id || '',
+      categoryId: dish.category_id,
+      category: dish.categories?.name || 'Other',
       description: dish.description || '',
       variations: (dish.dish_variations || []).map((v: any) => ({
+        id: v.id,
         size: v.size,
         price: parseFloat(v.price),
       })),
@@ -92,7 +97,15 @@ export async function GET(request: NextRequest) {
       restaurantData: {
         ...restaurantData,
         mobileNo: restaurantData.mobile_no,
+        coverImage: restaurantData.cover_image,
+        googleMapLink: restaurantData.google_map_link,
+        googleRatingLink: restaurantData.google_rating_link,
         aboutus: restaurantData.about_us,
+        instagramLink: restaurantData.instagram_link,
+        facebookLink: restaurantData.facebook_link,
+        twitterLink: restaurantData.twitter_link,
+        linkedinLink: restaurantData.linkedin_link,
+        youtubeLink: restaurantData.youtube_link,
       },
       menuData,
       categoriesData

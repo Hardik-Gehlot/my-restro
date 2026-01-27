@@ -49,6 +49,13 @@ const testUser = {
     password_hash: '$2b$10$dGq18bgdY46i0S0JYWnksOwA18vWtmb2Xj8ejXxiDIEL2x6z8CaGG',
 };
 
+const superadminUser = {
+    email: 'superadmin@menudigital.com',
+    name: 'Master Admin',
+    role: 'superadmin',
+    password_hash: '$2b$10$dGq18bgdY46i0S0JYWnksOwA18vWtmb2Xj8ejXxiDIEL2x6z8CaGG', // admin123
+};
+
 // ============================================
 // Execution
 // ============================================
@@ -91,6 +98,19 @@ async function injectData() {
         console.log('✅ User inserted:', user.email);
         console.log(`   ID: ${user.id}`);
         console.log(`   Linked Restaurant ID: ${user.restaurant_id}`);
+
+        console.log('\n3️⃣ Inserting Superadmin User...');
+        const { data: superadmin, error: superError } = await supabase
+            .from('users')
+            .insert(superadminUser)
+            .select()
+            .single();
+
+        if (superError) {
+            console.error('❌ Failed to insert superadmin:', superError);
+        } else {
+            console.log('✅ Superadmin inserted:', superadmin.email);
+        }
 
         console.log('\n📊 VERIFICATION QUERY');
         console.log('='.repeat(50));

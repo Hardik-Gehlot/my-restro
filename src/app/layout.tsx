@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { WEBSITE_DETAILS } from "@/lib/common-data";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -13,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "My Restro",
-  description: "Digitize your restaurant",
+  title: WEBSITE_DETAILS.name,
+  description: "Digitize your restaurant with modern digital menus",
 };
 
 export default function RootLayout({
@@ -24,6 +25,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <title>{WEBSITE_DETAILS.name}</title>
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

@@ -85,10 +85,8 @@ export const updateFirebaseTimestamp = async (
 
     try {
         const docRef = doc(db, 'restaurant_timestamps', restaurantId);
-        const timestampData: RestaurantTimestamp = {
+        const timestampData = {
             lastUpdated: Date.now(),
-            updatedBy,
-            changeType,
         };
 
         await setDoc(docRef, timestampData);

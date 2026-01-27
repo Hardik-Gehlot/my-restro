@@ -1,13 +1,13 @@
-import { 
-  Clock, 
-  Globe, 
-  Store, 
-  Wifi, 
-  Plus, 
-  Edit2, 
-  Trash2, 
-  X, 
-  Search, 
+import {
+  Clock,
+  Globe,
+  Store,
+  Wifi,
+  Plus,
+  Edit2,
+  Trash2,
+  X,
+  Search,
   ChevronUp,
   User,
   LogOut,
@@ -22,7 +22,12 @@ import {
   ChevronRight,
   Check,
   Lock,
-  Loader2
+  Loader2,
+  CreditCard,
+  Layout,
+  Youtube,
+  Download,
+  FileText
 } from 'lucide-react';
 
 import { FiUser, FiLogOut, FiX, FiAward, FiArrowLeft } from 'react-icons/fi';
@@ -56,6 +61,11 @@ export const Icons = {
   Menu,
   Lock,
   Loader2,
+  CreditCard,
+  Layout,
+  Youtube,
+  Download,
+  FileText,
 
   // React Icons
   FiUser,

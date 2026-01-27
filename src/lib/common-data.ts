@@ -39,12 +39,12 @@ export const pricingSection = {
 
   plans: [
     {
-      id: 'complete',
-      name: 'Complete Package',
+      id: 'basic',
+      name: 'Basic Plan',
       price: '₹1,999/yr',
       originalPrice: '₹2,999/yr',
       badge: 'Most Popular',
-      description: 'Best value for growing restaurants',
+      description: 'Everything you need to digitize your restaurant',
       features: [
         'Unlimited products and menu items',
         'Management dashboard with analytics',
@@ -60,10 +60,10 @@ export const pricingSection = {
 };
 
 
-  const whatsappNumber = "919096706395";
-  const whatsappMessage = "Hi! I'm interested in getting a digital menu for my restaurant.";
- export const whatsappLink = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`;
+const whatsappNumber = "919096706395";
+const whatsappMessage = "Hi! I'm interested in getting a digital menu for my restaurant.";
+export const whatsappLink = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`;
 
 export const RESTAURANT_CACHE_DURATION = 7 * 24 * 60 * 60 * 1000;
 export const JWT_EXPIRY = 24 * 60 * 60 * 1000; //one day
- 
+

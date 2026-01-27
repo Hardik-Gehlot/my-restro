@@ -107,12 +107,19 @@ export const db = {
    */
   updateDish: async (token: string, id: string, data: Partial<Dish>): Promise<Dish | null> => {
     try {
+      // Prepare payload - prioritize categoryId if available
+      const payload = {
+        id,
+        ...data,
+        categoryId: data.categoryId || data.category,
+      };
+
       const response = await fetchWithTimeout(
         API_ENDPOINTS.DISH,
         {
           method: 'PUT',
           headers: createAuthHeaders(token),
-          body: JSON.stringify({ id, ...data, categoryId: data.category }),
+          body: JSON.stringify(payload),
         },
         CONFIG.API_TIMEOUT
       );
@@ -192,12 +199,17 @@ export const db = {
    */
   addDish: async (token: string, dish: Omit<Dish, "id">): Promise<Dish | null> => {
     try {
+      const payload = {
+        ...dish,
+        categoryId: dish.categoryId || dish.category,
+      };
+
       const response = await fetchWithTimeout(
         API_ENDPOINTS.DISH,
         {
           method: 'POST',
           headers: createAuthHeaders(token),
-          body: JSON.stringify({ ...dish, categoryId: dish.category }),
+          body: JSON.stringify(payload),
         },
         CONFIG.API_TIMEOUT
       );
@@ -812,5 +824,114 @@ export const db = {
    */
   trackAdClick: async (adId: string): Promise<void> => {
     console.log(`Ad Click tracked for: ${adId}`);
+  },
+
+  /**
+   * Superadmin: Get dashboard stats and all restaurants
+   */
+  getSuperStats: async (token: string): Promise<ApiResponse> => {
+    try {
+      const response = await fetchWithTimeout(
+        '/api/superadmin/dashboard',
+        {
+          method: 'GET',
+          headers: createAuthHeaders(token),
+        },
+        CONFIG.API_TIMEOUT
+      );
+      const data = await parseJsonResponse(response);
+      if (!response.ok) return { status: 'error', message: data.error || 'Failed to fetch stats' };
+      return { status: 'success', data };
+    } catch (error) {
+      return { status: 'error', message: 'Network error or timeout' };
+    }
+  },
+
+  /**
+   * Superadmin: Update restaurant plan/expiry
+   */
+  updateRestaurantPlan: async (token: string, id: string, plan: string, expiryDate: string, planAmount: number): Promise<ApiResponse> => {
+    try {
+      const response = await fetchWithTimeout(
+        `/api/superadmin/restaurant/${id}`,
+        {
+          method: 'PUT',
+          headers: createAuthHeaders(token),
+          body: JSON.stringify({ action: 'update_plan', plan, expiryDate, planAmount }),
+        },
+        CONFIG.API_TIMEOUT
+      );
+      const data = await parseJsonResponse(response);
+      if (!response.ok) return { status: 'error', message: data.error || 'Update failed' };
+      return { status: 'success', message: 'Plan updated' };
+    } catch (error) {
+      return { status: 'error', message: 'Network error' };
+    }
+  },
+
+  /**
+   * Superadmin: Reset restaurant password
+   */
+  resetRestaurantPassword: async (token: string, id: string, newPassword: string): Promise<ApiResponse> => {
+    try {
+      const response = await fetchWithTimeout(
+        `/api/superadmin/restaurant/${id}`,
+        {
+          method: 'PUT',
+          headers: createAuthHeaders(token),
+          body: JSON.stringify({ action: 'reset_password', newPassword }),
+        },
+        CONFIG.API_TIMEOUT
+      );
+      const data = await parseJsonResponse(response);
+      if (!response.ok) return { status: 'error', message: data.error || 'Reset failed' };
+      return { status: 'success', message: 'Password reset' };
+    } catch (error) {
+      return { status: 'error', message: 'Network error' };
+    }
+  },
+
+  /**
+   * Superadmin: Create new restaurant and user
+   */
+  createRestaurant: async (token: string, restaurantName: string, mobileNo: string, email: string, password: string): Promise<ApiResponse> => {
+    try {
+      const response = await fetchWithTimeout(
+        '/api/superadmin/restaurant',
+        {
+          method: 'POST',
+          headers: createAuthHeaders(token),
+          body: JSON.stringify({ action: 'create_single', restaurantName, mobileNo, email, password }),
+        },
+        CONFIG.API_TIMEOUT
+      );
+      const data = await parseJsonResponse(response);
+      if (!response.ok) return { status: 'error', message: data.error || 'Creation failed' };
+      return { status: 'success', data: data.restaurantId, message: 'Restaurant created' };
+    } catch (error) {
+      return { status: 'error', message: 'Network error' };
+    }
+  },
+
+  /**
+   * Superadmin: Bulk upload dishes for a specific restaurant
+   */
+  bulkUploadDishes: async (token: string, restaurantId: string, bulkData: any[]): Promise<ApiResponse> => {
+    try {
+      const response = await fetchWithTimeout(
+        '/api/superadmin/restaurant',
+        {
+          method: 'POST',
+          headers: createAuthHeaders(token),
+          body: JSON.stringify({ action: 'bulk_upload_dishes', restaurantId, bulkData }),
+        },
+        CONFIG.API_TIMEOUT
+      );
+      const data = await parseJsonResponse(response);
+      if (!response.ok) return { status: 'error', message: data.error || 'Bulk upload failed' };
+      return { status: 'success', message: data.message, data: data.count };
+    } catch (error) {
+      return { status: 'error', message: 'Network error' };
+    }
   },
 };

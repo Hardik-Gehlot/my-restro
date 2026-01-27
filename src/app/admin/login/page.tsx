@@ -30,7 +30,20 @@ export default function AdminLoginPage() {
           return;
         }
         sessionStorage.setItem(KEYS.JWT_TOKEN, response.data);
-        router.push('/admin/dashboard/menu');
+        
+        // Decode token to check role
+        try {
+          const parts = response.data.split('.');
+          const payload = JSON.parse(atob(parts[1]));
+          
+          if (payload.role === 'superadmin') {
+            router.push('/superadmin/dashboard');
+          } else {
+            router.push('/admin/dashboard/menu');
+          }
+        } catch (e) {
+          router.push('/admin/dashboard/menu');
+        }
       } catch (err) {
         setError('An error occurred. Please try again.');
         setLoading(false);

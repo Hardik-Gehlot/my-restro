@@ -7,7 +7,7 @@ export interface User {
   password: string; // In production, this would be hashed
   restaurantId: string;
   name: string;
-  role: "admin";
+  role: "admin" | "superadmin";
   createdAt: string;
 }
 
@@ -15,6 +15,7 @@ export interface JWTPayload {
   userId: string;
   email: string;
   restaurantId: string;
+  role: "admin" | "superadmin";
 }
 
 // ============================================
@@ -98,9 +99,11 @@ export interface Restaurant {
   youtubeLink?: string;
   active_plan?: string;
   plan_expiry?: string;
+  planAmount?: number;
 }
 
 export interface DishVariation {
+  id?: string;
   size: "half" | "full" | "small" | "medium" | "large" | "price";
   price: number;
 }
@@ -111,7 +114,8 @@ export interface Dish {
   isVeg: boolean;
   name: string;
   image: string;
-  category: string;
+  category: string; // This will store the category NAME for display
+  categoryId?: string; // This will store the category ID for logic/updates
   description: string;
   variations: DishVariation[];
   isAvailable: boolean;

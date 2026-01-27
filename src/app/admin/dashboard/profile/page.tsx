@@ -1,12 +1,13 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { Edit2, Instagram, Facebook, Twitter, Linkedin, Youtube, MapPin } from 'lucide-react';
 import RestaurantEditModal from '@/components/admin/modals/RestaurantEditModal';
 import ProtectedRoute from '@/components/admin/ProtectedRoute';
 import { useToast } from '@/components/shared/CustomToast';
 import { db } from '@/app/database';
 import { ApiResponse, Dish, KEYS, Restaurant } from '@/types';
 import { useRouter } from 'next/navigation';
+import { Icons } from '@/lib/icons';
+import { whatsappLink } from '@/lib/common-data';
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -92,6 +93,8 @@ export default function ProfilePage() {
     );
   }
 
+  const isExpired = new Date(restaurant.plan_expiry || 0) <= new Date();
+
   return (
     <div>
       <div className="p-4 sm:p-6">
@@ -108,17 +111,72 @@ export default function ProfilePage() {
               <img 
                 src={restaurant.logo} 
                 alt={restaurant.name}
-                className="w-20 h-20 rounded-full border-4 border-white object-cover"
+                className="w-20 h-20 rounded-full border-4 border-white object-cover shadow-lg"
               />
               <div>
-                <h2 className="text-2xl font-bold text-white">{restaurant.name}</h2>
-                <p className="text-md text-white/90">{restaurant.tagline}</p>
+                <h2 className="text-2xl font-bold text-white drop-shadow-md">{restaurant.name}</h2>
+                <p className="text-md text-white/90 drop-shadow-sm">{restaurant.tagline}</p>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Restaurant Details */}
+        {/* Small Subscription Plan Section */}
+        <div className="bg-white rounded-xl p-4 shadow-sm mb-4 border border-gray-100">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="p-2 bg-orange-50 rounded-lg">
+                <Icons.CreditCard className="w-6 h-6 text-orange-600" />
+              </div>
+              <div>
+                <p className="text-xs font-bold text-gray-500 uppercase tracking-tight">Active Plan</p>
+                <h3 className="text-lg font-bold text-gray-900 leading-tight">
+                  {restaurant.active_plan || 'Free Plan'}
+                </h3>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-4">
+              <div>
+                <p className="text-xs font-bold text-gray-500 uppercase tracking-tight">Status & Expiry</p>
+                <div className="flex items-center gap-2">
+                  <div className={`w-2 h-2 rounded-full ${!isExpired ? 'bg-green-500' : 'bg-red-500 animate-pulse'}`}></div>
+                  <span className={`text-sm font-bold ${!isExpired ? 'text-green-700' : 'text-red-700'}`}>
+                    {!isExpired ? 'Valid' : 'Expired'}
+                  </span>
+                  <span className="text-gray-400">|</span>
+                  <span className="text-sm font-medium text-gray-700">
+                    {restaurant.plan_expiry ? new Date(restaurant.plan_expiry).toLocaleDateString('en-IN', {
+                      day: 'numeric',
+                      month: 'short',
+                      year: 'numeric'
+                    }) : 'N/A'}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {isExpired && (
+              <a 
+                href={whatsappLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-bold rounded-lg transition-all shadow-md group"
+              >
+                <Icons.Phone className="w-4 h-4 group-hover:animate-bounce" />
+                Contact Admin
+              </a>
+            )}
+            
+            {!isExpired && restaurant.plan_expiry && (
+               <div className="bg-blue-50 px-3 py-1 rounded-full text-[10px] font-bold text-blue-700 uppercase">
+                 {Math.ceil((new Date(restaurant.plan_expiry).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))} Days Left
+               </div>
+            )}
+          </div>
+        </div>
+
+        {/* Restaurant Information Card */}
         <div className="bg-white rounded-xl p-6 shadow-sm mb-4">
           <h3 className="text-xl font-bold text-gray-900 mb-6">Restaurant Information</h3>
           
@@ -147,7 +205,7 @@ export default function ProfilePage() {
                               rel="noopener noreferrer"
                               className="text-base text-blue-600 hover:underline flex items-center gap-1"
                             >
-                              <MapPin size={16} /> View on Google Maps
+                              <Icons.MapPin size={16} /> View on Google Maps
                             </a>
                           </div>
                         )}
@@ -161,7 +219,7 @@ export default function ProfilePage() {
                               rel="noopener noreferrer"
                               className="text-base text-blue-600 hover:underline flex items-center gap-1"
                             >
-                              <Edit2 size={16} /> Rate on Google
+                              <Icons.Edit2 size={16} /> Rate on Google
                             </a>
                           </div>
                         )}
@@ -177,31 +235,31 @@ export default function ProfilePage() {
             <div className="flex flex-wrap gap-4">
               {restaurant.instagramLink && (
                 <a href={restaurant.instagramLink} target="_blank" rel="noopener noreferrer" className="text-pink-600 hover:text-pink-700 flex items-center gap-2">
-                  <Instagram size={24} />
+                  <Icons.Instagram size={24} />
                   <span className="sr-only">Instagram</span>
                 </a>
               )}
               {restaurant.facebookLink && (
                 <a href={restaurant.facebookLink} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-700 flex items-center gap-2">
-                  <Facebook size={24} />
+                  <Icons.Facebook size={24} />
                   <span className="sr-only">Facebook</span>
                 </a>
               )}
               {restaurant.twitterLink && (
                 <a href={restaurant.twitterLink} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-500 flex items-center gap-2">
-                  <Twitter size={24} />
+                  <Icons.Twitter size={24} />
                   <span className="sr-only">Twitter</span>
                 </a>
               )}
               {restaurant.linkedinLink && (
                 <a href={restaurant.linkedinLink} target="_blank" rel="noopener noreferrer" className="text-blue-700 hover:text-blue-800 flex items-center gap-2">
-                  <Linkedin size={24} />
+                  <Icons.Linkedin size={24} />
                   <span className="sr-only">LinkedIn</span>
                 </a>
               )}
               {restaurant.youtubeLink && (
                 <a href={restaurant.youtubeLink} target="_blank" rel="noopener noreferrer" className="text-red-600 hover:text-red-700 flex items-center gap-2">
-                  <Youtube size={24} />
+                  <Icons.Youtube size={24} />
                   <span className="sr-only">YouTube</span>
                 </a>
               )}
@@ -212,7 +270,7 @@ export default function ProfilePage() {
             onClick={() => setEditingRestaurant(restaurant)}
             className="w-full mt-8 bg-orange-600 text-white py-3 rounded-lg font-semibold flex items-center justify-center gap-2"
           >
-            <Edit2 size={20} />
+            <Icons.Edit2 size={20} />
             Edit Restaurant Details
           </button>
         </div>

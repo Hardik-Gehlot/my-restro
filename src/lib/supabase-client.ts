@@ -23,32 +23,32 @@ export const getServiceRoleClient = () => {
  */
 export const fetchRestaurantWithMenu = async (restaurantId: string) => {
     try {
-        // Fetch restaurant
+        // Fetch restaurant (Exclude sensitive plan details and system fields for public)
         const { data: restaurant, error: restaurantError } = await supabase
             .from('restaurants')
-            .select('*')
+            .select('id, name, tagline, mobile_no, logo, cover_image, google_map_link, google_rating_link, about_us, instagram_link, facebook_link, twitter_link, linkedin_link, youtube_link')
             .eq('id', restaurantId)
             .single();
 
         if (restaurantError) throw restaurantError;
 
-        // Fetch dishes with variations and category details
+        // Fetch dishes with variations and category details (Exclude system fields)
         const { data: dishes, error: dishesError } = await supabase
             .from('dishes')
             .select(`
-                *,
-                categories (name),
-                dish_variations (*)
+                id, restaurant_id, category_id, name, description, image, is_veg, is_available,
+                categories (id, name),
+                dish_variations (id, size, price)
             `)
             .eq('restaurant_id', restaurantId)
             .eq('is_available', true);
 
         if (dishesError) throw dishesError;
 
-        // Fetch categories
+        // Fetch categories (Exclude system fields)
         const { data: categories, error: categoriesError } = await supabase
             .from('categories')
-            .select('*')
+            .select('id, name, restaurant_id')
             .eq('restaurant_id', restaurantId);
 
         if (categoriesError) throw categoriesError;
@@ -60,9 +60,11 @@ export const fetchRestaurantWithMenu = async (restaurantId: string) => {
             isVeg: dish.is_veg,
             name: dish.name,
             image: dish.image || '',
+            categoryId: dish.category_id,
             category: dish.categories?.name || 'Other',
             description: dish.description || '',
             variations: (dish.dish_variations || []).map((v: any) => ({
+                id: v.id,
                 size: v.size,
                 price: parseFloat(v.price),
             })),
@@ -90,8 +92,6 @@ export const fetchRestaurantWithMenu = async (restaurantId: string) => {
             twitterLink: restaurant.twitter_link,
             linkedinLink: restaurant.linkedin_link,
             youtubeLink: restaurant.youtube_link,
-            active_plan: restaurant.active_plan,
-            plan_expiry: restaurant.plan_expiry,
         };
 
         return {

@@ -14,9 +14,22 @@ interface DishEditModalProps {
 
 // Edit Dish Modal Component
 const DishEditModal = ({ dish, onClose, onSave, categories }: DishEditModalProps) => {
-    const [form, setForm] = useState<Dish>(dish);
+    const [form, setForm] = useState<Dish>({
+        ...dish,
+        category: dish.categoryId || dish.category // Ensure category name fallback
+    });
 
     const update = (key: keyof Dish, value: any) => {
+        if (key === 'category') {
+            // When category (ID) is updated, we also want to update the name if possible
+            const selectedCategory = categories.find(c => c.id === value);
+            setForm(prev => ({ 
+                ...prev, 
+                category: selectedCategory?.name || prev.category,
+                categoryId: value 
+            }));
+            return;
+        }
         setForm(prev => ({ ...prev, [key]: value }));
     };
 
@@ -132,9 +145,14 @@ const DishEditModal = ({ dish, onClose, onSave, categories }: DishEditModalProps
                                                     <div className="sm:col-span-2">
                                                         <textarea
                                                             value={form.description}
-                                                            onChange={(e) => update("description", e.target.value)}
+                                                            onChange={(e) => update("description", e.target.value.slice(0, 150))}
                                                             className="w-full border border-gray-300 p-3 rounded-lg text-gray-900 min-h-[80px]"
                                                         />
+                                                        <div className="flex justify-end mt-1">
+                                                            <span className={`text-xs ${form.description.length >= 150 ? 'text-red-500' : 'text-gray-500'}`}>
+                                                                {form.description.length}/150
+                                                            </span>
+                                                        </div>
                                                     </div>
                                                 </div>
                                                 <div className="space-y-4 px-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:px-6 sm:py-5">
@@ -143,16 +161,40 @@ const DishEditModal = ({ dish, onClose, onSave, categories }: DishEditModalProps
                                                     </div>
                                                     <div className="sm:col-span-2">
                                                         <select
-                                                            value={form.category}
+                                                            value={form.categoryId || ""}
                                                             onChange={(e) => update("category", e.target.value)}
                                                             className="w-full border border-gray-300 p-3 rounded-lg text-gray-900"
                                                         >
+                                                            <option value="" disabled>Select a category</option>
                                                             {categories.map((category) => (
                                                                 <option key={category.id} value={category.id}>
                                                                     {category.name}
                                                                 </option>
                                                             ))}
                                                         </select>
+                                                    </div>
+                                                </div>
+                                                <div className="space-y-4 px-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:px-6 sm:py-5">
+                                                    <div>
+                                                        <label className="block text-sm font-semibold text-gray-900 mb-1">Availability</label>
+                                                    </div>
+                                                    <div className="sm:col-span-2">
+                                                        <div className="flex items-center gap-3">
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => update("isAvailable", !form.isAvailable)}
+                                                                className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 ${form.isAvailable ? 'bg-orange-600' : 'bg-gray-200'}`}
+                                                            >
+                                                                <span className="sr-only">Toggle availability</span>
+                                                                <span
+                                                                    aria-hidden="true"
+                                                                    className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${form.isAvailable ? 'translate-x-5' : 'translate-x-0'}`}
+                                                                />
+                                                            </button>
+                                                            <span className={`text-sm font-medium ${form.isAvailable ? 'text-green-600' : 'text-red-500'}`}>
+                                                                {form.isAvailable ? 'Available' : 'Unavailable'}
+                                                            </span>
+                                                        </div>
                                                     </div>
                                                 </div>
                                                 <div className="space-y-4 px-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:px-6 sm:py-5">
@@ -188,6 +230,7 @@ const DishEditModal = ({ dish, onClose, onSave, categories }: DishEditModalProps
                                                                   onChange={(e) => updateVariation(index, 'size', e.target.value)}
                                                                   className="flex-1 border border-gray-300 p-2 rounded-lg text-gray-900"
                                                               >
+                                                                  <option value="price">Price (Standard)</option>
                                                                   <option value="small">Small</option>
                                                                   <option value="medium">Medium</option>
                                                                   <option value="large">Large</option>

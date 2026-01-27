@@ -41,6 +41,9 @@ export default function RestaurantDetailPage() {
     
     const { restaurant } = await db.getRestaurantDataWithMenu(restaurantId, isRefresh);
     setRestaurant(restaurant);
+    if (restaurant) {
+      document.title = `${restaurant.name} | Special Menu`;
+    }
     setLoading(false);
   };
 

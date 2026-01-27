@@ -16,8 +16,10 @@ interface FormState {
     name: string;
     description: string;
     image: string;
-    category: string;
+    category: string; // This will store the category NAME
+    categoryId: string; // This will store the category ID
     isVeg: boolean;
+    isAvailable: boolean;
     variations: DishVariation[];
 }
 
@@ -27,12 +29,23 @@ const AddDishModal = ({ onClose, onSave, restaurantId, categories }: AddDishModa
         name: "",
         description: "",
         image: "",
-        category: categories.length > 0 ? categories[0].id : "", // Store ID instead of name
+        category: categories.length > 0 ? categories[0].name : "",
+        categoryId: categories.length > 0 ? categories[0].id : "",
         isVeg: true,
+        isAvailable: true,
         variations: [{ size: "price", price: 0 }]
     });
 
     const update = (key: keyof FormState, value: any) => {
+        if (key === 'categoryId') {
+            const selectedCategory = categories.find(c => c.id === value);
+            setForm(prev => ({ 
+                ...prev, 
+                categoryId: value,
+                category: selectedCategory?.name || prev.category
+            }));
+            return;
+        }
         setForm(prev => ({ ...prev, [key]: value }));
     };
 
@@ -159,9 +172,14 @@ const AddDishModal = ({ onClose, onSave, restaurantId, categories }: AddDishModa
                                                         <textarea
                                                             placeholder="Describe your dish"
                                                             value={form.description}
-                                                            onChange={(e) => update("description", e.target.value)}
+                                                            onChange={(e) => update("description", e.target.value.slice(0, 150))}
                                                             className="w-full border border-gray-300 p-3 rounded-lg text-gray-900 placeholder-gray-500 min-h-[80px]"
                                                         />
+                                                        <div className="flex justify-end mt-1">
+                                                            <span className={`text-xs ${form.description.length >= 150 ? 'text-red-500' : 'text-gray-500'}`}>
+                                                                {form.description.length}/150
+                                                            </span>
+                                                        </div>
                                                     </div>
                                                 </div>
                                                 <div className="space-y-4 px-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:px-6 sm:py-5">
@@ -170,8 +188,8 @@ const AddDishModal = ({ onClose, onSave, restaurantId, categories }: AddDishModa
                                                     </div>
                                                     <div className="sm:col-span-2">
                                                         <select
-                                                            value={form.category}
-                                                            onChange={(e) => update("category", e.target.value)}
+                                                            value={form.categoryId}
+                                                            onChange={(e) => update("categoryId", e.target.value)}
                                                             className="w-full border border-gray-300 p-3 rounded-lg text-gray-900"
                                                         >
                                                             {categories.map((category) => (
@@ -180,6 +198,29 @@ const AddDishModal = ({ onClose, onSave, restaurantId, categories }: AddDishModa
                                                                 </option>
                                                             ))}
                                                         </select>
+                                                    </div>
+                                                </div>
+                                                <div className="space-y-4 px-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:px-6 sm:py-5">
+                                                    <div>
+                                                        <label className="block text-sm font-semibold text-gray-900 mb-1">Availability</label>
+                                                    </div>
+                                                    <div className="sm:col-span-2">
+                                                        <div className="flex items-center gap-3">
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => update("isAvailable", !form.isAvailable)}
+                                                                className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 ${form.isAvailable ? 'bg-orange-600' : 'bg-gray-200'}`}
+                                                            >
+                                                                <span className="sr-only">Toggle availability</span>
+                                                                <span
+                                                                    aria-hidden="true"
+                                                                    className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${form.isAvailable ? 'translate-x-5' : 'translate-x-0'}`}
+                                                                />
+                                                            </button>
+                                                            <span className={`text-sm font-medium ${form.isAvailable ? 'text-green-600' : 'text-red-500'}`}>
+                                                                {form.isAvailable ? 'Available' : 'Unavailable'}
+                                                            </span>
+                                                        </div>
                                                     </div>
                                                 </div>
                                                 <div className="space-y-4 px-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:space-y-0 sm:px-6 sm:py-5">
@@ -215,6 +256,7 @@ const AddDishModal = ({ onClose, onSave, restaurantId, categories }: AddDishModa
                                                                   onChange={(e) => updateVariation(index, 'size', e.target.value)}
                                                                   className="flex-1 border border-gray-300 p-2 rounded-lg text-gray-900"
                                                               >
+                                                                  <option value="price">Price (Standard)</option>
                                                                   <option value="small">Small</option>
                                                                   <option value="medium">Medium</option>
                                                                   <option value="large">Large</option>
