@@ -3,35 +3,57 @@ import { useState, Fragment } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { Icons } from '@/lib/icons';
 
+import { Dish, Category, DishVariation } from '@/types';
+
+interface AddDishModalProps {
+    onClose: () => void;
+    onSave: (dish: Omit<Dish, 'id'> & { id?: string }) => void;
+    restaurantId: string;
+    categories: Category[];
+}
+
+interface FormState {
+    name: string;
+    description: string;
+    image: string;
+    category: string;
+    isVeg: boolean;
+    variations: DishVariation[];
+}
+
 // Add Dish Modal Component
-const AddDishModal = ({ onClose, onSave, restaurantId, categories }) => {
-    const [form, setForm] = useState({
+const AddDishModal = ({ onClose, onSave, restaurantId, categories }: AddDishModalProps) => {
+    const [form, setForm] = useState<FormState>({
         name: "",
         description: "",
         image: "",
-        category: categories.length > 0 ? categories[0].name : "",
+        category: categories.length > 0 ? categories[0].id : "", // Store ID instead of name
         isVeg: true,
-        variations: [{ size: "small", price: 0 }]
+        variations: [{ size: "price", price: 0 }]
     });
 
-    const update = (key, value) => {
+    const update = (key: keyof FormState, value: any) => {
         setForm(prev => ({ ...prev, [key]: value }));
     };
 
     const addVariation = () => {
         setForm(prev => ({
             ...prev,
-            variations: [...prev.variations, { size: "medium", price: 0 }]
+            variations: [...prev.variations, { size: "price", price: 0 }]
         }));
     };
 
-    const updateVariation = (index, field, value) => {
+    const updateVariation = (index: number, field: keyof DishVariation, value: string | number) => {
         const newVariations = [...form.variations];
-        newVariations[index][field] = field === 'price' ? Number(value) : value;
+        if (field === 'price') {
+            newVariations[index].price = Number(value) || 0;
+        } else {
+            newVariations[index].size = String(value) as "price" | "half" | "full" | "small" | "medium" | "large";
+        }
         setForm(prev => ({ ...prev, variations: newVariations }));
     };
 
-    const removeVariation = (index) => {
+    const removeVariation = (index: number) => {
         setForm(prev => ({
             ...prev,
             variations: prev.variations.filter((_, i) => i !== index)
@@ -45,8 +67,8 @@ const AddDishModal = ({ onClose, onSave, restaurantId, categories }) => {
         }
         onSave({
             ...form,
-            id: `dish_${Date.now()}`,
-            restaurantId
+            restaurantId,
+            isAvailable: true
         });
     };
 
@@ -153,7 +175,7 @@ const AddDishModal = ({ onClose, onSave, restaurantId, categories }) => {
                                                             className="w-full border border-gray-300 p-3 rounded-lg text-gray-900"
                                                         >
                                                             {categories.map((category) => (
-                                                                <option key={category.id} value={category.name}>
+                                                                <option key={category.id} value={category.id}>
                                                                     {category.name}
                                                                 </option>
                                                             ))}
@@ -166,7 +188,7 @@ const AddDishModal = ({ onClose, onSave, restaurantId, categories }) => {
                                                     </div>
                                                     <div className="sm:col-span-2">
                                                         <select
-                                                            value={form.isVeg}
+                                                            value={String(form.isVeg)}
                                                             onChange={(e) => update("isVeg", e.target.value === 'true')}
                                                             className="w-full border border-gray-300 p-3 rounded-lg text-gray-900"
                                                         >

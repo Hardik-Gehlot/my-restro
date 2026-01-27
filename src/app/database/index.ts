@@ -3,7 +3,7 @@
 // ============================================
 import { RESTAURANT_CACHE_DURATION } from "@/lib/common-data";
 import { mockDishes, mockRestaurants } from "@/lib/mock-data";
-import { supabaseDatabase } from "@/lib/supabase";
+
 import {
   AdminRestaurantCacheData,
   ApiResponse,
@@ -24,6 +24,8 @@ import {
   sanitizeInput
 } from "@/lib/validation";
 import { API_ENDPOINTS, ERROR_MESSAGES, SUCCESS_MESSAGES, CONFIG } from "@/lib/constants";
+import { shouldFetchFromAPI } from "@/lib/cache-manager";
+import { updateFirebaseTimestamp, getFirebaseTimestamp } from "@/lib/firebase";
 
 // ============================================
 // Database Service
@@ -84,6 +86,9 @@ export const db = {
         console.warn('Failed to update cache:', cacheError);
       }
 
+      // Update Firebase timestamp for public users to see the update on refresh
+      await updateFirebaseTimestamp(updatedRestaurant.id);
+
       return {
         status: 'success',
         message: SUCCESS_MESSAGES.RESTAURANT.UPDATED,
@@ -98,68 +103,157 @@ export const db = {
   },
 
   /**
-   * Update dish (mock implementation)
+   * Update dish
    */
-  updateDish: async (id: string, data: Partial<Dish>): Promise<Dish | null> => {
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    const dish = mockDishes.find((d) => d.id === id);
-    if (dish) {
-      Object.assign(dish, data);
-      return dish;
+  updateDish: async (token: string, id: string, data: Partial<Dish>): Promise<Dish | null> => {
+    try {
+      const response = await fetchWithTimeout(
+        API_ENDPOINTS.DISH,
+        {
+          method: 'PUT',
+          headers: createAuthHeaders(token),
+          body: JSON.stringify({ id, ...data, categoryId: data.category }),
+        },
+        CONFIG.API_TIMEOUT
+      );
+
+      const responseData = await parseJsonResponse(response);
+
+      if (!response.ok) {
+        console.error('Update dish failed:', responseData.error);
+        return null;
+      }
+
+      // Update cache
+      try {
+        const cachedData = await idb.get(KEYS.ADMIN_RESTAURANT_DATA);
+        if (cachedData?.menuData) {
+          const index = cachedData.menuData.findIndex(d => d.id === id);
+          if (index !== -1) {
+            cachedData.menuData[index] = responseData.dish;
+            await idb.set(KEYS.ADMIN_RESTAURANT_DATA, cachedData);
+
+            // Update Firebase timestamp
+            await updateFirebaseTimestamp(cachedData.restaurantData.id);
+          }
+        }
+      } catch (cacheError) {
+        console.warn('Failed to update cache:', cacheError);
+      }
+
+      return responseData.dish;
+    } catch (error) {
+      console.error('Error updating dish:', error);
+      return null;
     }
-    return null;
   },
 
   /**
-   * Delete dish (mock implementation)
+   * Delete dish
    */
-  deleteDish: async (id: string): Promise<boolean> => {
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    const index = mockDishes.findIndex((d) => d.id === id);
-    if (index !== -1) {
-      mockDishes.splice(index, 1);
+  deleteDish: async (token: string, id: string): Promise<boolean> => {
+    try {
+      const response = await fetchWithTimeout(
+        `${API_ENDPOINTS.DISH}?id=${id}`,
+        {
+          method: 'DELETE',
+          headers: createAuthHeaders(token),
+        },
+        CONFIG.API_TIMEOUT
+      );
+
+      if (!response.ok) {
+        return false;
+      }
+
+      // Update cache
+      try {
+        const cachedData = await idb.get(KEYS.ADMIN_RESTAURANT_DATA);
+        if (cachedData?.menuData) {
+          cachedData.menuData = cachedData.menuData.filter(d => d.id !== id);
+          await idb.set(KEYS.ADMIN_RESTAURANT_DATA, cachedData);
+
+          // Update Firebase timestamp
+          await updateFirebaseTimestamp(cachedData.restaurantData.id);
+        }
+      } catch (cacheError) {
+        console.warn('Failed to update cache:', cacheError);
+      }
+
       return true;
+    } catch (error) {
+      console.error('Error deleting dish:', error);
+      return false;
     }
-    return false;
   },
 
   /**
-   * Add dish (mock implementation)
+   * Add dish
    */
-  addDish: async (dish: Omit<Dish, "id">): Promise<Dish> => {
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    const newDish: Dish = {
-      ...dish,
-      id: `dish_${Date.now()}`,
-    };
-    mockDishes.push(newDish);
-    return newDish;
+  addDish: async (token: string, dish: Omit<Dish, "id">): Promise<Dish | null> => {
+    try {
+      const response = await fetchWithTimeout(
+        API_ENDPOINTS.DISH,
+        {
+          method: 'POST',
+          headers: createAuthHeaders(token),
+          body: JSON.stringify({ ...dish, categoryId: dish.category }),
+        },
+        CONFIG.API_TIMEOUT
+      );
+
+      const responseData = await parseJsonResponse(response);
+
+      if (!response.ok) {
+        console.error('Add dish failed:', responseData.error);
+        return null;
+      }
+
+      // Update cache
+      try {
+        const cachedData = await idb.get(KEYS.ADMIN_RESTAURANT_DATA);
+        if (cachedData?.menuData) {
+          cachedData.menuData.push(responseData.dish);
+          await idb.set(KEYS.ADMIN_RESTAURANT_DATA, cachedData);
+
+          // Update Firebase timestamp
+          await updateFirebaseTimestamp(cachedData.restaurantData.id);
+        }
+      } catch (cacheError) {
+        console.warn('Failed to update cache:', cacheError);
+      }
+
+      return responseData.dish;
+    } catch (error) {
+      console.error('Error adding dish:', error);
+      return null;
+    }
   },
 
   /**
-   * Get restaurant data with menu (with caching)
+   * Get restaurant data with menu (with smart caching)
    * Public endpoint - no authentication required
+   * @param restaurantId id of the restaurant
+   * @param isRefresh if true, will check Firebase for updates (2 min throttle)
    */
   getRestaurantDataWithMenu: async (
     restaurantId: string,
+    isRefresh: boolean = false
   ): Promise<{ restaurant: Restaurant | null; menu: Dish[] }> => {
     try {
-      // Check cache first
-      const cachedData = await idb.get(KEYS.RESTAURANT_DATA);
-      if (cachedData) {
-        if (cachedData.restaurantData.id === restaurantId) {
-          const now = Date.now();
-          if (now - cachedData.timestamp < RESTAURANT_CACHE_DURATION) {
-            console.log('Returning restaurant data from cache');
-            return {
-              restaurant: cachedData.restaurantData,
-              menu: cachedData.menuData,
-            };
-          }
-        }
+      // 1. Use smart cache manager to decide if we need to hit the API
+      const { shouldFetch, reason } = await shouldFetchFromAPI(restaurantId, isRefresh);
+      console.log(`Cache Decision: ${shouldFetch ? 'FETCH' : 'CACHE'} (${reason})`);
+
+      if (!shouldFetch) {
+        const cached = await idb.get(KEYS.RESTAURANT_DATA);
+        return {
+          restaurant: cached!.restaurantData,
+          menu: cached!.menuData,
+        };
       }
 
-      // Fetch from API
+      // 2. Fetch from API
       const response = await fetchWithTimeout(
         `/api/restaurant/${restaurantId}`,
         {
@@ -171,40 +265,36 @@ export const db = {
         CONFIG.API_TIMEOUT
       );
 
-      console.log('response: ', response);
-
       const data = await parseJsonResponse(response);
 
       if (!response.ok) {
         console.error('Failed to fetch restaurant data:', data.error);
-        return {
-          restaurant: null,
-          menu: [],
-        };
+        // Fallback to cache if available on API failure
+        const cached = await idb.get(KEYS.RESTAURANT_DATA);
+        if (cached && cached.restaurantData.id === restaurantId) {
+          return { restaurant: cached.restaurantData, menu: cached.menuData };
+        }
+        return { restaurant: null, menu: [] };
       }
 
-      // Validate response data
-      if (!data.restaurantData) {
-        console.error('Invalid response: missing restaurantData');
-        return {
-          restaurant: null,
-          menu: [],
-        };
-      }
+      // 3. Get latest Firebase timestamp to store in cache
+      // This ensures we know when the server was last updated
+      const firebaseTimestamp = await getFirebaseTimestamp(restaurantId);
 
-      // Store in IndexedDB cache
+      // 4. Store in IndexedDB cache
       const cacheData: RestaurantCacheData = {
         restaurantData: data.restaurantData,
         menuData: data.menuData || [],
         timestamp: Date.now(),
+        lastFirebaseCheck: isRefresh ? Date.now() : 0,
+        firebaseTimestamp: firebaseTimestamp
       };
 
       try {
         await idb.set(KEYS.RESTAURANT_DATA, cacheData);
-        console.log('Restaurant data cached in IndexedDB');
+        console.log('Restaurant data cached in IndexedDB with Firebase ref');
       } catch (cacheError) {
         console.warn('Failed to cache restaurant data:', cacheError);
-        // Don't fail the operation if caching fails
       }
 
       return {
@@ -213,10 +303,12 @@ export const db = {
       };
     } catch (error) {
       console.error("Error in getRestaurantDataWithMenu:", error);
-      return {
-        restaurant: null,
-        menu: [],
-      };
+      // Fallback to cache if available
+      const cached = await idb.get(KEYS.RESTAURANT_DATA);
+      if (cached && cached.restaurantData.id === restaurantId) {
+        return { restaurant: cached.restaurantData, menu: cached.menuData };
+      }
+      return { restaurant: null, menu: [] };
     }
   },
 
@@ -471,6 +563,9 @@ export const db = {
         if (cachedData?.categoriesData) {
           cachedData.categoriesData.push(data.category);
           await idb.set(KEYS.ADMIN_RESTAURANT_DATA, cachedData);
+
+          // Update Firebase timestamp
+          await updateFirebaseTimestamp(cachedData.restaurantData.id);
         }
       } catch (cacheError) {
         console.warn('Failed to update cache:', cacheError);
@@ -542,6 +637,9 @@ export const db = {
           if (index !== -1) {
             cachedData.categoriesData[index] = data.category;
             await idb.set(KEYS.ADMIN_RESTAURANT_DATA, cachedData);
+
+            // Update Firebase timestamp
+            await updateFirebaseTimestamp(cachedData.restaurantData.id);
           }
         }
       } catch (cacheError) {
@@ -600,6 +698,9 @@ export const db = {
             (c: Category) => c.id !== categoryId
           );
           await idb.set(KEYS.ADMIN_RESTAURANT_DATA, cachedData);
+
+          // Update Firebase timestamp
+          await updateFirebaseTimestamp(cachedData.restaurantData.id);
         }
       } catch (cacheError) {
         console.warn('Failed to update cache:', cacheError);
@@ -665,5 +766,51 @@ export const db = {
         message: error instanceof ApiError ? error.message : ERROR_MESSAGES.NETWORK.UNKNOWN,
       };
     }
+  },
+
+  /**
+   * Get featured restaurants for the home page
+   */
+  getFeaturedRestaurants: async (): Promise<Restaurant[]> => {
+    // For now, return mock data since we don't have a global restaurants fetcher yet
+    await new Promise(resolve => setTimeout(resolve, 500));
+    return mockRestaurants;
+  },
+
+  /**
+   * Search restaurants by query
+   */
+  searchRestaurants: async (query: string): Promise<Restaurant[]> => {
+    await new Promise(resolve => setTimeout(resolve, 500));
+    const q = query.toLowerCase();
+    return mockRestaurants.filter(r =>
+      r.name.toLowerCase().includes(q) ||
+      r.tagline.toLowerCase().includes(q)
+    );
+  },
+
+  /**
+   * Filter restaurants by cuisine
+   */
+  getRestaurantsByCuisine: async (cuisine: string): Promise<Restaurant[]> => {
+    await new Promise(resolve => setTimeout(resolve, 500));
+    const c = cuisine.toLowerCase();
+    return mockRestaurants.filter(r =>
+      r.cuisine?.some(type => type.toLowerCase() === c)
+    );
+  },
+
+  /**
+   * Track ad impression
+   */
+  trackAdImpression: async (adId: string): Promise<void> => {
+    console.log(`Ad Impression tracked for: ${adId}`);
+  },
+
+  /**
+   * Track ad click
+   */
+  trackAdClick: async (adId: string): Promise<void> => {
+    console.log(`Ad Click tracked for: ${adId}`);
   },
 };

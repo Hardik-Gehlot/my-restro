@@ -2,7 +2,14 @@
 
 import { FiMenu } from 'react-icons/fi';
 
-const Header = ({ onMenuClick, restaurant }) => {
+import { Restaurant } from '@/types';
+
+interface HeaderProps {
+  onMenuClick: () => void;
+  restaurant: Restaurant | null;
+}
+
+const Header = ({ onMenuClick, restaurant }: HeaderProps) => {
   return (
     <header className="bg-white sticky shadow-sm lg:hidden">
       <div className="px-4 sm:px-6 lg:px-8">

@@ -3,7 +3,8 @@
 import { useEffect } from 'react';
 import Image from 'next/image';
 import { FiExternalLink, FiTrendingUp } from 'react-icons/fi';
-import { db, Advertisement as AdType } from '@/lib/mock-data';
+import { db } from '@/app/database';
+import { Advertisement as AdType } from '@/types';
 
 interface AdvertisementProps {
   ad: AdType;

@@ -1,16 +1,14 @@
-
-'use server';
 import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
-import { mockCategories } from '@/lib/mock-data';
 import { JWTPayload } from '@/types';
+import { getServiceRoleClient } from '@/lib/supabase-client';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
+const JWT_SECRET = process.env.JWT_SECRET || process.env.NEXT_PUBLIC_JWT_SECRET || 'your-secret-key-change-in-production';
 
 // Helper function to verify token
 const verifyToken = (request: NextRequest): { payload: JWTPayload | null; error: NextResponse | null } => {
   const authHeader = request.headers.get('authorization');
-  
+
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return {
       payload: null,
@@ -19,7 +17,7 @@ const verifyToken = (request: NextRequest): { payload: JWTPayload | null; error:
   }
 
   const token = authHeader.substring(7);
-  
+
   try {
     const payload = jwt.verify(token, JWT_SECRET) as JWTPayload;
     return { payload, error: null };
@@ -37,12 +35,19 @@ export async function GET(request: NextRequest) {
     const { payload, error } = verifyToken(request);
     if (error) return error;
 
-    const restaurantCategories = mockCategories.filter(
-      c => c.restaurantId === payload!.restaurantId
-    );
+    const supabase = getServiceRoleClient();
+    const { data: categories, error: dbError } = await supabase
+      .from('categories')
+      .select('*')
+      .eq('restaurant_id', payload!.restaurantId);
+
+    if (dbError) {
+      console.error('Supabase fetch error:', dbError);
+      return NextResponse.json({ error: 'Failed to fetch categories' }, { status: 500 });
+    }
 
     return NextResponse.json({
-      categories: restaurantCategories
+      categories: categories || []
     }, { status: 200 });
   } catch (error) {
     console.error('Get categories error:', error);
@@ -63,13 +68,20 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Category name is required' }, { status: 400 });
     }
 
-    const newCategory = {
-      id: `cat-${Date.now()}`,
-      name: name.trim(),
-      restaurantId: payload!.restaurantId
-    };
+    const supabase = getServiceRoleClient();
+    const { data: newCategory, error: dbError } = await supabase
+      .from('categories')
+      .insert({
+        name: name.trim(),
+        restaurant_id: payload!.restaurantId
+      })
+      .select()
+      .single();
 
-    mockCategories.push(newCategory);
+    if (dbError) {
+      console.error('Supabase insert error:', dbError);
+      return NextResponse.json({ error: 'Failed to create category' }, { status: 500 });
+    }
 
     return NextResponse.json({
       message: 'Category created successfully',
@@ -98,26 +110,28 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Category name is required' }, { status: 400 });
     }
 
-    const categoryIndex = mockCategories.findIndex(c => c.id === id);
-    
-    if (categoryIndex === -1) {
-      return NextResponse.json({ error: 'Category not found' }, { status: 404 });
-    }
+    const supabase = getServiceRoleClient();
 
-    // Verify ownership
-    if (mockCategories[categoryIndex].restaurantId !== payload!.restaurantId) {
-      return NextResponse.json(
-        { error: 'Unauthorized: Cannot update another restaurant\'s category' },
-        { status: 403 }
-      );
-    }
+    // Verify ownership and update in one go
+    const { data: updatedCategory, error: dbError } = await supabase
+      .from('categories')
+      .update({ name: name.trim() })
+      .eq('id', id)
+      .eq('restaurant_id', payload!.restaurantId)
+      .select()
+      .single();
 
-    // Update category name
-    mockCategories[categoryIndex].name = name.trim();
+    if (dbError) {
+      if (dbError.code === 'PGRST116') {
+        return NextResponse.json({ error: 'Category not found or unauthorized' }, { status: 404 });
+      }
+      console.error('Supabase update error:', dbError);
+      return NextResponse.json({ error: 'Failed to update category' }, { status: 500 });
+    }
 
     return NextResponse.json({
       message: 'Category updated successfully',
-      category: mockCategories[categoryIndex]
+      category: updatedCategory
     }, { status: 200 });
   } catch (error) {
     console.error('Update category error:', error);
@@ -138,21 +152,19 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Category ID is required' }, { status: 400 });
     }
 
-    const categoryIndex = mockCategories.findIndex(c => c.id === id);
-    
-    if (categoryIndex === -1) {
-      return NextResponse.json({ error: 'Category not found' }, { status: 404 });
-    }
+    const supabase = getServiceRoleClient();
 
-    // Verify ownership
-    if (mockCategories[categoryIndex].restaurantId !== payload!.restaurantId) {
-      return NextResponse.json(
-        { error: 'Unauthorized: Cannot delete another restaurant\'s category' },
-        { status: 403 }
-      );
-    }
+    // Verify ownership and delete
+    const { error: dbError } = await supabase
+      .from('categories')
+      .delete()
+      .eq('id', id)
+      .eq('restaurant_id', payload!.restaurantId);
 
-    mockCategories.splice(categoryIndex, 1);
+    if (dbError) {
+      console.error('Supabase delete error:', dbError);
+      return NextResponse.json({ error: 'Failed to delete category' }, { status: 500 });
+    }
 
     return NextResponse.json({
       message: 'Category deleted successfully'

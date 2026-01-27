@@ -212,8 +212,13 @@ export default function MenuPage() {
 
   const loadData = useCallback(async () => {
     setLoading(true);
+
+    // Detect if this is a page refresh
+    const navigationHistory = performance.getEntriesByType('navigation') as PerformanceNavigationTiming[];
+    const isRefresh = navigationHistory.length > 0 && navigationHistory[0].type === 'reload';
+
     const { restaurant: restaurantData, menu: menuData } =
-      await db.getRestaurantDataWithMenu(restaurantId);
+      await db.getRestaurantDataWithMenu(restaurantId, isRefresh);
     setRestaurant(restaurantData);
     setDishes(menuData ?? []);
     setLoading(false);
@@ -324,7 +329,7 @@ export default function MenuPage() {
             <div
               key={category}
               id={category}
-              ref={(el) => (categoryRefs.current[category] = el)}
+              ref={(el) => { categoryRefs.current[category] = el; }}
               className="mb-4 bg-white/40 backdrop-blur-lg rounded-xl shadow-xl border border-white/60 overflow-hidden"
             >
               <button

@@ -13,7 +13,7 @@ export default function AdminLoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-    const handleSubmit = async (e: React.MouseEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
       if (!email || !password) {
         setError('Please enter both email and password');

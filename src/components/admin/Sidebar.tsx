@@ -7,7 +7,15 @@ import { Dialog, Transition } from '@headlessui/react';
 import { Icons } from '@/lib/icons';
 import { db } from '@/app/database';
 
-const Sidebar = ({ restaurant, open, setOpen }) => {
+import { Restaurant } from '@/types';
+
+interface SidebarProps {
+  restaurant: Restaurant | null;
+  open: boolean;
+  setOpen: (open: boolean) => void;
+}
+
+const Sidebar = ({ restaurant, open, setOpen }: SidebarProps) => {
   const pathname = usePathname();
 
   const navLinks = [

@@ -3,28 +3,41 @@ import { useState, Fragment } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { Icons } from '@/lib/icons';
 
-// Edit Dish Modal Component
-const DishEditModal = ({ dish, onClose, onSave, categories }) => {
-    const [form, setForm] = useState(dish);
+import { Dish, Category, DishVariation } from '@/types';
 
-    const update = (key, value) => {
+interface DishEditModalProps {
+    dish: Dish;
+    onClose: () => void;
+    onSave: (dish: Dish) => void;
+    categories: Category[];
+}
+
+// Edit Dish Modal Component
+const DishEditModal = ({ dish, onClose, onSave, categories }: DishEditModalProps) => {
+    const [form, setForm] = useState<Dish>(dish);
+
+    const update = (key: keyof Dish, value: any) => {
         setForm(prev => ({ ...prev, [key]: value }));
     };
 
-    const updateVariation = (index, field, value) => {
+    const updateVariation = (index: number, field: keyof DishVariation, value: string | number) => {
         const newVariations = [...form.variations];
-        newVariations[index][field] = field === 'price' ? Number(value) : value;
+        if (field === 'price') {
+            newVariations[index].price = Number(value) || 0;
+        } else {
+            newVariations[index].size = String(value) as "price" | "half" | "full" | "small" | "medium" | "large";
+        }
         setForm(prev => ({ ...prev, variations: newVariations }));
     };
 
     const addVariation = () => {
         setForm(prev => ({
             ...prev,
-            variations: [...prev.variations, { size: "medium", price: 0 }]
+            variations: [...prev.variations, { size: "price", price: 0 }]
         }));
     };
 
-    const removeVariation = (index) => {
+    const removeVariation = (index: number) => {
         setForm(prev => ({
             ...prev,
             variations: prev.variations.filter((_, i) => i !== index)
@@ -135,7 +148,7 @@ const DishEditModal = ({ dish, onClose, onSave, categories }) => {
                                                             className="w-full border border-gray-300 p-3 rounded-lg text-gray-900"
                                                         >
                                                             {categories.map((category) => (
-                                                                <option key={category.id} value={category.name}>
+                                                                <option key={category.id} value={category.id}>
                                                                     {category.name}
                                                                 </option>
                                                             ))}
@@ -148,7 +161,7 @@ const DishEditModal = ({ dish, onClose, onSave, categories }) => {
                                                     </div>
                                                     <div className="sm:col-span-2">
                                                         <select
-                                                            value={form.isVeg}
+                                                            value={String(form.isVeg)}
                                                             onChange={(e) => update("isVeg", e.target.value === 'true')}
                                                             className="w-full border border-gray-300 p-3 rounded-lg text-gray-900"
                                                         >

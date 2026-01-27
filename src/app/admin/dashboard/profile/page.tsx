@@ -11,7 +11,7 @@ import { useRouter } from 'next/navigation';
 export default function ProfilePage() {
   const router = useRouter();
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
-  const [editingRestaurant, setEditingRestaurant] = useState(null);
+  const [editingRestaurant, setEditingRestaurant] = useState<Restaurant | null>(null);
   const { showToast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
 

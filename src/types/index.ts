@@ -63,12 +63,15 @@ export interface TimestampedData {
 export interface RestaurantCacheData extends TimestampedData {
   restaurantData: Restaurant;
   menuData: Dish[];
+  lastFirebaseCheck?: number;  // Last time we checked Firebase (for refresh optimization)
+  firebaseTimestamp?: number;  // Firebase's last update timestamp
 }
 
 export interface AdminRestaurantCacheData extends TimestampedData {
   restaurantData: Restaurant;
   menuData: Dish[];
   categoriesData: Category[];
+  // No Firebase checks for admin - always fresh data
 }
 
 // ============================================
@@ -84,6 +87,10 @@ export interface Restaurant {
   googleMapLink: string;
   googleRatingLink: string;
   aboutus: string;
+  description?: string;
+  rating?: number;
+  totalReviews?: number;
+  cuisine?: string[];
   instagramLink?: string;
   facebookLink?: string;
   twitterLink?: string;
@@ -114,6 +121,15 @@ export interface Category {
   id: string;
   name: string;
   restaurantId: string;
+}
+
+export interface Advertisement {
+  id: string;
+  title: string;
+  description: string;
+  image: string;
+  ctaText: string;
+  ctaLink: string;
 }
 
 // ============================================

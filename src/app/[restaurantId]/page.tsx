@@ -34,8 +34,12 @@ export default function RestaurantDetailPage() {
 
   const loadData = async () => {
     setLoading(true);
-    const { restaurant } =
-      await db.getRestaurantDataWithMenu(restaurantId);
+    
+    // Detect if this is a page refresh
+    const navigationHistory = performance.getEntriesByType('navigation') as PerformanceNavigationTiming[];
+    const isRefresh = navigationHistory.length > 0 && navigationHistory[0].type === 'reload';
+    
+    const { restaurant } = await db.getRestaurantDataWithMenu(restaurantId, isRefresh);
     setRestaurant(restaurant);
     setLoading(false);
   };

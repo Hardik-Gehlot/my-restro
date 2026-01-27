@@ -83,7 +83,8 @@ export const SUCCESS_MESSAGES = {
 // ============================================
 export const CONFIG = {
     API_TIMEOUT: 10000, // 10 seconds
-    CACHE_DURATION: 7 * 24 * 60 * 60 * 1000, // 7 days
+    CACHE_DURATION: 2 * 24 * 60 * 60 * 1000, // 2 days
+    FIREBASE_CHECK_INTERVAL: 2 * 60 * 1000, // 2 minutes
     PASSWORD_MIN_LENGTH: 6,
     CATEGORY_NAME_MAX_LENGTH: 100,
     DISH_NAME_MAX_LENGTH: 200,

@@ -12,7 +12,7 @@ export default function AdminDashboard({ children }: {
 }) {
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [restaurant,setRestaurant] = useState<Restaurant|null>();
+  const [restaurant,setRestaurant] = useState<Restaurant|null>(null);
   const {showToast} = useToast();
   const [isLoading, setIsLoading] = useState(true);
   useEffect(()=>{

@@ -14,7 +14,8 @@ import {
   FiAward,
   FiChevronRight
 } from 'react-icons/fi';
-import { db, Restaurant } from '@/lib/mock-data';
+import { db } from '@/app/database';
+import { Restaurant } from '@/types';
 
 export default function HomePage() {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
@@ -255,7 +256,7 @@ export default function HomePage() {
                           {restaurant.name}
                         </h4>
                         <div className="flex flex-wrap gap-1 mt-1">
-                          {restaurant.cuisine.map((c, idx) => (
+                          {restaurant.cuisine?.map((c, idx) => (
                             <span key={idx} className="text-xs bg-orange-50 text-orange-600 px-2 py-1 rounded-full">
                               {c}
                             </span>

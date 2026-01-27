@@ -102,12 +102,17 @@ export default function AdminDashboard() {
     {} as DishesByCategory,
   );
 
-  const handleAddDish = async (newDish: Dish) => {
+  const handleAddDish = async (newDish: Omit<Dish, 'id'> & { id?: string }) => {
     try {
-      const addedDish: Dish = await db.addDish(newDish);
-      setDishes([...dishes, addedDish]);
-      setShowAddModal(false);
-      showToast("Dish added successfully!", "success");
+      const token = sessionStorage.getItem(KEYS.JWT_TOKEN);
+      if (!token) return;
+
+      const addedDish = await db.addDish(token, newDish);
+      if (addedDish) {
+        setDishes([...dishes, addedDish]);
+        setShowAddModal(false);
+        showToast("Dish added successfully!", "success");
+      }
     } catch (error) {
       console.error("Error adding dish:", error);
       showToast("Failed to add dish.", "error");
@@ -116,7 +121,10 @@ export default function AdminDashboard() {
 
   const handleEditDish = async (updatedDish: Dish) => {
     try {
-      const editedDish = await db.updateDish(updatedDish.id, updatedDish);
+      const token = sessionStorage.getItem(KEYS.JWT_TOKEN);
+      if (!token) return;
+
+      const editedDish = await db.updateDish(token, updatedDish.id, updatedDish);
       if (!editedDish) {
         showToast("Failed to update dish.", "error");
         return;
@@ -133,7 +141,10 @@ export default function AdminDashboard() {
   const handleDeleteDish = async (dishId: string) => {
     if (confirm("Are you sure you want to delete this dish?")) {
       try {
-        await db.deleteDish(dishId);
+        const token = sessionStorage.getItem(KEYS.JWT_TOKEN);
+        if (!token) return;
+
+        await db.deleteDish(token, dishId);
         setDishes(dishes.filter((d) => d.id !== dishId));
         showToast("Dish deleted successfully!", "success");
       } catch (error) {
@@ -379,7 +390,7 @@ export default function AdminDashboard() {
         <AddDishModal
           onClose={() => setShowAddModal(false)}
           onSave={handleAddDish}
-          restaurantId={currentRestaurant?.id}
+          restaurantId={currentRestaurant?.id || ""}
           categories={categories}
         />
       )}
