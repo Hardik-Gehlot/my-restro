@@ -17,6 +17,7 @@ import Footer from "@/components/shared/Footer";
 import FilterModel from "@/components/shared/FilterModel";
 import { Dish, Restaurant } from "@/types";
 import { db } from "@/app/database";
+import { PLACEHOLDERS } from "@/lib/constants";
 
 interface MenuHeaderProp {
   restaurantName: string;
@@ -424,12 +425,12 @@ export default function MenuPage() {
 
                         </div>
                         <div className="relative w-28 h-28 flex-shrink-0 rounded-lg overflow-hidden">
-                          <Image
-                            src={dish.image}
-                            alt={dish.name}
-                            fill
-                            className="object-cover"
-                          />
+                           <Image
+                             src={dish.image || PLACEHOLDERS.DISH_IMAGE}
+                             alt={dish.name}
+                             fill
+                             className="object-cover"
+                           />
                         </div>
                       </div>
                     ))}

@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Icons } from "@/lib/icons";
 import AddDishModal from "@/components/admin/modals/AddDishModal";
 import DishEditModal from "@/components/admin/modals/DishEditModal";
@@ -8,6 +8,9 @@ import { useToast } from "@/components/shared/CustomToast";
 import { db } from "@/app/database";
 import { ApiResponse, Dish, KEYS, Restaurant, Category } from "@/types";
 import { useRouter } from "next/navigation";
+import { PLACEHOLDERS } from "@/lib/constants";
+import { motion, AnimatePresence } from "framer-motion";
+import { FiX } from "react-icons/fi";
 
 interface DishesByCategory {
   [category: string]: Dish[];
@@ -25,8 +28,6 @@ export default function AdminDashboard() {
   const [editingDish, setEditingDish] = useState<Dish | null>(null);
   const { showToast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
-  const [showSearch, setShowSearch] = useState(true);
-  const [lastScrollY, setLastScrollY] = useState(0);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -73,21 +74,7 @@ export default function AdminDashboard() {
     fetchData();
   }, []);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-
-      if (currentScrollY > lastScrollY && currentScrollY > 100) {
-        setShowSearch(false);
-      } else {
-        setShowSearch(true);
-      }
-      setLastScrollY(currentScrollY);
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [lastScrollY]);
+  // Removed manual scroll listener in favor of Framer Motion useScroll
 
   const dishesByCategory: DishesByCategory = dishes.reduce(
     (acc: DishesByCategory, dish: Dish) => {
@@ -163,51 +150,31 @@ export default function AdminDashboard() {
 
   return (
     <div className="relative min-h-screen bg-gray-50 pb-24">
-      <div className="top-0 z-20 bg-white/95 backdrop-blur-sm shadow-sm border-b border-gray-200">
-        <div
-          className={`max-w-7xl mx-auto transition-all duration-300 ${
-            showSearch
-              ? "max-h-20 opacity-100"
-              : "max-h-0 opacity-0 overflow-hidden"
-          }`}
-        >
-          <div className="px-4 sm:px-6 lg:px-8 py-3">
-            <div className="relative">
-              <Icons.Search
-                className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 z-10"
-                size={20}
-              />
-              <input
-                type="text"
-                placeholder="Search dishes by name, category, or description..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-12 py-3 bg-gray-50 border-2 border-transparent 
-                       rounded-lg text-gray-900 placeholder-gray-500
-                       focus:bg-white focus:border-orange-500 focus:outline-none
-                       transition-all"
-              />
-              {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery("")}
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 z-10"
-                >
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
-                </button>
-              )}
-            </div>
+      <div className="bg-white shadow-sm border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+          <div className="relative">
+            <Icons.Search
+              className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 z-10"
+              size={20}
+            />
+            <input
+              type="text"
+              placeholder="Search dishes by name, category, or description..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-12 pr-12 py-3 bg-gray-100/50 border-2 border-transparent 
+                     rounded-xl text-gray-900 placeholder-gray-500
+                     focus:bg-white focus:border-orange-500 focus:outline-none focus:ring-4 focus:ring-orange-500/10
+                     transition-all"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery("")}
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 z-10 hover:bg-gray-200 p-1 rounded-full transition-colors"
+              >
+                <FiX className="w-5 h-5" />
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -285,18 +252,29 @@ export default function AdminDashboard() {
                         leaveTo="transform scale-95 opacity-0"
                       >
                         <Disclosure.Panel
-                          as="div"
+                          as={motion.div}
+                          initial="hidden"
+                          animate="visible"
+                          variants={{
+                            visible: { 
+                              transition: { staggerChildren: 0.1 } 
+                            }
+                          }}
                           className="px-4 pb-4 space-y-3"
                         >
                           {filteredDishes.map((dish) => (
-                            <div
+                            <motion.div
                               key={dish.id}
+                              variants={{
+                                hidden: { opacity: 0, scale: 0.95, y: 10 },
+                                visible: { opacity: 1, scale: 1, y: 0 }
+                              }}
                               className="bg-gray-50 rounded-lg overflow-hidden border border-gray-200 
-                                                       hover:border-orange-200 hover:shadow-md transition-all"
+                                                       hover:border-orange-200 hover:shadow-md transition-all group/dish"
                             >
                               <div className="flex gap-3 p-3">
                                 <img
-                                  src={dish.image}
+                                  src={dish.image || PLACEHOLDERS.DISH_IMAGE}
                                   alt={dish.name}
                                   className="w-24 h-24 rounded-lg object-cover"
                                 />
@@ -360,7 +338,7 @@ export default function AdminDashboard() {
                                   Delete
                                 </button>
                               </div>
-                            </div>
+                            </motion.div>
                           ))}
                         </Disclosure.Panel>
                       </Transition>
@@ -373,15 +351,20 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* Fixed Bottom Add Button */}
-      <div className="fixed bottom-6 right-6 z-50">
-        <button
+      <div className="fixed bottom-8 right-8 z-50">
+        <motion.button
           onClick={() => setShowAddModal(true)}
-          className="fixed bottom-6 right-6 bg-orange-600 text-white rounded-lg shadow-lg z-50 flex items-center justify-center px-3 py-2 text-sm"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className="bg-orange-600 text-white rounded-xl shadow-2xl flex items-center justify-center p-2 hover:bg-orange-700 transition-colors group"
         >
-          <Icons.Plus size={20} />
-          <span>Add Dish</span>
-        </button>
+          <div className="flex items-center gap-2 whitespace-nowrap">
+            <Icons.Plus size={24} className="group-hover:rotate-90 transition-transform" />
+            <span className="font-bold tracking-wide">
+              Add Dish
+            </span>
+          </div>
+        </motion.button>
       </div>
 
       {/* Modals */}

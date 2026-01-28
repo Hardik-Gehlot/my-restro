@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import * as XLSX from 'xlsx';
 import { pricingSection } from '@/lib/common-data';
 import { useToast } from '@/components/shared/CustomToast';
+import { PLACEHOLDERS } from '@/lib/constants';
 
 interface SuperadminRestaurant {
   id: string;
@@ -269,7 +270,7 @@ export default function SuperadminRestaurants() {
 
                  <div className="flex items-center gap-5 mb-8">
                     <div className="w-16 h-16 rounded-[1.25rem] bg-slate-800/50 p-2 border border-slate-700 flex items-center justify-center overflow-hidden">
-                        <img src={rest.logo || '/logo-placeholder.png'} alt={rest.name} className="max-w-full max-h-full object-contain" />
+                        <img src={rest.logo || PLACEHOLDERS.RESTAURANT_LOGO} alt={rest.name} className="max-w-full max-h-full object-contain" />
                     </div>
                     <div>
                         <h3 className="font-bold text-white text-xl tracking-tight leading-tight">{rest.name}</h3>
@@ -381,7 +382,7 @@ export default function SuperadminRestaurants() {
                   >
                     <div className="flex items-center gap-5 mb-10">
                         <div className="w-14 h-14 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 p-2 flex items-center justify-center">
-                            <img src={selectedRestaurant.logo || '/logo-placeholder.png'} alt={selectedRestaurant.name} className="max-w-full max-h-full object-contain" />
+                            <img src={selectedRestaurant.logo || PLACEHOLDERS.RESTAURANT_LOGO} alt={selectedRestaurant.name} className="max-w-full max-h-full object-contain" />
                         </div>
                         <div>
                             <h2 className="text-3xl font-bold text-white tracking-tight">Update Restaurant</h2>

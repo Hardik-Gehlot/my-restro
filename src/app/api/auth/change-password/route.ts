@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 import { getServiceRoleClient } from '@/lib/supabase-client';
 import { JWTPayload } from '@/types';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
+const JWT_SECRET = process.env.NEXT_PUBLIC_JWT_SECRET || 'your-secret-key-change-in-production';
 
 export async function POST(request: NextRequest) {
   try {
@@ -39,10 +39,10 @@ export async function POST(request: NextRequest) {
 
     const supabase = getServiceRoleClient();
 
-    // Fetch user from Supabase
+    // Fetch user from Supabase using only the required field
     const { data: user, error: userError } = await supabase
       .from('users')
-      .select('*')
+      .select('password_hash')
       .eq('id', payload.userId)
       .single();
 
@@ -68,7 +68,10 @@ export async function POST(request: NextRequest) {
     // Update password in Supabase
     const { error: updateError } = await supabase
       .from('users')
-      .update({ password_hash: hashedPassword })
+      .update({
+        password_hash: hashedPassword,
+        updated_at: new Date().toISOString()
+      })
       .eq('id', payload.userId);
 
     if (updateError) {
@@ -79,8 +82,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const newToken = jwt.sign(payload, JWT_SECRET, { expiresIn: '1d' });
-    return NextResponse.json({ token: newToken, message: 'Password changed successfully' }, { status: 200 });
+    // Sign new token with original payload but fresh timestamp
+    const { iat, exp, ...cleanPayload } = payload as any;
+    const newToken = jwt.sign(cleanPayload, JWT_SECRET, { expiresIn: '7d' });
+
+    return NextResponse.json({
+      token: newToken,
+      message: 'Password changed successfully'
+    }, { status: 200 });
   } catch (error) {
     console.error('Change password error:', error);
     return NextResponse.json(

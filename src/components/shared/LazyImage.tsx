@@ -31,7 +31,13 @@ export const LazyImage: React.FC<LazyImageProps> = ({
   const imgRef = useRef<HTMLImageElement>(null);
 
   useEffect(() => {
-    if (!imgRef.current) return;
+    if (!imgRef.current || !src) {
+      if (!src) {
+        setImageSrc(placeholder);
+        setIsLoading(false);
+      }
+      return;
+    }
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -71,7 +77,7 @@ export const LazyImage: React.FC<LazyImageProps> = ({
         observer.unobserve(imgRef.current);
       }
     };
-  }, [src, onLoad, onError]);
+  }, [src, placeholder, onLoad, onError]);
 
   return (
     <img

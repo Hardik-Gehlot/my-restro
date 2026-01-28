@@ -1,5 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
+import { motion, AnimatePresence } from 'framer-motion';
 import Sidebar from '@/components/admin/Sidebar';
 import Header from '@/components/admin/Header';
 import { KEYS, Restaurant } from '@/types';
@@ -55,6 +57,8 @@ export default function AdminDashboard({ children }: {
 
     loadData();
   }, [router, showToast]); 
+  const pathname = usePathname();
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-screen bg-gray-50">
@@ -65,11 +69,21 @@ export default function AdminDashboard({ children }: {
   return (
     <div className="min-h-screen bg-gray-50">
       <Sidebar restaurant={restaurant} open={sidebarOpen} setOpen={setSidebarOpen} />
-      <div className="lg:pl-64 flex flex-col flex-1">
+      <div className="lg:pl-64 flex flex-col min-h-screen">
         <Header onMenuClick={() => setSidebarOpen(true)} restaurant={restaurant} />
-        <main className="flex-1 h-screen overflow-y-auto">
-          <div className="mx-auto h-full">
-            {children}
+        <main className="flex-1">
+          <div className="mx-auto">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={pathname}
+                initial={{ opacity: 0, x: 10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -10 }}
+                transition={{ duration: 0.2, ease: "easeInOut" }}
+              >
+                {children}
+              </motion.div>
+            </AnimatePresence>
           </div>
         </main>
       </div>

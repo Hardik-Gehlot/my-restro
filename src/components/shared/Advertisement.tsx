@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { FiExternalLink, FiTrendingUp } from 'react-icons/fi';
 import { db } from '@/app/database';
 import { Advertisement as AdType } from '@/types';
+import { PLACEHOLDERS } from '@/lib/constants';
 
 interface AdvertisementProps {
   ad: AdType;
@@ -54,7 +55,7 @@ export default function Advertisement({
           {/* Background Image with Overlay */}
           <div className="absolute inset-0 opacity-20">
             <Image
-              src={ad.image}
+              src={ad.image || PLACEHOLDERS.DISH_IMAGE}
               alt={ad.title}
               fill
               className="object-cover"
@@ -100,7 +101,7 @@ export default function Advertisement({
           {/* Image */}
           <div className="relative h-48 bg-gradient-to-br from-gray-200 to-gray-300">
             <Image
-              src={ad.image}
+              src={ad.image || PLACEHOLDERS.DISH_IMAGE}
               alt={ad.title}
               fill
               className="object-cover"

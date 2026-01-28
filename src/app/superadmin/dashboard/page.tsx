@@ -5,6 +5,7 @@ import { KEYS, ApiResponse } from '@/types';
 import { Icons } from '@/lib/icons';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import { PLACEHOLDERS } from '@/lib/constants';
 
 export default function SuperadminDashboard() {
   const [stats, setStats] = useState<any>(null);
@@ -99,7 +100,7 @@ export default function SuperadminDashboard() {
                                     <tr key={rest.id} className="hover:bg-slate-800/20 transition-colors group">
                                         <td className="p-4">
                                             <div className="flex items-center gap-3">
-                                                <img src={rest.logo} alt={rest.name} className="w-10 h-10 rounded-xl bg-slate-800 p-0.5 object-cover" />
+                                                <img src={rest.logo || PLACEHOLDERS.RESTAURANT_LOGO} alt={rest.name} className="w-10 h-10 rounded-xl bg-slate-800 p-0.5 object-cover" />
                                                 <div>
                                                     <p className="text-white font-bold group-hover:text-cyan-400 transition-colors">{rest.name}</p>
                                                     <p className="text-xs text-slate-500">{rest.mobile_no}</p>

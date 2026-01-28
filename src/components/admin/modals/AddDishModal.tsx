@@ -2,6 +2,7 @@
 import { useState, Fragment } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { Icons } from '@/lib/icons';
+import { useToast } from '@/components/shared/CustomToast';
 
 import { Dish, Category, DishVariation } from '@/types';
 
@@ -35,6 +36,7 @@ const AddDishModal = ({ onClose, onSave, restaurantId, categories }: AddDishModa
         isAvailable: true,
         variations: [{ size: "price", price: 0 }]
     });
+    const { showToast } = useToast();
 
     const update = (key: keyof FormState, value: any) => {
         if (key === 'categoryId') {
@@ -75,7 +77,7 @@ const AddDishModal = ({ onClose, onSave, restaurantId, categories }: AddDishModa
 
     const handleSubmit = () => {
         if (!form.name || !form.image || form.variations.length === 0) {
-            alert("Please fill all required fields");
+            showToast("Please fill all required fields", "warning");
             return;
         }
         onSave({

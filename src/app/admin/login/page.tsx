@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { FiMail, FiLock, FiAlertCircle, FiAward } from 'react-icons/fi';
+import { useToast } from '@/components/shared/CustomToast';
 import { db } from '@/app/database';
 import { KEYS } from '@/types';
 
@@ -10,22 +11,21 @@ export default function AdminLoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const { showToast } = useToast();
 
     const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
       if (!email || !password) {
-        setError('Please enter both email and password');
+        showToast('Please enter both email and password', 'error');
         return;
       }
-      setError('');
       setLoading(true);
       try {
         const response = await db.login(email,password);
   
         if (response.status==='error') {
-          setError(response.data || 'Login failed');
+          showToast(response.data || 'Login failed', 'error');
           setLoading(false);
           return;
         }
@@ -45,7 +45,7 @@ export default function AdminLoginPage() {
           router.push('/admin/dashboard/menu');
         }
       } catch (err) {
-        setError('An error occurred. Please try again.');
+        showToast('An error occurred. Please try again.', 'error');
         setLoading(false);
       }
     };
@@ -65,13 +65,7 @@ export default function AdminLoginPage() {
         {/* Login Form */}
         <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Error Message */}
-            {error && (
-              <div className="bg-red-50 border-2 border-red-200 rounded-xl p-4 flex items-start space-x-3">
-                <FiAlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
-                <p className="text-sm text-red-700">{error}</p>
-              </div>
-            )}
+            {/* Form Fields */}
 
             {/* Email Field */}
             <div>

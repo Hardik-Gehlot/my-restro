@@ -92,6 +92,16 @@ export const CONFIG = {
 } as const;
 
 // ============================================
+// Placeholders
+// ============================================
+
+export const PLACEHOLDERS = {
+    RESTAURANT_LOGO: 'https://plus.unsplash.com/premium_vector-1731231946251-221230b7d0cb?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8cmVzdGF1cmFudHxlbnwwfHwwfHx8MA%3D%3D',
+    RESTAURANT_COVER: 'https://plus.unsplash.com/premium_vector-1739809916555-c2344f72e667?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cmVzdGF1cmFudCUyMGJhY2tncm91bmR8ZW58MHx8MHx8fDA%3D',
+    DISH_IMAGE: 'https://plus.unsplash.com/premium_photo-1664527306801-f815c9a8516f?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OXx8ZGlzaHxlbnwwfHwwfHx8MA%3D%3D',
+} as const;
+
+// ============================================
 // Validation Patterns
 // ============================================
 export const VALIDATION_PATTERNS = {

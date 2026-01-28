@@ -6,8 +6,10 @@ import { usePathname } from 'next/navigation';
 import { Dialog, Transition } from '@headlessui/react';
 import { Icons } from '@/lib/icons';
 import { db } from '@/app/database';
+import { PLACEHOLDERS } from '@/lib/constants';
 
 import { Restaurant } from '@/types';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface SidebarProps {
   restaurant: Restaurant | null;
@@ -36,7 +38,7 @@ const Sidebar = ({ restaurant, open, setOpen }: SidebarProps) => {
       <div className="p-6 text-center border-b">
         <div className="w-24 h-24 rounded-full mx-auto mb-3 overflow-hidden border-2 border-orange-200">
           <img 
-            src={restaurant?.logo}
+            src={restaurant?.logo || PLACEHOLDERS.RESTAURANT_LOGO}
             alt={restaurant?.name}
             className="w-full h-full object-cover"
           />
@@ -52,14 +54,26 @@ const Sidebar = ({ restaurant, open, setOpen }: SidebarProps) => {
               <Link
                 href={link.href}
                 onClick={() => setOpen(false)}
-                className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 font-medium ${
+                className={`flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-300 font-medium relative group ${
                   pathname.startsWith(link.href)
-                    ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-md'
+                    ? 'text-white shadow-lg'
                     : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'
                 }`}
               >
-                <link.icon className="w-6 h-6" />
-                <span>{link.label}</span>
+                {pathname.startsWith(link.href) && (
+                  <motion.div
+                    layoutId="activeNav"
+                    className="absolute inset-0 bg-gradient-to-r from-orange-500 to-red-600 rounded-xl"
+                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                  />
+                )}
+                <motion.div
+                  whileHover={{ rotate: 10, scale: 1.2 }}
+                  className="relative z-10"
+                >
+                  <link.icon className="w-5 h-5" />
+                </motion.div>
+                <span className="relative z-10">{link.label}</span>
               </Link>
             </li>
           ))}

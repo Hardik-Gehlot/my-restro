@@ -8,6 +8,7 @@ import { ApiResponse, Dish, KEYS, Restaurant } from '@/types';
 import { useRouter } from 'next/navigation';
 import { Icons } from '@/lib/icons';
 import { whatsappLink } from '@/lib/common-data';
+import { PLACEHOLDERS } from '@/lib/constants';
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -102,14 +103,14 @@ export default function ProfilePage() {
         <div className="bg-white rounded-xl overflow-hidden shadow-sm mb-4">
           <div className="relative h-48">
             <img 
-              src={restaurant.coverImage} 
+              src={restaurant.coverImage || PLACEHOLDERS.RESTAURANT_COVER} 
               alt="Cover"
               className="w-full h-full object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
             <div className="absolute bottom-4 left-4 flex items-center gap-4">
               <img 
-                src={restaurant.logo} 
+                src={restaurant.logo || PLACEHOLDERS.RESTAURANT_LOGO} 
                 alt={restaurant.name}
                 className="w-20 h-20 rounded-full border-4 border-white object-cover shadow-lg"
               />

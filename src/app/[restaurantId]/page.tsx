@@ -18,7 +18,9 @@ import {
 import { BiSolidDish } from "react-icons/bi";
 import Footer from "@/components/shared/Footer";
 import { Restaurant } from "@/types";
-import { db } from "../database";
+import { db } from "@/app/database";
+import { PLACEHOLDERS } from "@/lib/constants";
+import { Icons } from "@/lib/icons";
 
 export default function RestaurantDetailPage() {
   const params = useParams();
@@ -85,7 +87,7 @@ export default function RestaurantDetailPage() {
       {/* Header Image Section */}
       <div className="relative h-56 bg-gray-900">
         <Image
-          src={restaurant.coverImage}
+          src={restaurant.coverImage || PLACEHOLDERS.RESTAURANT_COVER}
           alt={restaurant.name}
           fill
           className="object-cover opacity-90"
@@ -96,7 +98,7 @@ export default function RestaurantDetailPage() {
         <div className="absolute -bottom-12 left-4">
           <div className="relative w-24 h-24 rounded-2xl overflow-hidden border-4 border-white shadow-2xl bg-white">
             <Image
-              src={restaurant.logo}
+              src={restaurant.logo || PLACEHOLDERS.RESTAURANT_LOGO}
               alt={restaurant.name}
               fill
               className="object-cover"
