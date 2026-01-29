@@ -1,7 +1,7 @@
 import { Icons } from './icons';
 
 export const WEBSITE_DETAILS = {
-  name: 'MenuDigital',
+  name: 'DineOnline',
   icon: Icons.Store
 };
 

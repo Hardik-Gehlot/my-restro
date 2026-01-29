@@ -28,68 +28,37 @@ const ToastItem = ({ toast, removeToast }: ToastItemProps) => {
 
   const getIcon = () => {
     switch (toast.type) {
-      case 'success': return <CheckCircle className="h-5 w-5 text-emerald-400" />;
-      case 'error': return <XCircle className="h-5 w-5 text-rose-400" />;
-      case 'warning': return <AlertTriangle className="h-5 w-5 text-amber-400" />;
-      default: return <Info className="h-5 w-5 text-cyan-400" />;
-    }
-  };
-
-  const getBorderColor = () => {
-    switch (toast.type) {
-      case 'success': return 'border-emerald-500/30';
-      case 'error': return 'border-rose-500/30';
-      case 'warning': return 'border-amber-500/30';
-      default: return 'border-cyan-500/30';
-    }
-  };
-
-  const getShadowColor = () => {
-    switch (toast.type) {
-      case 'success': return 'shadow-emerald-900/20';
-      case 'error': return 'shadow-rose-900/20';
-      case 'warning': return 'shadow-amber-900/20';
-      default: return 'shadow-cyan-900/20';
+      case 'success': return <CheckCircle className="h-4 w-4 text-emerald-500" />;
+      case 'error': return <XCircle className="h-4 w-4 text-rose-500" />;
+      case 'warning': return <AlertTriangle className="h-4 w-4 text-amber-500" />;
+      default: return <Info className="h-4 w-4 text-cyan-500" />;
     }
   };
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20, scale: 0.9, filter: 'blur(10px)' }}
-      animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
-      exit={{ opacity: 0, scale: 0.95, filter: 'blur(10px)' }}
+      initial={{ opacity: 0, x: 20, filter: 'blur(10px)' }}
+      animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
+      exit={{ opacity: 0, x: 20, filter: 'blur(10px)' }}
       className={`relative flex items-center justify-between
-        min-w-[320px] max-w-md px-5 py-4 my-2
-        bg-slate-900/80 backdrop-blur-xl border ${getBorderColor()}
-        rounded-2xl shadow-2xl ${getShadowColor()}
+        min-w-[260px] max-w-md px-4 py-2 my-1
+        bg-white/95 backdrop-blur-md
+        rounded-none shadow-[0_4px_20px_rgba(0,0,0,0.15)]
         pointer-events-auto group
       `}
     >
-      <div className="flex items-center gap-3">
-        <div className="p-2 bg-slate-800 rounded-xl">
+      <div className="flex items-center gap-2.5">
+        <div className="flex items-center justify-center">
             {getIcon()}
         </div>
-        <span className="text-sm font-medium text-slate-200">{toast.message}</span>
+        <span className="text-[12px] font-bold text-slate-900 tracking-tight leading-none">{toast.message}</span>
       </div>
       <button 
         onClick={() => removeToast(toast.id)} 
-        className="p-1 hover:bg-slate-800 rounded-lg text-slate-500 hover:text-white transition-colors"
+        className="p-1 hover:bg-slate-200/50 text-slate-400 hover:text-slate-900 transition-colors ml-4"
       >
-        <X className="h-4 w-4" />
+        <X className="h-3.5 w-3.5" />
       </button>
-      
-      {/* Animated Progress Bar */}
-      <motion.div 
-        initial={{ width: '100%' }}
-        animate={{ width: '0%' }}
-        transition={{ duration: 4, ease: 'linear' }}
-        className={`absolute bottom-0 left-0 h-[2px] rounded-full
-            ${toast.type === 'success' && 'bg-emerald-500'}
-            ${toast.type === 'error' && 'bg-rose-500'}
-            ${toast.type === 'warning' && 'bg-amber-500'}
-            ${toast.type === 'info' && 'bg-cyan-500'}
-        `}
-      />
     </motion.div>
   );
 };

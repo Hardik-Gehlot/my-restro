@@ -8,7 +8,7 @@ export default function Footer() {
           
           {/* Logo / Brand */}
           <div className="flex items-center gap-2 text-2xl font-semibold text-gray-800">
-            <Icons.BiSolidDish className="text-3xl text-orange-500" />
+            <Icons.Store className="text-3xl text-orange-500" />
             <span>{WEBSITE_DETAILS.name}</span>
           </div>
 
