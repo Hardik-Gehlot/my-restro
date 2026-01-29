@@ -9,6 +9,8 @@ import { useRouter } from 'next/navigation';
 import { Icons } from '@/lib/icons';
 import { whatsappLink } from '@/lib/common-data';
 import { PLACEHOLDERS } from '@/lib/constants';
+import FullscreenLoader from '@/components/shared/FullscreenLoader';
+import { ProfileSkeleton } from '@/components/shared/Skeleton';
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -16,6 +18,7 @@ export default function ProfilePage() {
   const [editingRestaurant, setEditingRestaurant] = useState<Restaurant | null>(null);
   const { showToast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -68,6 +71,9 @@ export default function ProfilePage() {
       return;
     }
 
+    setEditingRestaurant(null);
+    setIsSaving(true);
+
     const response = await db.updateRestaurant(token, updatedRestaurant);
     
     if (response.status === 'error') {
@@ -76,20 +82,19 @@ export default function ProfilePage() {
     }
 
     setRestaurant(updatedRestaurant);
-    setEditingRestaurant(null);
     showToast("Restaurant details updated successfully!", 'success');
   } catch (error) {
     console.error('Error updating restaurant:', error);
     showToast("Failed to update restaurant details.", 'error');
+  } finally {
+    setIsSaving(false);
   }
 };
 
   if (!restaurant) {
     return (
-      <div>
-        <div className="flex items-center justify-center h-screen">
-          <div className="animate-spin w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full"></div>
-        </div>
+      <div className="p-4 sm:p-6">
+        <ProfileSkeleton />
       </div>
     );
   }
@@ -97,7 +102,11 @@ export default function ProfilePage() {
   const isExpired = new Date(restaurant.plan_expiry || 0) <= new Date();
 
   return (
-    <div>
+    <>
+      <FullscreenLoader 
+        isVisible={isSaving} 
+        messages={["Updating restaurant details...", "Saving your changes...", "Almost done..."]} 
+      />
       <div className="p-4 sm:p-6">
         {/* Restaurant Cover */}
         <div className="bg-white rounded-xl overflow-hidden shadow-sm mb-4">
@@ -284,6 +293,6 @@ export default function ProfilePage() {
           />
         )}
       </div>
-    </div>
+    </>
   );
 }

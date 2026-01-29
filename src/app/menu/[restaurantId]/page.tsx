@@ -18,6 +18,7 @@ import FilterModel from "@/components/shared/FilterModel";
 import { Dish, Restaurant } from "@/types";
 import { db } from "@/app/database";
 import { PLACEHOLDERS } from "@/lib/constants";
+import { MenuPageSkeleton } from "@/components/shared/Skeleton";
 
 interface MenuHeaderProp {
   restaurantName: string;
@@ -301,7 +302,7 @@ export default function MenuPage() {
     setIsCategoryModalOpen(false);
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <MenuPageSkeleton />;
   if (!restaurant) return <div>Not found</div>;
 
   return (
@@ -368,7 +369,7 @@ export default function MenuPage() {
                           index < groupedAndFilteredDishes[category].length - 1
                             ? "border-b border-white/40"
                             : ""
-                        }`}
+                        } ${dish.isAvailable === false ? "opacity-60 grayscale-[0.3]" : ""}`}
                       >
                         <div className="flex-1 min-w-0 pr-4">
                           <h4 className="flex-wrap text-base font-bold text-gray-800 flex items-center gap-2">
@@ -387,7 +388,7 @@ export default function MenuPage() {
                             </div>
                             {dish.name}
                             {dish.isAvailable === false && (
-                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-semibold bg-gray-300/50 text-gray-600 border border-gray-300">
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-bold bg-red-100 text-red-600 border border-red-200 animate-pulse">
                                 <svg
                                   className="w-3 h-3"
                                   fill="none"

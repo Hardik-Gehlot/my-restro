@@ -4,6 +4,8 @@ import { usePathname } from 'next/navigation';
 import { Icons } from '@/lib/icons';
 import { WEBSITE_DETAILS } from '@/lib/common-data';
 import { motion } from 'framer-motion';
+import { useState } from 'react';
+import FullscreenLoader from '../shared/FullscreenLoader';
 
 interface SidebarProps {
   open: boolean;
@@ -17,20 +19,26 @@ const menuItems = [
 
 export default function SuperadminSidebar({ open, setOpen }: SidebarProps) {
   const pathname = usePathname();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   return (
     <>
+      <FullscreenLoader 
+        isVisible={isLoggingOut} 
+        messages={["Closing secure session...", "Goodbye SuperAdmin...", "Redirecting to portal..."]} 
+      />
+
       {/* Mobile Backdrop */}
       {open && (
         <div 
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden transition-opacity" 
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] lg:hidden transition-opacity" 
           onClick={() => setOpen(false)}
         />
       )}
 
       {/* Sidebar */}
       <aside className={`
-        fixed top-0 left-0 bottom-0 z-50 w-64
+        fixed top-0 left-0 bottom-0 z-[100] w-64
         bg-slate-950 border-r border-slate-800
         transition-transform duration-300 transform
         ${open ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
@@ -81,8 +89,14 @@ export default function SuperadminSidebar({ open, setOpen }: SidebarProps) {
           <div className="p-4 border-t border-slate-800">
             <button 
               onClick={() => {
-                sessionStorage.clear();
-                window.location.href = '/admin/login';
+                if (confirm('Are you sure you want to sign out?')) {
+                  setOpen(false);
+                  setIsLoggingOut(true);
+                  setTimeout(() => {
+                    sessionStorage.clear();
+                    window.location.href = '/admin/login';
+                  }, 800);
+                }
               }}
               className="flex items-center gap-3 w-full px-4 py-3 text-red-400 hover:bg-red-500/10 rounded-xl transition-colors font-medium"
             >

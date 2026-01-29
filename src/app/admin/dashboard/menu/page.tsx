@@ -11,6 +11,8 @@ import { useRouter } from "next/navigation";
 import { PLACEHOLDERS } from "@/lib/constants";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiX } from "react-icons/fi";
+import FullscreenLoader from "@/components/shared/FullscreenLoader";
+import { DashboardSkeleton } from "@/components/shared/Skeleton";
 
 interface DishesByCategory {
   [category: string]: Dish[];
@@ -28,6 +30,8 @@ export default function AdminDashboard() {
   const [editingDish, setEditingDish] = useState<Dish | null>(null);
   const { showToast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [savingMessages, setSavingMessages] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -93,15 +97,20 @@ export default function AdminDashboard() {
       const token = sessionStorage.getItem(KEYS.JWT_TOKEN);
       if (!token) return;
 
+      setShowAddModal(false);
+      setIsSaving(true);
+      setSavingMessages(["Adding dish to menu...", "Saving your changes...", "Almost there..."]);
+
       const addedDish = await db.addDish(token, newDish);
       if (addedDish) {
         setDishes([...dishes, addedDish]);
-        setShowAddModal(false);
         showToast("Dish added successfully!", "success");
       }
     } catch (error) {
       console.error("Error adding dish:", error);
       showToast("Failed to add dish.", "error");
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -110,17 +119,22 @@ export default function AdminDashboard() {
       const token = sessionStorage.getItem(KEYS.JWT_TOKEN);
       if (!token) return;
 
+      setEditingDish(null);
+      setIsSaving(true);
+      setSavingMessages(["Updating dish...", "Saving changes...", "Almost done..."]);
+
       const editedDish = await db.updateDish(token, updatedDish.id, updatedDish);
       if (!editedDish) {
         showToast("Failed to update dish.", "error");
         return;
       }
       setDishes(dishes.map((d) => (d.id === editedDish.id ? editedDish : d)));
-      setEditingDish(null);
       showToast("Dish updated successfully!", "success");
     } catch (error) {
       console.error("Error updating dish:", error);
       showToast("Failed to update dish.", "error");
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -130,25 +144,32 @@ export default function AdminDashboard() {
         const token = sessionStorage.getItem(KEYS.JWT_TOKEN);
         if (!token) return;
 
+        setIsSaving(true);
+        setSavingMessages(["Deleting dish...", "Removing from menu...", "Almost done..."]);
+
         await db.deleteDish(token, dishId);
         setDishes(dishes.filter((d) => d.id !== dishId));
         showToast("Dish deleted successfully!", "success");
       } catch (error) {
         console.error("Error deleting dish:", error);
         showToast("Failed to delete dish.", "error");
+      } finally {
+        setIsSaving(false);
       }
     }
   };
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="animate-spin w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full"></div>
+      <div className="p-4 sm:p-6 lg:p-8">
+        <DashboardSkeleton />
       </div>
     );
   }
 
   return (
+    <>
+      <FullscreenLoader isVisible={isSaving} messages={savingMessages} />
     <div className="relative min-h-screen bg-gray-50 pb-24">
       <div className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
@@ -385,5 +406,6 @@ export default function AdminDashboard() {
         />
       )}
     </div>
+    </>
   );
 }

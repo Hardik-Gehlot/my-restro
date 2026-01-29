@@ -6,6 +6,8 @@ import { useToast } from '@/components/shared/CustomToast';
 import { db } from '@/app/database';
 import { Category, KEYS } from '@/types';
 import { useRouter } from 'next/navigation';
+import FullscreenLoader from '@/components/shared/FullscreenLoader';
+import { DashboardSkeleton } from '@/components/shared/Skeleton';
 
 export default function CategoriesPage() {
   const router = useRouter();
@@ -14,6 +16,8 @@ export default function CategoriesPage() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [categoryName, setCategoryName] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+  const [savingMessage, setSavingMessage] = useState('');
   const { showToast } = useToast();
 
   useEffect(() => {
@@ -53,17 +57,27 @@ export default function CategoriesPage() {
     const token = sessionStorage.getItem(KEYS.JWT_TOKEN);
     if (!token) return;
 
-    const response = await db.addCategory(token, categoryName);
+    setIsSaving(true);
+    setSavingMessage('Adding category...');
     
-    if (response.status === 'error') {
-      showToast(response.message || 'Failed to add category', 'error');
-      return;
-    }
+    try {
+      const response = await db.addCategory(token, categoryName);
+      
+      if (response.status === 'error') {
+        showToast(response.message || 'Failed to add category', 'error');
+        return;
+      }
 
-    setCategories([...categories, response.data!]);
-    setShowAddModal(false);
-    setCategoryName('');
-    showToast('Category added successfully!', 'success');
+      setCategories([...categories, response.data!]);
+      setShowAddModal(false);
+      setCategoryName('');
+      showToast('Category added successfully!', 'success');
+    } catch (error) {
+      console.error('Error adding category:', error);
+      showToast('An error occurred while adding category', 'error');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleUpdateCategory = async () => {
@@ -75,17 +89,27 @@ export default function CategoriesPage() {
     const token = sessionStorage.getItem(KEYS.JWT_TOKEN);
     if (!token) return;
 
-    const response = await db.updateCategory(token, editingCategory.id, categoryName);
-    
-    if (response.status === 'error') {
-      showToast(response.message || 'Failed to update category', 'error');
-      return;
-    }
+    setIsSaving(true);
+    setSavingMessage('Updating category...');
 
-    setCategories(categories.map(c => c.id === editingCategory.id ? response.data! : c));
-    setEditingCategory(null);
-    setCategoryName('');
-    showToast('Category updated successfully!', 'success');
+    try {
+      const response = await db.updateCategory(token, editingCategory.id, categoryName);
+      
+      if (response.status === 'error') {
+        showToast(response.message || 'Failed to update category', 'error');
+        return;
+      }
+
+      setCategories(categories.map(c => c.id === editingCategory.id ? response.data! : c));
+      setEditingCategory(null);
+      setCategoryName('');
+      showToast('Category updated successfully!', 'success');
+    } catch (error) {
+      console.error('Error updating category:', error);
+      showToast('An error occurred while updating category', 'error');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleDeleteCategory = async (categoryId: string) => {
@@ -94,15 +118,25 @@ export default function CategoriesPage() {
     const token = sessionStorage.getItem(KEYS.JWT_TOKEN);
     if (!token) return;
 
-    const response = await db.deleteCategory(token, categoryId);
-    
-    if (response.status === 'error') {
-      showToast(response.message || 'Failed to delete category', 'error');
-      return;
-    }
+    setIsSaving(true);
+    setSavingMessage('Deleting category...');
 
-    setCategories(categories.filter(c => c.id !== categoryId));
-    showToast('Category deleted successfully!', 'success');
+    try {
+      const response = await db.deleteCategory(token, categoryId);
+      
+      if (response.status === 'error') {
+        showToast(response.message || 'Failed to delete category', 'error');
+        return;
+      }
+
+      setCategories(categories.filter(c => c.id !== categoryId));
+      showToast('Category deleted successfully!', 'success');
+    } catch (error) {
+      console.error('Error deleting category:', error);
+      showToast('An error occurred while deleting category', 'error');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const openEditModal = (category: Category) => {
@@ -118,14 +152,16 @@ export default function CategoriesPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="animate-spin w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full"></div>
+      <div className="p-4 sm:p-6 lg:p-8">
+        <DashboardSkeleton />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
+    <>
+      <FullscreenLoader isVisible={isSaving} messages={[savingMessage]} />
+      <div className="min-h-screen bg-gray-50 pb-24">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         
         {/* Header */}
@@ -245,5 +281,6 @@ export default function CategoriesPage() {
         </div>
       )}
     </div>
+    </>
   );
 }

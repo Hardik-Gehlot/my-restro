@@ -6,6 +6,7 @@ import { Icons } from '@/lib/icons';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { PLACEHOLDERS } from '@/lib/constants';
+import { Skeleton } from '@/components/shared/Skeleton';
 
 export default function SuperadminDashboard() {
   const [stats, setStats] = useState<any>(null);
@@ -30,12 +31,34 @@ export default function SuperadminDashboard() {
 
   if (isLoading) {
     return (
-      <div className="space-y-6">
-        <div className="h-10 w-48 bg-slate-800 rounded animate-pulse" />
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-           {[1, 2, 3, 4].map(i => <div key={i} className="h-32 bg-slate-800 rounded-2xl animate-pulse" />)}
+      <div className="space-y-8 max-w-7xl mx-auto">
+        {/* Header skeleton */}
+        <div className="space-y-2">
+          <Skeleton className="h-10 w-64" dark />
+          <Skeleton className="h-4 w-96" dark />
         </div>
-        <div className="h-96 bg-slate-800 rounded-2xl animate-pulse" />
+
+        {/* Stats grid skeleton */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {[1, 2, 3, 4].map(i => (
+            <div key={i} className="p-6 rounded-2xl border border-slate-800 bg-slate-900/10 h-32 space-y-4">
+              <Skeleton className="w-10 h-10 rounded-lg" dark />
+              <div className="space-y-2">
+                <Skeleton className="h-3 w-20" dark />
+                <Skeleton className="h-6 w-32" dark />
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+          <div className="xl:col-span-2">
+            <Skeleton className="h-[500px] w-full rounded-3xl" dark />
+          </div>
+          <div>
+            <Skeleton className="h-[500px] w-full rounded-3xl" dark />
+          </div>
+        </div>
       </div>
     );
   }

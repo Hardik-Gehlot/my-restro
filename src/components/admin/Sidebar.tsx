@@ -10,6 +10,8 @@ import { PLACEHOLDERS } from '@/lib/constants';
 
 import { Restaurant } from '@/types';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useState } from 'react';
+import FullscreenLoader from '../shared/FullscreenLoader';
 
 interface SidebarProps {
   restaurant: Restaurant | null;
@@ -19,6 +21,7 @@ interface SidebarProps {
 
 const Sidebar = ({ restaurant, open, setOpen }: SidebarProps) => {
   const pathname = usePathname();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const navLinks = [
     { href: '/admin/dashboard/profile', icon: Icons.FiUser, label: 'Profile' },
@@ -27,9 +30,24 @@ const Sidebar = ({ restaurant, open, setOpen }: SidebarProps) => {
     { href: '/admin/dashboard/setting', icon: Icons.IoIosSettings, label: 'Settings' },
   ];
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     if (confirm('Are you sure you want to logout?')) {
-      db.logout();
+      // Close sidebar first as per user request
+      setOpen(false);
+      
+      // Start logout loading state
+      setIsLoggingOut(true);
+      
+      try {
+        await db.logout();
+        // Use a small delay for a smoother transition
+        setTimeout(() => {
+          window.location.href = '/admin/login';
+        }, 800);
+      } catch (error) {
+        console.error('Logout error:', error);
+        setIsLoggingOut(false);
+      }
     }
   };
 
@@ -94,9 +112,14 @@ const Sidebar = ({ restaurant, open, setOpen }: SidebarProps) => {
 
   return (
     <>
+      <FullscreenLoader 
+        isVisible={isLoggingOut} 
+        messages={["Logging out safely...", "Clearing your session...", "Redirecting to login..."]} 
+      />
+      
       {/* Mobile sidebar */}
       <Transition.Root show={open} as={Fragment}>
-        <Dialog as="div" className="relative z-40 lg:hidden" onClose={setOpen}>
+        <Dialog as="div" className="relative z-[100] lg:hidden" onClose={setOpen}>
           <Transition.Child
             as={Fragment}
             enter="transition-opacity ease-linear duration-300"
@@ -141,7 +164,7 @@ const Sidebar = ({ restaurant, open, setOpen }: SidebarProps) => {
       </Transition.Root>
 
       {/* Static sidebar for desktop */}
-      <div className="hidden lg:flex lg:flex-shrink-0 lg:fixed lg:inset-y-0">
+      <div className="hidden lg:flex lg:flex-shrink-0 lg:fixed lg:inset-y-0 lg:z-[100]">
         <div className="flex flex-col w-64">
           {sidebarContent}
         </div>

@@ -5,11 +5,15 @@ import { db } from '@/app/database';
 import { KEYS } from '@/types';
 import { useRouter } from 'next/navigation';
 import { Icons } from '@/lib/icons';
+import FullscreenLoader from '@/components/shared/FullscreenLoader';
 
 export default function SettingsPage() {
   const router = useRouter();
   const { showToast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState({
     currentPassword: '',
     newPassword: '',
@@ -69,101 +73,140 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        
-        {/* Header */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
-          <div className="flex items-center gap-3">
-             <div className="p-2 bg-orange-100 rounded-lg">
-                <Icons.IoIosSettings className="w-6 h-6 text-orange-600" />
-             </div>
-             <div>
-                <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-                <p className="text-gray-600 mt-1">Manage your account preferences</p>
-             </div>
+    <>
+      <FullscreenLoader 
+        isVisible={loading} 
+        messages={["Updating password...", "Securing your account...", "Almost done..."]}
+      />
+      
+      <div className="min-h-screen bg-gray-50 pb-24">
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          
+          {/* Header */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+            <div className="flex items-center gap-3">
+               <div className="p-2 bg-orange-100 rounded-lg">
+                  <Icons.IoIosSettings className="w-6 h-6 text-orange-600" />
+               </div>
+               <div>
+                  <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
+                  <p className="text-gray-600 mt-1">Manage your account preferences</p>
+               </div>
+            </div>
+          </div>
+
+          {/* Change Password Form */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <h2 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
+              <Icons.Lock className="w-5 h-5 text-gray-500" />
+              Change Password
+            </h2>
+
+            <form onSubmit={handleSubmit} className="space-y-6 text-gray-800">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Current Password
+                </label>
+                <div className="relative">
+                  <input
+                    type={showCurrentPassword ? 'text' : 'password'}
+                    name="currentPassword"
+                    value={formData.currentPassword}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 
+                             focus:ring-orange-500 focus:border-transparent transition-all"
+                    placeholder="Enter current password"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                    className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                  >
+                    {showCurrentPassword ? (
+                      <Icons.EyeOff className="w-5 h-5" />
+                    ) : (
+                      <Icons.Eye className="w-5 h-5" />
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    New Password
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showNewPassword ? 'text' : 'password'}
+                      name="newPassword"
+                      value={formData.newPassword}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 
+                               focus:ring-orange-500 focus:border-transparent transition-all"
+                      placeholder="Enter new password"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowNewPassword(!showNewPassword)}
+                      className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                    >
+                      {showNewPassword ? (
+                        <Icons.EyeOff className="w-5 h-5" />
+                      ) : (
+                        <Icons.Eye className="w-5 h-5" />
+                      )}
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Confirm Password
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showConfirmPassword ? 'text' : 'password'}
+                      name="confirmPassword"
+                      value={formData.confirmPassword}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 
+                               focus:ring-orange-500 focus:border-transparent transition-all"
+                      placeholder="Confirm new password"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                    >
+                      {showConfirmPassword ? (
+                        <Icons.EyeOff className="w-5 h-5" />
+                      ) : (
+                        <Icons.Eye className="w-5 h-5" />
+                      )}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex justify-end pt-4">
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className={`flex items-center gap-2 px-6 py-3 bg-orange-600 text-white 
+                           font-semibold rounded-lg transition-colors
+                           ${loading ? 'opacity-70 cursor-not-allowed' : 'hover:bg-orange-700'}`}
+                >
+                  Update Password
+                </button>
+              </div>
+            </form>
           </div>
         </div>
-
-        {/* Change Password Form */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <h2 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
-            <Icons.Lock className="w-5 h-5 text-gray-500" />
-            Change Password
-          </h2>
-
-          <form onSubmit={handleSubmit} className="space-y-6 text-gray-800">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Current Password
-              </label>
-              <input
-                type="password"
-                name="currentPassword"
-                value={formData.currentPassword}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 
-                         focus:ring-orange-500 focus:border-transparent transition-all"
-                placeholder="Enter current password"
-              />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  New Password
-                </label>
-                <input
-                  type="password"
-                  name="newPassword"
-                  value={formData.newPassword}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 
-                           focus:ring-orange-500 focus:border-transparent transition-all"
-                  placeholder="Enter new password"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Confirm Password
-                </label>
-                <input
-                  type="password"
-                  name="confirmPassword"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 
-                           focus:ring-orange-500 focus:border-transparent transition-all"
-                  placeholder="Confirm new password"
-                />
-              </div>
-            </div>
-
-            <div className="flex justify-end pt-4">
-              <button
-                type="submit"
-                disabled={loading}
-                className={`flex items-center gap-2 px-6 py-3 bg-orange-600 text-white 
-                         font-semibold rounded-lg transition-colors
-                         ${loading ? 'opacity-70 cursor-not-allowed' : 'hover:bg-orange-700'}`}
-              >
-                {loading ? (
-                  <>
-                    <Icons.Loader2 className="animate-spin w-5 h-5" />
-                    Updating...
-                  </>
-                ) : (
-                  'Update Password'
-                )}
-              </button>
-            </div>
-          </form>
-        </div>
       </div>
-    </div>
+    </>
   );
 }

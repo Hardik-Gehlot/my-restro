@@ -27,7 +27,9 @@ import {
   Layout,
   Youtube,
   Download,
-  FileText
+  FileText,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 
 import { FiUser, FiLogOut, FiX, FiAward, FiArrowLeft } from 'react-icons/fi';
@@ -66,6 +68,8 @@ export const Icons = {
   Youtube,
   Download,
   FileText,
+  Eye,
+  EyeOff,
 
   // React Icons
   FiUser,

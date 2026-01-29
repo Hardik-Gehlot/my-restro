@@ -8,6 +8,8 @@ import * as XLSX from 'xlsx';
 import { pricingSection } from '@/lib/common-data';
 import { useToast } from '@/components/shared/CustomToast';
 import { PLACEHOLDERS } from '@/lib/constants';
+import FullscreenLoader from '@/components/shared/FullscreenLoader';
+import { SuperAdminSkeleton } from '@/components/shared/Skeleton';
 
 interface SuperadminRestaurant {
   id: string;
@@ -53,6 +55,8 @@ export default function SuperadminRestaurants() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [selectedRestaurant, setSelectedRestaurant] = useState<SuperadminRestaurant | null>(null);
   const [bulkDishData, setBulkDishData] = useState<DishPayload[]>([]);
+  const [isSaving, setIsSaving] = useState(false);
+  const [savingMessage, setSavingMessage] = useState('');
   
   const { showToast } = useToast();
 
@@ -113,16 +117,24 @@ export default function SuperadminRestaurants() {
     const token = sessionStorage.getItem(KEYS.JWT_TOKEN);
     if (!token || !selectedRestaurant || bulkDishData.length === 0) return;
 
-    setIsLoading(true);
-    const res = await db.bulkUploadDishes(token, selectedRestaurant.id, bulkDishData);
-    if (res.status === 'success') {
-      showToast(res.message || 'Bulk upload successful', 'success');
-      setBulkDishData([]);
-      setIsBulkModalOpen(false);
-    } else {
-      showToast(res.message || 'Bulk upload failed', 'error');
+    setIsSaving(true);
+    setSavingMessage(`Uploading ${bulkDishData.length} dishes...`);
+    
+    try {
+      const res = await db.bulkUploadDishes(token, selectedRestaurant.id, bulkDishData);
+      if (res.status === 'success') {
+        showToast(res.message || 'Bulk upload successful', 'success');
+        setBulkDishData([]);
+        setIsBulkModalOpen(false);
+      } else {
+        showToast(res.message || 'Bulk upload failed', 'error');
+      }
+    } catch (error) {
+      console.error('Bulk upload error:', error);
+      showToast('An error occurred during bulk upload', 'error');
+    } finally {
+      setIsSaving(false);
     }
-    setIsLoading(false);
   };
 
   const handleUpdatePlan = async () => {
@@ -143,12 +155,24 @@ export default function SuperadminRestaurants() {
     const amountNum = parseFloat(planForm.amount) || 0;
 
     const res = await db.updateRestaurantPlan(token, selectedRestaurant.id, planForm.plan, newExpiry.toISOString(), amountNum);
-    if (res.status === 'success') {
-      showToast('Plan and amount updated successfully', 'success');
-      fetchRestaurants();
-      setIsEditModalOpen(false);
-    } else {
-      showToast(res.message || 'Plan update failed', 'error');
+    
+    setIsSaving(true);
+    setSavingMessage('Updating restaurant plan...');
+    
+    try {
+      const res = await db.updateRestaurantPlan(token, selectedRestaurant.id, planForm.plan, newExpiry.toISOString(), amountNum);
+      if (res.status === 'success') {
+        showToast('Plan and amount updated successfully', 'success');
+        fetchRestaurants();
+        setIsEditModalOpen(false);
+      } else {
+        showToast(res.message || 'Plan update failed', 'error');
+      }
+    } catch (error) {
+      console.error('Update plan error:', error);
+      showToast('An error occurred while updating the plan', 'error');
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -159,12 +183,22 @@ export default function SuperadminRestaurants() {
           return;
       }
       
-      const res = await db.resetRestaurantPassword(token, selectedRestaurant.id, pwdForm.newPassword);
-      if (res.status === 'success') {
-          showToast('Password reset successfully (Symmetric Hash Applied)', 'success');
-          setPwdForm({ newPassword: '' });
-      } else {
-          showToast(res.message || 'Password reset failed', 'error');
+      setIsSaving(true);
+      setSavingMessage('Resetting password...');
+      
+      try {
+        const res = await db.resetRestaurantPassword(token, selectedRestaurant.id, pwdForm.newPassword);
+        if (res.status === 'success') {
+            showToast('Password reset successfully', 'success');
+            setPwdForm({ newPassword: '' });
+        } else {
+            showToast(res.message || 'Password reset failed', 'error');
+        }
+      } catch (error) {
+        console.error('Reset password error:', error);
+        showToast('An error occurred while resetting password', 'error');
+      } finally {
+        setIsSaving(false);
       }
   };
 
@@ -175,17 +209,25 @@ export default function SuperadminRestaurants() {
           return;
       }
 
-      setIsLoading(true);
-      const res = await db.createRestaurant(token, createForm.name, createForm.mobile_no, createForm.email, createForm.password);
-      if (res.status === 'success') {
-          showToast('Restaurant created successfully!', 'success');
-          setIsCreateModalOpen(false);
-          setCreateForm({ name: '', mobile_no: '', email: '', password: '' });
-          fetchRestaurants();
-      } else {
-          showToast(res.message || 'Failed to create restaurant', 'error');
+      setIsSaving(true);
+      setSavingMessage('Creating new restaurant...');
+      
+      try {
+        const res = await db.createRestaurant(token, createForm.name, createForm.mobile_no, createForm.email, createForm.password);
+        if (res.status === 'success') {
+            showToast('Restaurant created successfully!', 'success');
+            setIsCreateModalOpen(false);
+            setCreateForm({ name: '', mobile_no: '', email: '', password: '' });
+            fetchRestaurants();
+        } else {
+            showToast(res.message || 'Failed to create restaurant', 'error');
+        }
+      } catch (error) {
+        console.error('Create restaurant error:', error);
+        showToast('An error occurred while creating the restaurant', 'error');
+      } finally {
+        setIsSaving(false);
       }
-      setIsLoading(false);
   };
 
   const filteredRestaurants = useMemo(() => {
@@ -196,41 +238,40 @@ export default function SuperadminRestaurants() {
   }, [restaurants, searchQuery]);
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto">
-      {/* Search and Actions */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div>
-           <h1 className="text-3xl font-extrabold text-white tracking-tight">Restaurants</h1>
-           <p className="text-slate-400 mt-1">Manage all restaurants and their subscriptions.</p>
-        </div>
-        <div className="flex flex-wrap items-center gap-3">
-            <button 
+    <>
+      <FullscreenLoader isVisible={isSaving} messages={[savingMessage]} />
+      {isLoading && restaurants.length === 0 ? (
+        <SuperAdminSkeleton />
+      ) : (
+        <div className="space-y-8 max-w-7xl mx-auto">
+          {/* Search and Actions */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div>
+              <h1 className="text-3xl font-extrabold text-white tracking-tight">Restaurants</h1>
+              <p className="text-slate-400 mt-1">Manage all restaurants and their subscriptions.</p>
+            </div>
+            <div className="flex flex-wrap items-center gap-3">
+              <button 
                 onClick={() => setIsCreateModalOpen(true)}
                 className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white rounded-2xl transition-all text-sm font-bold shadow-xl shadow-cyan-900/20 active:scale-95"
-            >
+              >
                 <Icons.Plus className="w-4 h-4" />
                 Add New Restaurant
-            </button>
-        </div>
-      </div>
-
-      <div className="relative group">
-          <input 
-            type="text" 
-            placeholder="Search restaurants by name or phone..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-slate-900/50 border border-slate-800 rounded-2xl py-5 pl-14 pr-6 text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-cyan-500/30 transition-all shadow-2xl backdrop-blur-sm"
-          />
-          <Icons.Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-600 w-6 h-6 group-focus-within:text-cyan-400 transition-colors" />
-      </div>
-
-      {/* Restaurant Node Cards */}
-      {isLoading && restaurants.length === 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {[1,2,3].map(i => <div key={i} className="h-72 bg-slate-900/50 rounded-3xl border border-slate-800 animate-pulse" />)}
+              </button>
+            </div>
           </div>
-      ) : (
+
+          <div className="relative group">
+            <input 
+              type="text" 
+              placeholder="Search restaurants by name or phone..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-slate-900/50 border border-slate-800 rounded-2xl py-5 pl-14 pr-6 text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-cyan-500/30 transition-all shadow-2xl backdrop-blur-sm"
+            />
+            <Icons.Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-600 w-6 h-6 group-focus-within:text-cyan-400 transition-colors" />
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
              {filteredRestaurants.map((rest, idx) => (
                <motion.div
@@ -309,7 +350,6 @@ export default function SuperadminRestaurants() {
                </motion.div>
              ))}
           </div>
-      )}
 
       {/* Modals Implementation */}
       <AnimatePresence>
@@ -545,5 +585,7 @@ export default function SuperadminRestaurants() {
           )}
       </AnimatePresence>
     </div>
+      )}
+    </>
   );
 }

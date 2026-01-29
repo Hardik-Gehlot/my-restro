@@ -39,12 +39,12 @@ export const pricingSection = {
 
   plans: [
     {
-      id: 'basic',
-      name: 'Basic Plan',
-      price: '₹1,999/yr',
+      id: 'menu',
+      name: 'Menu',
+      price: '₹1,899/yr',
       originalPrice: '₹2,999/yr',
       badge: 'Most Popular',
-      description: 'Everything you need to digitize your restaurant',
+      description: 'Perfect for restaurants getting started with digital menus',
       features: [
         'Unlimited products and menu items',
         'Management dashboard with analytics',
@@ -55,7 +55,47 @@ export const pricingSection = {
         'Free setup and training',
       ],
       ctaText: 'Get Started Now',
-    }
+      isPopular: true,
+      comingSoon: false,
+    },
+    {
+      id: 'order',
+      name: 'Order',
+      price: '',
+      originalPrice: '',
+      badge: 'Coming Soon',
+      description: 'Enable customers to order directly via WhatsApp',
+      features: [
+        'Everything in Menu plan',
+        'WhatsApp ordering integration',
+        'Order notifications on WhatsApp',
+        'Customer messaging support',
+        'Order history tracking',
+        'Direct customer communication',
+      ],
+      ctaText: 'Contact Us',
+      isPopular: false,
+      comingSoon: true,
+    },
+    {
+      id: 'grow',
+      name: 'Grow',
+      price: '',
+      originalPrice: '',
+      badge: 'Coming Soon',
+      description: 'Grow your business with coupons & loyalty programs',
+      features: [
+        'Everything in Order plan',
+        'Create discount coupons for customers',
+        'Customer loyalty program tools',
+        'Advanced analytics dashboard',
+        'Priority customer support',
+        'Social media integration',
+      ],
+      ctaText: 'Contact Us',
+      isPopular: false,
+      comingSoon: true,
+    },
   ],
 };
 

@@ -785,7 +785,6 @@ export const db = {
    */
   getFeaturedRestaurants: async (): Promise<Restaurant[]> => {
     // For now, return mock data since we don't have a global restaurants fetcher yet
-    await new Promise(resolve => setTimeout(resolve, 500));
     return mockRestaurants;
   },
 
@@ -793,7 +792,6 @@ export const db = {
    * Search restaurants by query
    */
   searchRestaurants: async (query: string): Promise<Restaurant[]> => {
-    await new Promise(resolve => setTimeout(resolve, 500));
     const q = query.toLowerCase();
     return mockRestaurants.filter(r =>
       r.name.toLowerCase().includes(q) ||
@@ -805,7 +803,6 @@ export const db = {
    * Filter restaurants by cuisine
    */
   getRestaurantsByCuisine: async (cuisine: string): Promise<Restaurant[]> => {
-    await new Promise(resolve => setTimeout(resolve, 500));
     const c = cuisine.toLowerCase();
     return mockRestaurants.filter(r =>
       r.cuisine?.some(type => type.toLowerCase() === c)

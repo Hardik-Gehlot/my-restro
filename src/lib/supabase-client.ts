@@ -40,8 +40,7 @@ export const fetchRestaurantWithMenu = async (restaurantId: string) => {
                 categories (id, name),
                 dish_variations (id, size, price)
             `)
-            .eq('restaurant_id', restaurantId)
-            .eq('is_available', true);
+            .eq('restaurant_id', restaurantId);
 
         if (dishesError) throw dishesError;
 
