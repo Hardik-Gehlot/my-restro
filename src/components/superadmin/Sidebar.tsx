@@ -15,6 +15,7 @@ interface SidebarProps {
 const menuItems = [
   { name: 'Dashboard', icon: Icons.Layout, path: '/superadmin/dashboard' },
   { name: 'Restaurants', icon: Icons.Store, path: '/superadmin/dashboard/restaurants' },
+  { name: 'Settings', icon: Icons.Settings, path: '/superadmin/dashboard/setting' },
 ];
 
 export default function SuperadminSidebar({ open, setOpen }: SidebarProps) {

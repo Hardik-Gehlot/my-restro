@@ -29,7 +29,9 @@ import {
   Download,
   FileText,
   Eye,
-  EyeOff
+  EyeOff,
+  Settings,
+  Calendar
 } from 'lucide-react';
 
 import { FiUser, FiLogOut, FiX, FiAward, FiArrowLeft } from 'react-icons/fi';
@@ -70,6 +72,8 @@ export const Icons = {
   FileText,
   Eye,
   EyeOff,
+  Settings,
+  Calendar,
 
   // React Icons
   FiUser,

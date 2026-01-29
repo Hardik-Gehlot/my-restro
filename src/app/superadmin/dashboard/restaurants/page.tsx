@@ -61,7 +61,13 @@ export default function SuperadminRestaurants() {
   const { showToast } = useToast();
 
   // Form States
-  const [planForm, setPlanForm] = useState<PlanFormState>({ plan: 'basic', expiryOption: '1_year', amount: '1999' });
+  const [planForm, setPlanForm] = useState<PlanFormState & { expiryDate: string }>({ 
+    plan: 'menu', 
+    expiryOption: '1_year', 
+    amount: '1899',
+    expiryDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString()
+  });
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [pwdForm, setPwdForm] = useState({ newPassword: '' });
   const [createForm, setCreateForm] = useState<CreateFormState>({ name: '', mobile_no: '', email: '', password: '' });
 
@@ -82,9 +88,13 @@ export default function SuperadminRestaurants() {
 
   const handleDownloadSample = () => {
     const headers = [
-      ['name', 'category', 'description', 'price', 'size', 'image', 'isVeg']
+      ['name', 'category', 'description', 'price_variations', 'image', 'is_available', 'is_veg']
     ];
-    const ws = XLSX.utils.aoa_to_sheet(headers);
+    const data = [
+      ['Paneer Butter Masala', 'Main Course', 'Creamy cottage cheese in tomato gravy', '[half:150, full:280]', '', 'TRUE', 'TRUE'],
+      ['Coca Cola', 'Beverages', '300ml cold drink', '[price:40]', '', 'TRUE', 'TRUE']
+    ];
+    const ws = XLSX.utils.aoa_to_sheet([...headers, ...data]);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Dishes_Template");
     XLSX.writeFile(wb, "my-restro-dish-template.xlsx");
@@ -141,26 +151,13 @@ export default function SuperadminRestaurants() {
     const token = sessionStorage.getItem(KEYS.JWT_TOKEN);
     if (!token || !selectedRestaurant) return;
 
-    let durationDays = 365;
-    if (planForm.expiryOption === '3_days') durationDays = 3;
-    if (planForm.expiryOption === '0_days') durationDays = 0;
-    if (planForm.expiryOption === '3_month') durationDays = 90;
-    if (planForm.expiryOption === '6_month') durationDays = 180;
-    if (planForm.expiryOption === '9_month') durationDays = 270;
-    if (planForm.expiryOption === '1_year') durationDays = 365;
-
-    const newExpiry = new Date();
-    newExpiry.setDate(newExpiry.getDate() + durationDays);
-
     const amountNum = parseFloat(planForm.amount) || 0;
 
-    const res = await db.updateRestaurantPlan(token, selectedRestaurant.id, planForm.plan, newExpiry.toISOString(), amountNum);
-    
     setIsSaving(true);
     setSavingMessage('Updating restaurant plan...');
     
     try {
-      const res = await db.updateRestaurantPlan(token, selectedRestaurant.id, planForm.plan, newExpiry.toISOString(), amountNum);
+      const res = await db.updateRestaurantPlan(token, selectedRestaurant.id, planForm.plan, planForm.expiryDate, amountNum);
       if (res.status === 'success') {
         showToast('Plan and amount updated successfully', 'success');
         fetchRestaurants();
@@ -174,6 +171,12 @@ export default function SuperadminRestaurants() {
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const setExpiryByMonths = (months: number) => {
+    const date = new Date();
+    date.setMonth(date.getMonth() + months);
+    setPlanForm({ ...planForm, expiryDate: date.toISOString() });
   };
 
   const handleResetPassword = async () => {
@@ -191,6 +194,7 @@ export default function SuperadminRestaurants() {
         if (res.status === 'success') {
             showToast('Password reset successfully', 'success');
             setPwdForm({ newPassword: '' });
+            setIsEditModalOpen(false);
         } else {
             showToast(res.message || 'Password reset failed', 'error');
         }
@@ -239,6 +243,15 @@ export default function SuperadminRestaurants() {
 
   return (
     <>
+      <style jsx global>{`
+        .custom-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+        .custom-scrollbar {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+      `}</style>
       <FullscreenLoader isVisible={isSaving} messages={[savingMessage]} />
       {isLoading && restaurants.length === 0 ? (
         <SuperAdminSkeleton />
@@ -274,50 +287,52 @@ export default function SuperadminRestaurants() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
              {filteredRestaurants.map((rest, idx) => (
-               <motion.div
-                 key={rest.id}
-                 initial={{ opacity: 0, y: 20 }}
-                 animate={{ opacity: 1, y: 0 }}
-                 transition={{ delay: idx * 0.05 }}
-                 className="bg-slate-900/30 border border-slate-800/80 hover:border-cyan-500/40 rounded-[2.5rem] p-7 relative overflow-hidden group transition-all hover:shadow-[0_0_50px_rgba(34,211,238,0.08)] backdrop-blur-md"
-               >
-                 <div className="absolute top-0 right-0 p-5 flex gap-3">
-                    <button 
-                        onClick={() => {
-                            setSelectedRestaurant(rest);
-                            setBulkDishData([]);
-                            setIsBulkModalOpen(true);
-                        }}
-                        title="Upload Menu"
-                        className="p-3 bg-slate-800/80 hover:bg-blue-600/30 text-blue-400 rounded-2xl transition-all border border-slate-700/50 active:scale-90"
-                    >
-                        <Icons.FileText className="w-4 h-4" />
-                    </button>
-                    <button 
-                        onClick={() => {
-                            setSelectedRestaurant(rest);
-                            setPlanForm({ 
-                                plan: rest.active_plan || 'basic', 
-                                expiryOption: '1_year', 
-                                amount: (rest.planAmount || 0).toString() 
-                            });
-                            setIsEditModalOpen(true);
-                        }}
-                        className="p-3 bg-slate-800/80 hover:bg-cyan-600/30 text-cyan-400 rounded-2xl transition-all border border-slate-700/50 active:scale-90"
-                    >
-                        <Icons.Edit2 className="w-4 h-4" />
-                    </button>
-                 </div>
-
-                 <div className="flex items-center gap-5 mb-8">
-                    <div className="w-16 h-16 rounded-[1.25rem] bg-slate-800/50 p-2 border border-slate-700 flex items-center justify-center overflow-hidden">
-                        <img src={rest.logo || PLACEHOLDERS.RESTAURANT_LOGO} alt={rest.name} className="max-w-full max-h-full object-contain" />
-                    </div>
-                    <div>
-                        <h3 className="font-bold text-white text-xl tracking-tight leading-tight">{rest.name}</h3>
-                        <p className="text-xs text-slate-500 font-mono mt-1 opacity-70">{rest.mobile_no || 'No mobile'}</p>
-                    </div>
-                 </div>
+                <motion.div
+                  key={rest.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: idx * 0.05 }}
+                  className="bg-slate-900/30 border border-slate-800/80 hover:border-cyan-500/40 rounded-[2.5rem] p-7 relative overflow-hidden group transition-all hover:shadow-[0_0_50px_rgba(34,211,238,0.08)] backdrop-blur-md"
+                >
+                  <div className="flex items-center justify-between gap-5 mb-8">
+                     <div className="flex items-center gap-5">
+                        <div className="w-16 h-16 rounded-[1.25rem] bg-slate-800/50 p-2 border border-slate-700 flex items-center justify-center overflow-hidden">
+                            <img src={rest.logo || PLACEHOLDERS.RESTAURANT_LOGO} alt={rest.name} className="max-w-full max-h-full object-contain" />
+                        </div>
+                        <div>
+                            <h3 className="font-bold text-white text-xl tracking-tight leading-tight">{rest.name}</h3>
+                            <p className="text-xs text-slate-500 font-mono mt-1 opacity-70">{rest.mobile_no || 'No mobile'}</p>
+                        </div>
+                     </div>
+                     <div className="flex gap-2">
+                        <button 
+                            onClick={() => {
+                                setSelectedRestaurant(rest);
+                                setBulkDishData([]);
+                                setIsBulkModalOpen(true);
+                            }}
+                            title="Upload Menu"
+                            className="p-3 bg-slate-800/80 hover:bg-blue-600/30 text-blue-400 rounded-2xl transition-all border border-slate-700/50 active:scale-90"
+                        >
+                            <Icons.FileText className="w-4 h-4" />
+                        </button>
+                        <button 
+                            onClick={() => {
+                                setSelectedRestaurant(rest);
+                                setPlanForm({ 
+                                    plan: rest.active_plan || 'menu', 
+                                    expiryOption: '1_year', 
+                                    amount: (rest.planAmount || 0).toString(),
+                                    expiryDate: rest.plan_expiry
+                                });
+                                setIsEditModalOpen(true);
+                            }}
+                            className="p-3 bg-slate-800/80 hover:bg-cyan-600/30 text-cyan-400 rounded-2xl transition-all border border-slate-700/50 active:scale-90"
+                        >
+                            <Icons.Edit2 className="w-4 h-4" />
+                        </button>
+                     </div>
+                  </div>
 
                  <div className="grid grid-cols-2 gap-4 mb-8">
                     <div className="bg-slate-950/40 rounded-3xl p-4 border border-slate-800/50">
@@ -354,7 +369,7 @@ export default function SuperadminRestaurants() {
       {/* Modals Implementation */}
       <AnimatePresence>
           {isBulkModalOpen && selectedRestaurant && (
-              <div className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-10">
+              <div key="bulk-modal" className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-10">
                   <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="absolute inset-0 bg-slate-950/90 backdrop-blur-xl" onClick={() => setIsBulkModalOpen(false)} />
                   <motion.div 
                     initial={{scale:0.9, opacity:0}} 
@@ -412,7 +427,7 @@ export default function SuperadminRestaurants() {
           )}
 
           {isEditModalOpen && selectedRestaurant && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-10">
+            <div key="edit-modal" className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-10">
                  <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="absolute inset-0 bg-slate-950/90 backdrop-blur-xl" onClick={() => setIsEditModalOpen(false)} />
                   <motion.div 
                     initial={{scale:0.9, opacity:0}} 
@@ -445,24 +460,29 @@ export default function SuperadminRestaurants() {
                                         onChange={(e) => setPlanForm({...planForm, plan: e.target.value})}
                                         className="w-full bg-slate-950/50 border border-slate-800 rounded-2xl p-4 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/30 transition-all font-bold appearance-none"
                                     >
-                                        <option value="basic">Basic Plan</option>
-                                        {pricingSection.plans.filter(p => p.id !== 'basic').map(p => (
+                                        {pricingSection.plans.filter(p => !p.id.includes('basic')).map(p => (
                                             <option key={p.id} value={p.id}>{p.name}</option>
                                         ))}
                                     </select>
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-[10px] font-bold text-slate-600 ml-1">RENEWAL PERIOD</label>
-                                    <select 
-                                        value={planForm.expiryOption} 
-                                        onChange={(e) => setPlanForm({...planForm, expiryOption: e.target.value})}
-                                        className="w-full bg-slate-950/50 border border-slate-800 rounded-2xl p-4 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/30 transition-all font-bold appearance-none"
-                                    >
-                                        <option value="1_month">1 Month</option>
-                                        <option value="3_month">3 Months</option>
-                                        <option value="6_month">6 Months</option>
-                                        <option value="1_year">1 Year</option>
-                                    </select>
+                                    <label className="text-[10px] font-bold text-slate-600 ml-1">RENEWAL EXPIRY</label>
+                                    <div className="flex gap-2">
+                                        <div className="relative flex-1">
+                                            <input 
+                                                type="text" 
+                                                readOnly
+                                                value={new Date(planForm.expiryDate).toLocaleDateString('en-GB')}
+                                                className="w-full bg-slate-950/50 border border-slate-800 rounded-2xl p-4 text-white focus:outline-none transition-all font-bold font-mono"
+                                            />
+                                        </div>
+                                        <button 
+                                            onClick={() => setIsCalendarOpen(true)}
+                                            className="p-4 bg-slate-800 hover:bg-slate-700 text-cyan-400 rounded-2xl border border-slate-700 active:scale-95 transition-all flex items-center justify-center"
+                                        >
+                                            <Icons.Calendar className="w-5 h-5" />
+                                        </button>
+                                    </div>
                                 </div>
                                 <div className="space-y-1.5">
                                     <label className="text-[10px] font-bold text-slate-600 ml-1">RENEWAL AMOUNT (INR)</label>
@@ -520,7 +540,7 @@ export default function SuperadminRestaurants() {
           )}
 
           {isCreateModalOpen && (
-              <div className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-10">
+              <div key="create-modal" className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-10">
                   <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="absolute inset-0 bg-slate-950/90 backdrop-blur-xl" onClick={() => setIsCreateModalOpen(false)} />
                   <motion.div 
                     initial={{scale:0.9, opacity:0}} 
@@ -579,6 +599,58 @@ export default function SuperadminRestaurants() {
                                   {isLoading ? <Icons.Loader2 className="w-4 h-4 animate-spin" /> : 'Save Changes'}
                               </button>
                           </div>
+                      </div>
+                  </motion.div>
+              </div>
+          )}
+
+          {isCalendarOpen && (
+              <div key="calendar-modal" className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                  <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsCalendarOpen(false)} />
+                  <motion.div 
+                    initial={{scale:0.95, opacity:0}} 
+                    animate={{scale:1, opacity:1}} 
+                    exit={{scale:0.95, opacity:0}} 
+                    className="bg-slate-900 border border-slate-800 rounded-[2rem] p-8 w-full max-w-sm relative z-10 shadow-3xl overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.5)]"
+                  >
+                      <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                          <Icons.Calendar className="w-5 h-5 text-cyan-400" />
+                          Choose Expiry Date
+                      </h3>
+                      
+                      <div className="space-y-4">
+                          <input 
+                            type="date" 
+                            value={planForm.expiryDate.split('T')[0]}
+                            onChange={(e) => setPlanForm({...planForm, expiryDate: new Date(e.target.value).toISOString()})}
+                            className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-white focus:ring-2 focus:ring-cyan-500/30 transition-all font-bold color-scheme-dark"
+                            style={{ colorScheme: 'dark' }}
+                          />
+                          
+                          <div className="grid grid-cols-2 gap-2">
+                              {[
+                                  { label: '+1 Month', value: 1 },
+                                  { label: '+3 Months', value: 3 },
+                                  { label: '+6 Months', value: 6 },
+                                  { label: '+9 Months', value: 9 },
+                                  { label: '+1 Year', value: 12 }
+                              ].map((chip) => (
+                                  <button 
+                                    key={chip.label}
+                                    onClick={() => setExpiryByMonths(chip.value)}
+                                    className="px-4 py-3 bg-slate-800/50 hover:bg-cyan-500/20 text-slate-300 hover:text-cyan-400 text-[10px] font-black rounded-xl border border-slate-800 hover:border-cyan-500/30 transition-all uppercase tracking-wider last:col-span-2"
+                                  >
+                                      {chip.label}
+                                  </button>
+                              ))}
+                          </div>
+
+                          <button 
+                            onClick={() => setIsCalendarOpen(false)}
+                            className="w-full mt-4 bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-4 rounded-xl transition-all shadow-lg active:scale-95 uppercase text-xs tracking-[0.2em]"
+                          >
+                              Apply Date
+                          </button>
                       </div>
                   </motion.div>
               </div>

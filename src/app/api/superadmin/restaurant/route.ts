@@ -35,12 +35,15 @@ export async function POST(request: NextRequest) {
                 return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
             }
 
-            // 1. Create Restaurant
+            // 1. Create Restaurant with default 'menu' plan
             const { data: restaurant, error: restError } = await supabase
                 .from('restaurants')
                 .insert({
                     name: restaurantName,
                     mobile_no: mobileNo,
+                    active_plan: 'menu',
+                    plan_expiry: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString(),
+                    planAmount: 1899
                 })
                 .select()
                 .single();
@@ -101,27 +104,49 @@ export async function POST(request: NextRequest) {
 
             for (const item of bulkData) {
                 try {
-                    const name = item.name || item.dishName;
+                    const name = item.name || item.dishName || item.Name;
                     if (!name) continue;
+
+                    const isAvailableVal = item.is_available ?? item.isavailable ?? item.isAvailable ?? item.Available ?? true;
+                    const isAvailable = (isAvailableVal === 'true' || isAvailableVal === true || String(isAvailableVal).toUpperCase() === 'TRUE' || isAvailableVal === 1);
+
+                    const isVegVal = item.is_veg ?? item.isveg ?? item.isVeg ?? item.Veg ?? item.is_veg ?? true;
+                    const isVeg = (isVegVal === 'true' || isVegVal === true || String(isVegVal).toUpperCase() === 'TRUE' || isVegVal === 1);
 
                     const { data: dish, error: dError } = await supabase
                         .from('dishes')
                         .insert({
                             restaurant_id: restaurantId,
-                            category_id: categoryMap[item.category || 'General'],
+                            category_id: categoryMap[item.category || item.Category || 'General'],
                             name: name,
-                            description: item.description || '',
-                            image: item.image || '',
-                            is_veg: item.isVeg === 'true' || item.isVeg === true,
-                            is_available: true
+                            description: item.description || item.Description || '',
+                            image: item.image || item.Image || '',
+                            is_veg: isVeg,
+                            is_available: isAvailable
                         })
                         .select()
                         .single();
 
                     if (dError) throw dError;
 
-                    // Support variations in bulk upload if provided
-                    if (item.price !== undefined) {
+                    // Handle price variations [small:125, medium:154]
+                    const variationsRaw = item.price_variations || item.pricevariations || item.price_variation || item.variations;
+                    if (variationsRaw) {
+                        const variationsStr = String(variationsRaw).replace(/[\[\]]/g, '');
+                        const variations = variationsStr.split(',').map(s => s.trim()).filter(Boolean);
+
+                        for (const v of variations) {
+                            const [size, price] = v.split(':').map(s => s.trim());
+                            if (size && price) {
+                                await supabase.from('dish_variations').insert({
+                                    dish_id: dish.id,
+                                    size: size.toLowerCase(),
+                                    price: parseFloat(price) || 0
+                                });
+                            }
+                        }
+                    } else if (item.price !== undefined) {
+                        // Legacy support for single price
                         await supabase.from('dish_variations').insert({
                             dish_id: dish.id,
                             size: item.size || 'price',
