@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
                     mobile_no: mobileNo,
                     active_plan: 'menu',
                     plan_expiry: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString(),
-                    planAmount: 1899
+                    plan_amount: 1899
                 })
                 .select()
                 .single();
