@@ -73,11 +73,17 @@ const MenuHeader = ({
   };
 
   return (
-    <div className="sticky top-0 z-40 bg-white/40 backdrop-blur-lg border-b border-white/60 shadow-lg">
+    <div className={`sticky top-0 z-40 transition-all duration-200 ${
+      isScrolled && !isSearchOpen
+        ? "bg-white/60 backdrop-blur-xl border-b border-white/20 shadow-lg" 
+        : "bg-white border-b border-gray-100 shadow-none"
+    }`}>
       <div className="flex items-center justify-between px-2 sm:px-4 py-3 h-16 transition-all relative overflow-hidden">
         <motion.button
           onClick={() => router.back()}
-          className="p-2 hover:bg-white/50 rounded-lg transition-colors z-10"
+          className={`p-2 rounded-lg transition-colors z-10 ${
+            isSearchOpen ? "bg-white" : "hover:bg-black/5"
+          }`}
         >
           <FiArrowLeft className="w-6 h-6 text-gray-700" />
         </motion.button>
@@ -102,7 +108,7 @@ const MenuHeader = ({
                 exit={{ scale: 0, opacity: 0 }}
                 transition={{ duration: 0.2 }}
                 onClick={openSearch}
-                className="p-2 hover:bg-white/50 rounded-lg transition-colors"
+                className="p-2 hover:bg-black/5 rounded-lg transition-colors"
               >
                 <FiSearch className="w-6 h-6 text-gray-700" />
               </motion.button>
@@ -111,7 +117,9 @@ const MenuHeader = ({
 
           <button
             onClick={onFilterClick}
-            className="p-2 hover:bg-white/50 rounded-lg transition-colors relative"
+            className={`p-2 rounded-lg transition-colors relative z-10 ${
+              isSearchOpen ? "bg-white" : "hover:bg-black/5"
+            }`}
           >
             <FiFilter className="w-6 h-6 text-gray-700" />
             {activeFiltersCount > 0 && (
@@ -127,9 +135,9 @@ const MenuHeader = ({
               initial={{ scaleX: 0, opacity: 0 }}
               animate={{ scaleX: 1, opacity: 1 }}
               exit={{ scaleX: 0, opacity: 0 }}
-              transition={{ duration: 0.35, ease: [0.25, 1, 0.5, 1] }}
-              style={{ transformOrigin: "100% 50%" }}
-              className="absolute top-0 left-12 sm:left-16 right-12 sm:right-16 h-full bg-white/90 backdrop-blur-sm flex items-center"
+              transition={{ duration: 0.25, ease: [0.25, 1, 0.5, 1] }}
+              style={{ transformOrigin: "right" }}
+              className="absolute top-0 left-0 right-0 h-full bg-white flex items-center px-12 sm:px-16"
             >
               <div className="relative w-full">
                 <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-green-600 w-5 h-5" />
@@ -139,7 +147,7 @@ const MenuHeader = ({
                   ref={searchInputRef}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search in menu..."
-                  className="w-full pl-10 pr-8 py-2.5 text-base text-gray-800 placeholder-gray-600 bg-gray-100 border border-gray-200 rounded-full focus:outline-none"
+                  className="w-full pl-10 pr-8 py-2.5 text-base text-gray-800 placeholder-gray-600 rounded-full focus:outline-none bg-gray-100 border border-gray-200"
                 />
                 {isSearchOpen && (
                   <button

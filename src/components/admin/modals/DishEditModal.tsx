@@ -16,16 +16,17 @@ interface DishEditModalProps {
 const DishEditModal = ({ dish, onClose, onSave, categories }: DishEditModalProps) => {
     const [form, setForm] = useState<Dish>({
         ...dish,
-        category: dish.categoryId || dish.category // Ensure category name fallback
+        category: dish.category || 'Other',
+        categoryId: dish.categoryId
     });
 
     const update = (key: keyof Dish, value: any) => {
         if (key === 'category') {
-            // When category (ID) is updated, we also want to update the name if possible
+            // value is the categoryId from the select
             const selectedCategory = categories.find(c => c.id === value);
             setForm(prev => ({ 
                 ...prev, 
-                category: selectedCategory?.name || prev.category,
+                category: selectedCategory?.name || 'Other',
                 categoryId: value 
             }));
             return;

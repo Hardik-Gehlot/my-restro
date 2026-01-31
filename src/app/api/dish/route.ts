@@ -3,7 +3,11 @@ import jwt from 'jsonwebtoken';
 import { JWTPayload } from '@/types';
 import { getServiceRoleClient } from '@/lib/supabase-client';
 
-const JWT_SECRET = process.env.JWT_SECRET || process.env.NEXT_PUBLIC_JWT_SECRET || 'your-secret-key-change-in-production';
+const JWT_SECRET = process.env.JWT_SECRET || process.env.NEXT_PUBLIC_JWT_SECRET;
+
+if (!JWT_SECRET) {
+    throw new Error('JWT_SECRET is not defined in environment variables');
+}
 
 // Helper function to verify token
 const verifyToken = (request: NextRequest): { payload: JWTPayload | null; error: NextResponse | null } => {
@@ -52,7 +56,10 @@ export async function POST(request: NextRequest) {
                 is_veg: isVeg,
                 is_available: isAvailable
             })
-            .select()
+            .select(`
+                *,
+                categories (name)
+            `)
             .single();
 
         if (dishError) {
@@ -74,8 +81,6 @@ export async function POST(request: NextRequest) {
 
             if (varError) {
                 console.error('Supabase variation insert error:', varError);
-                // We might want to delete the dish here if variations are critical, 
-                // but for now we'll just log
             }
         }
 
@@ -86,6 +91,7 @@ export async function POST(request: NextRequest) {
                 isVeg: dish.is_veg,
                 isAvailable: dish.is_available,
                 categoryId: dish.category_id,
+                category: (dish as any).categories?.name || 'Other',
                 variations: variations || []
             }
         }, { status: 201 });
@@ -124,7 +130,10 @@ export async function PUT(request: NextRequest) {
             })
             .eq('id', id)
             .eq('restaurant_id', payload!.restaurantId)
-            .select()
+            .select(`
+                *,
+                categories (name)
+            `)
             .single();
 
         if (dishError) {
@@ -159,6 +168,7 @@ export async function PUT(request: NextRequest) {
                 isVeg: dish.is_veg,
                 isAvailable: dish.is_available,
                 categoryId: dish.category_id,
+                category: (dish as any).categories?.name || 'Other',
                 variations: variations || []
             }
         }, { status: 200 });

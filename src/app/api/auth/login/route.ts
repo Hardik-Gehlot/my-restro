@@ -4,11 +4,12 @@ import jwt from 'jsonwebtoken';
 import { JWTPayload } from '@/types';
 import { getServiceRoleClient } from '@/lib/supabase-client';
 
-const JWT_SECRET = process.env.JWT_SECRET || process.env.NEXT_PUBLIC_JWT_SECRET || 'your-secret-key-change-in-production';
+const JWT_SECRET = process.env.NEXT_PUBLIC_JWT_SECRET || process.env.JWT_SECRET || 'your-secret-key-change-in-production';
 
 export async function POST(request: NextRequest) {
   try {
     const { email, password } = await request.json();
+    console.log(email, password);
     if (!email || !password) {
       return NextResponse.json(
         { error: 'Email and password are required' },
@@ -24,6 +25,7 @@ export async function POST(request: NextRequest) {
       .select('*')
       .eq('email', email.toLowerCase())
       .single();
+      console.log("user matched with email:",email,"user: ", user);
 
     if (dbError || !user) {
       console.log('Login attempt failed: User not found', email);
@@ -50,8 +52,9 @@ export async function POST(request: NextRequest) {
       restaurantId: user.restaurant_id,
       role: user.role
     };
-
-    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
+    console.log("payload: ", payload);
+    console.log("JWT_SECRET: ", JWT_SECRET);
+    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '1d' });
 
     return NextResponse.json({ token }, { status: 200 });
 

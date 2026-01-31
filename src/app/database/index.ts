@@ -111,7 +111,7 @@ export const db = {
       const payload = {
         id,
         ...data,
-        categoryId: data.categoryId || data.category,
+        categoryId: data.categoryId,
       };
 
       const response = await fetchWithTimeout(
@@ -125,7 +125,6 @@ export const db = {
       );
 
       const responseData = await parseJsonResponse(response);
-
       if (!response.ok) {
         console.error('Update dish failed:', responseData.error);
         return null;
