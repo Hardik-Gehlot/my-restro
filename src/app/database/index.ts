@@ -303,9 +303,7 @@ export const db = {
 
       try {
         await idb.set(KEYS.RESTAURANT_DATA, cacheData);
-        // Clear cart data when fresh restaurant data is fetched
-        await idb.del(KEYS.CART_DATA);
-        console.log('Restaurant data cached and cart cleared');
+        console.log('Restaurant data cached');
       } catch (cacheError) {
         console.warn('Failed to cache restaurant data:', cacheError);
       }

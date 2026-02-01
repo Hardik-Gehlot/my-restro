@@ -3,7 +3,6 @@ import { Fragment, useState, useEffect } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { FiX, FiPlus, FiMinus } from "react-icons/fi";
 import { Dish } from "@/types";
-import { motion } from "framer-motion";
 
 interface VariationSelectorModalProps {
   isOpen: boolean;
@@ -87,10 +86,10 @@ const VariationSelectorModal = ({
       <Dialog as="div" className="relative z-[90]" onClose={onClose}>
         <Transition.Child
           as={Fragment}
-          enter="ease-out duration-300"
+          enter="ease-out duration-150"
           enterFrom="opacity-0"
           enterTo="opacity-100"
-          leave="ease-in duration-200"
+          leave="ease-in duration-150"
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
@@ -98,17 +97,17 @@ const VariationSelectorModal = ({
         </Transition.Child>
 
         <div className="fixed inset-0 overflow-y-auto">
-          <div className="flex min-h-full items-center justify-center p-4">
+          <div className="flex min-h-full items-end sm:items-center justify-center">
             <Transition.Child
               as={Fragment}
-              enter="ease-out duration-300"
-              enterFrom="opacity-0 scale-95"
-              enterTo="opacity-100 scale-100"
-              leave="ease-in duration-200"
-              leaveFrom="opacity-100 scale-100"
-              leaveTo="opacity-0 scale-95"
+              enter="ease-out duration-200"
+              enterFrom="translate-y-full opacity-0"
+              enterTo="translate-y-0 opacity-100"
+              leave="ease-in duration-150"
+              leaveFrom="translate-y-0 opacity-100"
+              leaveTo="translate-y-full opacity-0"
             >
-              <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white shadow-xl transition-all">
+              <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-t-[2.5rem] sm:rounded-2xl bg-white shadow-2xl transition-all">
                 {/* Header */}
                 <div className="relative p-5 border-b bg-gradient-to-r from-orange-50 to-white">
                   <button
@@ -132,11 +131,8 @@ const VariationSelectorModal = ({
                     const cartQty = currentQuantities[variation.size] || 0;
 
                     return (
-                      <motion.div
+                      <div
                         key={idx}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: idx * 0.05 }}
                         className="p-3 rounded-xl border-2 border-gray-100 bg-gray-50 hover:border-orange-200 transition-all"
                       >
                         <div className="flex items-center justify-between mb-2">
@@ -177,7 +173,7 @@ const VariationSelectorModal = ({
                             </button>
                           </div>
                         </div>
-                      </motion.div>
+                      </div>
                     );
                   })}
                 </div>

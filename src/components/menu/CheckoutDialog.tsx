@@ -109,10 +109,8 @@ const CheckoutDialog = ({
     return false;
   };
 
-  const handleConfirm = async () => {
+  const downloadInvoice = () => {
     if (!isFormValid()) return;
-
-    // 1. Generate PDF
     const pdfBlob = generateInvoicePDF(
       restaurant,
       cart,
@@ -120,8 +118,18 @@ const CheckoutDialog = ({
       formData,
       totals,
     );
+    const url = URL.createObjectURL(pdfBlob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `Invoice-${restaurant.name.replace(/\s+/g, "-")}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
 
-    // 2. Generate WhatsApp Message Text
+  const orderOnWhatsApp = () => {
+    if (!isFormValid()) return;
     const rawMessage = generateWhatsAppMessage(
       restaurant,
       cart,
@@ -129,40 +137,7 @@ const CheckoutDialog = ({
       formData,
       totals,
     );
-    const decodedMessage = decodeURIComponent(rawMessage);
-
-    // 3. Try sharing using Web Share API (Best for sending files to WhatsApp)
-    if (navigator.share) {
-      try {
-        const file = new File(
-          [pdfBlob],
-          `Invoice-${restaurant.name.replace(/\s+/g, "-")}.pdf`,
-          { type: "application/pdf" },
-        );
-
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          await navigator.share({
-            files: [file],
-            title: `Order from ${restaurant.name}`,
-            text: decodedMessage,
-          });
-
-          // Cleanup
-          clearCart();
-          onClose();
-          return;
-        }
-      } catch (err) {
-        console.error("Sharing failed:", err);
-        // Fallback to text message if share was cancelled or failed
-      }
-    }
-
-    // 4. Fallback: Text-only message directly to restaurant number
-    // (PDF download is avoided as per request)
     openWhatsApp(restaurant.mobile_no, rawMessage);
-
-    // Cleanup
     clearCart();
     onClose();
   };
@@ -542,10 +517,9 @@ const CheckoutDialog = ({
                         )}
                     </div>
 
-                    {/* Footer Actions */}
-                    <div className="p-4 bg-white border-t sticky bottom-0 z-10">
+                    <div className="p-4 bg-white border-t sticky bottom-0 z-10 flex flex-col gap-3">
                       <button
-                        onClick={handleConfirm}
+                        onClick={orderOnWhatsApp}
                         disabled={!isFormValid()}
                         className={`w-full py-3.5 rounded-xl font-black text-sm shadow-xl flex items-center justify-center gap-2 transition-all active:scale-[0.98] ${
                           isFormValid()
@@ -554,7 +528,7 @@ const CheckoutDialog = ({
                         }`}
                       >
                         {isFormValid()
-                          ? "Confirm Order"
+                          ? "Order on WhatsApp"
                           : "Please Complete Fields"}
                         <Icons.FiChevronRight className="w-5 h-5" />
                       </button>

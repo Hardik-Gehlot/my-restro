@@ -29,12 +29,13 @@ export const shouldFetchFromAPI = async (
             return { shouldFetch: true, reason: 'Different restaurant' };
         }
 
-        // 3. Check if cache is older than 2 days
+        // 3. Check if cache is older than 1 days
         const cacheAge = Date.now() - cached.timestamp;
-        const twoDaysInMs = CONFIG.CACHE_DURATION;
+        const oneDaysInMs = CONFIG.CACHE_DURATION;
 
-        if (cacheAge > twoDaysInMs) {
+        if (cacheAge > oneDaysInMs) {
             await idb.del(KEYS.RESTAURANT_DATA);
+            await idb.del(KEYS.CART_DATA);
             return { shouldFetch: true, reason: 'Cache expired (>2 days old)' };
         }
 

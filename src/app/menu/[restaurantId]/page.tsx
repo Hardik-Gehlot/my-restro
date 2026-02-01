@@ -783,119 +783,120 @@ export default function MenuPage() {
         updateCartQuantity={updateCartQuantityByDishId}
       />
 
-      <div className="fixed bottom-6 right-6 z-[40] pointer-events-none w-full">
-        <div className="flex flex-col items-end gap-2">
-          {/* Menu Button */}
-          {searchQuery === "" && dishes?.length > 0 && (
+      {/* Floating Menu Button - Always on Right */}
+      <div
+        className={`fixed ${cartCount > 0 ? "bottom-28" : "bottom-6"} right-6 z-[40] pointer-events-none transition-all duration-300`}
+      >
+        {searchQuery === "" && dishes?.length > 0 && (
+          <motion.button
+            onClick={() => setIsCategoryModalOpen(!isCategoryModalOpen)}
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0, opacity: 0 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="bg-black text-white rounded-xl shadow-lg flex items-center justify-center px-4 py-2.5 text-sm font-semibold pointer-events-auto hover:bg-gray-900 transition-colors"
+          >
+            <AnimatePresence mode="wait">
+              {isCategoryModalOpen ? (
+                <motion.div
+                  key="close"
+                  initial={{ rotate: -90, scale: 0 }}
+                  animate={{ rotate: 0, scale: 1 }}
+                  exit={{ rotate: 90, scale: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="flex items-center gap-2"
+                >
+                  <FiX className="w-5 h-5" />
+                  <span>Close</span>
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="menu"
+                  initial={{ rotate: 90, scale: 0 }}
+                  animate={{ rotate: 0, scale: 1 }}
+                  exit={{ rotate: -90, scale: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="flex items-center gap-2"
+                >
+                  <BiSolidDish className="w-5 h-5" />
+                  <span>Menu</span>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.button>
+        )}
+      </div>
+
+      {/* Floating Checkout Button - Bottom Middle */}
+      <div className="fixed bottom-6 left-0 right-0 z-[40] pointer-events-none px-4 flex justify-center">
+        <AnimatePresence>
+          {cartCount > 0 && (
             <motion.button
-              onClick={() => setIsCategoryModalOpen(!isCategoryModalOpen)}
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0, opacity: 0 }}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="bg-black text-white rounded-xl shadow-lg flex items-center justify-center px-4 py-2.5 text-sm font-semibold pointer-events-auto hover:bg-gray-900 transition-colors"
+              onClick={() => setIsCheckoutOpen(true)}
+              initial={{ y: 20, opacity: 0, scale: 0.95 }}
+              animate={{ y: 0, opacity: 1, scale: 1 }}
+              exit={{ y: 20, opacity: 0, scale: 0.95 }}
+              transition={{ type: "spring", stiffness: 300, damping: 25 }}
+              whileHover={{ scale: 1.02, y: -2 }}
+              whileTap={{ scale: 0.98 }}
+              className="w-full max-w-lg backdrop-blur-3xl bg-white/80 border border-white/40 shadow-[0_20px_50px_rgba(0,0,0,0.15)] text-gray-900 p-2.5 rounded-[2rem] flex items-center justify-between pointer-events-auto transition-all overflow-hidden relative group"
             >
-              <AnimatePresence mode="wait">
-                {isCategoryModalOpen ? (
-                  <motion.div
-                    key="close"
-                    initial={{ rotate: -90, scale: 0 }}
-                    animate={{ rotate: 0, scale: 1 }}
-                    exit={{ rotate: 90, scale: 0 }}
-                    transition={{ duration: 0.2 }}
-                    className="flex items-center gap-2"
+              <div className="absolute inset-0 bg-gradient-to-r from-orange-500/5 via-transparent to-orange-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+
+              <div className="flex items-center gap-3 relative z-10 pl-1.5">
+                <motion.div
+                  className="relative"
+                  animate={{ scale: [1, 1.05, 1] }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                >
+                  <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg shadow-orange-500/30">
+                    <FiShoppingCart className="w-5 h-5 text-white" />
+                  </div>
+                  <motion.span
+                    className="absolute -top-1.5 -right-1.5 bg-black text-white text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center border-2 border-white shadow-md"
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
                   >
-                    <FiX className="w-5 h-5" />
-                    <span>Close</span>
-                  </motion.div>
-                ) : (
-                  <motion.div
-                    key="menu"
-                    initial={{ rotate: 90, scale: 0 }}
-                    animate={{ rotate: 0, scale: 1 }}
-                    exit={{ rotate: -90, scale: 0 }}
-                    transition={{ duration: 0.2 }}
-                    className="flex items-center gap-2"
+                    {cartCount}
+                  </motion.span>
+                </motion.div>
+
+                <div className="text-left">
+                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">
+                    View Cart
+                  </p>
+                  <motion.p
+                    className="text-xl font-black leading-tight text-gray-900"
+                    key={cartTotal}
+                    initial={{ y: 5, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
                   >
-                    <BiSolidDish className="w-5 h-5" />
-                    <span>Menu</span>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                    ₹{cartTotal.toFixed(2)}
+                  </motion.p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 bg-black text-white px-5 py-2.5 rounded-[1.5rem] font-bold text-sm shadow-xl hover:bg-gray-900 transition-all">
+                <span>Checkout</span>
+                <motion.div
+                  animate={{ x: [0, 3, 0] }}
+                  transition={{
+                    duration: 1.5,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                >
+                  <FiChevronRight className="w-4 h-4" />
+                </motion.div>
+              </div>
             </motion.button>
           )}
-
-          {/* Checkout Cart Button */}
-          <AnimatePresence>
-            {cartCount > 0 && (
-              <motion.button
-                onClick={() => setIsCheckoutOpen(true)}
-                initial={{ y: 100, opacity: 0, scale: 0.9 }}
-                animate={{ y: 0, opacity: 1, scale: 1 }}
-                exit={{ y: 100, opacity: 0, scale: 0.9 }}
-                transition={{ type: "spring", stiffness: 300, damping: 25 }}
-                whileHover={{ scale: 1.02, y: -2 }}
-                whileTap={{ scale: 0.98 }}
-                className="w-full max-w-sm backdrop-blur-3xl bg-white/80 border border-white/40 shadow-[0_20px_50px_rgba(0,0,0,0.15)] text-gray-900 p-2.5 rounded-[2rem] flex items-center justify-between pointer-events-auto transition-all overflow-hidden relative group"
-              >
-                {/* Same cart content as above */}
-                <div className="absolute inset-0 bg-gradient-to-r from-orange-500/5 via-transparent to-orange-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-
-                <div className="flex items-center gap-3 relative z-10 pl-1.5">
-                  <motion.div
-                    className="relative"
-                    animate={{ scale: [1, 1.05, 1] }}
-                    transition={{
-                      duration: 2,
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                    }}
-                  >
-                    <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg shadow-orange-500/30">
-                      <FiShoppingCart className="w-5 h-5 text-white" />
-                    </div>
-                    <motion.span
-                      className="absolute -top-1.5 -right-1.5 bg-black text-white text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center border-2 border-white shadow-md"
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                    >
-                      {cartCount}
-                    </motion.span>
-                  </motion.div>
-
-                  <div className="text-left">
-                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">
-                      View Cart
-                    </p>
-                    <motion.p
-                      className="text-xl font-black leading-tight text-gray-900"
-                      key={cartTotal}
-                      initial={{ y: 5, opacity: 0 }}
-                      animate={{ y: 0, opacity: 1 }}
-                    >
-                      ₹{cartTotal.toFixed(2)}
-                    </motion.p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2 bg-black text-white px-5 py-2.5 rounded-[1.5rem] font-bold text-sm shadow-xl hover:bg-gray-900 transition-all">
-                  <span>Checkout</span>
-                  <motion.div
-                    animate={{ x: [0, 3, 0] }}
-                    transition={{
-                      duration: 1.5,
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                    }}
-                  >
-                    <FiChevronRight className="w-4 h-4" />
-                  </motion.div>
-                </div>
-              </motion.button>
-            )}
-          </AnimatePresence>
-        </div>
+        </AnimatePresence>
       </div>
 
       <FilterModel
