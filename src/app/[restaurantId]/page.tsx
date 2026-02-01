@@ -87,7 +87,7 @@ export default function RestaurantDetailPage() {
       {/* Header Image Section */}
       <div className="relative h-56 bg-gray-900">
         <Image
-          src={restaurant.coverImage || PLACEHOLDERS.RESTAURANT_COVER}
+          src={restaurant.cover_image || PLACEHOLDERS.RESTAURANT_COVER}
           alt={restaurant.name}
           fill
           className="object-cover opacity-90"
@@ -108,45 +108,45 @@ export default function RestaurantDetailPage() {
 
         <div className="absolute -bottom-16 right-6">
           <div className="flex items-center space-x-4 mb-4">
-            {restaurant.instagramLink && (
+            {restaurant.instagram_link && (
               <a
-                href={restaurant.instagramLink}
+                href={restaurant.instagram_link}
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 <FiInstagram className="w-6 h-6 text-pink-500 hover:text-pink-700 transition-colors" />
               </a>
             )}
-            {restaurant.facebookLink && (
+            {restaurant.facebook_link && (
               <a
-                href={restaurant.facebookLink}
+                href={restaurant.facebook_link}
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 <FiFacebook className="w-6 h-6 text-blue-600 hover:text-blue-800 transition-colors" />
               </a>
             )}
-            {restaurant.twitterLink && (
+            {restaurant.twitter_link && (
               <a
-                href={restaurant.twitterLink}
+                href={restaurant.twitter_link}
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 <FiTwitter className="w-6 h-6 text-blue-400 hover:text-blue-600 transition-colors" />
               </a>
             )}
-            {restaurant.linkedinLink && (
+            {restaurant.linkedin_link && (
               <a
-                href={restaurant.linkedinLink}
+                href={restaurant.linkedin_link}
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 <FiLinkedin className="w-6 h-6 text-blue-700 hover:text-blue-900 transition-colors" />
               </a>
             )}
-            {restaurant.youtubeLink && (
+            {restaurant.youtube_link && (
               <a
-                href={restaurant.youtubeLink}
+                href={restaurant.youtube_link}
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -166,9 +166,9 @@ export default function RestaurantDetailPage() {
           <p className="text-lg text-gray-600 mb-6">{restaurant.tagline}</p>
 
           <div className="flex gap-3 mb-6 flex-col md:flex-row">
-            {restaurant.googleRatingLink && (
+            {restaurant.google_rating_link && (
               <a
-                href={restaurant.googleRatingLink}
+                href={restaurant.google_rating_link}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex-1 inline-flex items-center justify-center space-x-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-6 py-3.5 rounded-2xl font-bold shadow-lg hover:shadow-xl transition-all hover:scale-105"
@@ -193,7 +193,7 @@ export default function RestaurantDetailPage() {
       </div>
 
       {/* Contact Information Card */}
-      {restaurant.mobileNo && restaurant.googleMapLink && (
+      {restaurant.mobile_no && restaurant.google_map_link && (
         <div className="px-4 mb-6">
           <div className="bg-white/40 backdrop-blur-lg rounded-3xl border border-white/60 shadow-xl p-6">
             <h2 className="text-xl font-bold text-gray-800 mb-5">
@@ -202,9 +202,9 @@ export default function RestaurantDetailPage() {
 
             <div className="space-y-3">
               {/* Phone */}
-              {restaurant.mobileNo && (
+              {restaurant.mobile_no && (
                 <a
-                  href={`tel:${restaurant.mobileNo}`}
+                  href={`tel:${restaurant.mobile_no}`}
                   className="flex items-start space-x-4 p-4 bg-white/50 backdrop-blur-sm rounded-2xl border border-white/60 hover:bg-white/70 transition-all group hover:scale-[1.02]"
                 >
                   <div className="p-3 bg-gradient-to-br from-orange-400 to-orange-600 rounded-xl group-hover:scale-110 transition-transform shadow-lg">
@@ -215,16 +215,16 @@ export default function RestaurantDetailPage() {
                       Phone Number
                     </p>
                     <p className="text-base font-semibold text-gray-800">
-                      {restaurant.mobileNo}
+                      {restaurant.mobile_no}
                     </p>
                   </div>
                 </a>
               )}
 
               {/* Location */}
-              {restaurant.googleMapLink && (
+              {restaurant.google_map_link && (
                 <a
-                  href={restaurant.googleMapLink}
+                  href={restaurant.google_map_link}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-start space-x-4 p-4 bg-white/50 backdrop-blur-sm rounded-2xl border border-white/60 hover:bg-white/70 transition-all group hover:scale-[1.02]"
@@ -252,7 +252,7 @@ export default function RestaurantDetailPage() {
       )}
 
       {/* About Section */}
-      {restaurant.aboutus && (
+      {restaurant.about_us && (
         <div className="px-4 mb-6">
           <div className="bg-white/40 backdrop-blur-lg rounded-3xl border border-white/60 shadow-xl p-6">
             <h2 className="text-xl font-bold text-gray-800 mb-4">About Us</h2>
@@ -262,7 +262,7 @@ export default function RestaurantDetailPage() {
                 {restaurant.name}
               </span>
               <br />
-              {restaurant.aboutus}
+              {restaurant.about_us}
             </p>
           </div>
         </div>

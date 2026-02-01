@@ -82,24 +82,45 @@ export interface Restaurant {
   id: string;
   name: string;
   tagline: string;
-  mobileNo: string;
+  mobile_no: string;
   logo: string;
-  coverImage: string;
-  googleMapLink: string;
-  googleRatingLink: string;
-  aboutus: string;
+  cover_image: string;
+  google_map_link: string;
+  google_rating_link: string;
+  about_us: string;
   description?: string;
   rating?: number;
-  totalReviews?: number;
+  total_reviews?: number;
   cuisine?: string[];
-  instagramLink?: string;
-  facebookLink?: string;
-  twitterLink?: string;
-  linkedinLink?: string;
-  youtubeLink?: string;
-  active_plan?: string;
+  instagram_link?: string;
+  facebook_link?: string;
+  twitter_link?: string;
+  linkedin_link?: string;
+  youtube_link?: string;
+  active_plan?: "menu" | "order" | "grow";
   plan_expiry?: string;
-  planAmount?: number;
+  plan_amount?: number;
+  // Ordering & Billing Fields
+  cgst_rate?: number;
+  sgst_rate?: number;
+  gst_no?: string;
+  delivery_charges_type?: "fixed" | "variable";
+  delivery_charge_fixed?: number;
+  delivery_charge_min?: number;
+  delivery_charge_max?: number;
+  delivery_instruction?: string;
+  enabled_services?: string; // Stringified array like "[dinein,takeaway,delivery]"
+}
+
+export interface CartItem {
+  dishId: string;
+  name: string;
+  image: string;
+  variationId?: string;
+  variationSize: string;
+  price: number;
+  quantity: number;
+  isVeg: boolean;
 }
 
 export interface DishVariation {
@@ -159,13 +180,15 @@ export interface MultiValidationResult {
 export enum KEYS {
   RESTAURANT_DATA = "restaurant_data",
   ADMIN_RESTAURANT_DATA = "admin_restaurant_data",
-  JWT_TOKEN = "jwt_token"
+  JWT_TOKEN = "jwt_token",
+  CART_DATA = "cart_data"
 }
 
 // IndexedDB value types
 export type IDBValue =
   | RestaurantCacheData
   | AdminRestaurantCacheData
+  | CartItem[]
   | string
   | null
   | undefined;

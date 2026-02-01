@@ -34,7 +34,7 @@ import {
   Calendar
 } from 'lucide-react';
 
-import { FiUser, FiLogOut, FiX, FiAward, FiArrowLeft } from 'react-icons/fi';
+import { FiUser, FiLogOut, FiX, FiAward, FiArrowLeft, FiShoppingCart, FiChevronRight } from 'react-icons/fi';
 import { BiSolidDish } from "react-icons/bi";
 import { HiMiniRectangleStack } from "react-icons/hi2";
 import { IoIosSettings } from "react-icons/io";
@@ -83,5 +83,7 @@ export const Icons = {
   FiArrowLeft,
   BiSolidDish,
   HiMiniRectangleStack,
-  IoIosSettings
+  IoIosSettings,
+  FiShoppingCart,
+  FiChevronRight
 };

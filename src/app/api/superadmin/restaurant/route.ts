@@ -25,13 +25,13 @@ export async function POST(request: NextRequest) {
     if (!payload) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     const body = await request.json();
-    const { action, restaurantName, email, password, mobileNo, bulkData, restaurantId } = body;
+    const { action, restaurantName, email, password, mobile_no, bulkData, restaurantId } = body;
 
     const supabase = getServiceRoleClient();
 
     try {
         if (action === 'create_single') {
-            if (!restaurantName || !email || !password || !mobileNo) {
+            if (!restaurantName || !email || !password || !mobile_no) {
                 return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
             }
 
@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
                 .from('restaurants')
                 .insert({
                     name: restaurantName,
-                    mobile_no: mobileNo,
+                    mobile_no: mobile_no,
                     active_plan: 'menu',
                     plan_expiry: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString(),
                     plan_amount: 1899

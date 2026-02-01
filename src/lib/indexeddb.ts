@@ -1,5 +1,5 @@
 import { get, set, del } from 'idb-keyval';
-import { KEYS, RestaurantCacheData, AdminRestaurantCacheData } from '@/types';
+import { KEYS, RestaurantCacheData, AdminRestaurantCacheData, CartItem } from '@/types';
 
 // ============================================
 // Type-safe IndexedDB Wrapper
@@ -10,6 +10,7 @@ type IDBKeyMap = {
     [KEYS.RESTAURANT_DATA]: RestaurantCacheData;
     [KEYS.ADMIN_RESTAURANT_DATA]: AdminRestaurantCacheData;
     [KEYS.JWT_TOKEN]: string;
+    [KEYS.CART_DATA]: CartItem[];
 };
 
 /**

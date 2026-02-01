@@ -48,6 +48,9 @@ export async function GET(request: NextRequest) {
         id, name, tagline, mobile_no, logo, cover_image, google_map_link, google_rating_link, about_us, 
         instagram_link, facebook_link, twitter_link, linkedin_link, youtube_link,
         active_plan, plan_expiry,
+        gst_no, cgst_rate, sgst_rate, 
+        delivery_charges_type, delivery_charge_fixed, delivery_charge_min, delivery_charge_max, delivery_instruction,
+        enabled_services,
         categories (id, name, restaurant_id),
         dishes (
           id, restaurant_id, category_id, name, description, image, is_veg, is_available,
@@ -63,6 +66,17 @@ export async function GET(request: NextRequest) {
         { error: 'Restaurant not found' },
         { status: 404 }
       );
+    }
+
+    // Check plan expiry (skip for superadmin)
+    if (payload.role !== 'superadmin' && restaurant.plan_expiry) {
+      const expiryDate = new Date(restaurant.plan_expiry);
+      if (expiryDate < new Date()) {
+        return NextResponse.json(
+          { error: 'Plan expired', expired: true },
+          { status: 403 }
+        );
+      }
     }
 
     // Transform data to match frontend types
@@ -96,16 +110,7 @@ export async function GET(request: NextRequest) {
       user: user,
       restaurantData: {
         ...restaurantData,
-        mobileNo: restaurantData.mobile_no,
-        coverImage: restaurantData.cover_image,
-        googleMapLink: restaurantData.google_map_link,
-        googleRatingLink: restaurantData.google_rating_link,
-        aboutus: restaurantData.about_us,
-        instagramLink: restaurantData.instagram_link,
-        facebookLink: restaurantData.facebook_link,
-        twitterLink: restaurantData.twitter_link,
-        linkedinLink: restaurantData.linkedin_link,
-        youtubeLink: restaurantData.youtube_link,
+        // No more manual mapping to camelCase to avoid redundancy
       },
       menuData,
       categoriesData
@@ -158,19 +163,28 @@ export async function PUT(request: NextRequest) {
       .update({
         name: updatedData.name,
         tagline: updatedData.tagline,
-        mobile_no: updatedData.mobileNo,
+        mobile_no: updatedData.mobile_no,
         logo: updatedData.logo,
-        cover_image: updatedData.coverImage,
-        google_map_link: updatedData.googleMapLink,
-        google_rating_link: updatedData.googleRatingLink,
-        about_us: updatedData.aboutus,
-        instagram_link: updatedData.instagramLink,
-        facebook_link: updatedData.facebookLink,
-        twitter_link: updatedData.twitterLink,
-        linkedin_link: updatedData.linkedinLink,
-        youtube_link: updatedData.youtubeLink,
+        cover_image: updatedData.cover_image,
+        google_map_link: updatedData.google_map_link,
+        google_rating_link: updatedData.google_rating_link,
+        about_us: updatedData.about_us,
+        instagram_link: updatedData.instagram_link,
+        facebook_link: updatedData.facebook_link,
+        twitter_link: updatedData.twitter_link,
+        linkedin_link: updatedData.linkedin_link,
+        youtube_link: updatedData.youtube_link,
         active_plan: updatedData.active_plan,
         plan_expiry: updatedData.plan_expiry,
+        gst_no: updatedData.gst_no,
+        cgst_rate: updatedData.cgst_rate,
+        sgst_rate: updatedData.sgst_rate,
+        delivery_charges_type: updatedData.delivery_charges_type,
+        delivery_charge_fixed: updatedData.delivery_charge_fixed,
+        delivery_charge_min: updatedData.delivery_charge_min,
+        delivery_charge_max: updatedData.delivery_charge_max,
+        delivery_instruction: updatedData.delivery_instruction,
+        enabled_services: updatedData.enabled_services,
       })
       .eq('id', payload.restaurantId)
       .select()
@@ -185,8 +199,6 @@ export async function PUT(request: NextRequest) {
       message: 'Restaurant updated successfully',
       restaurant: {
         ...restaurant,
-        mobileNo: restaurant.mobile_no,
-        aboutus: restaurant.about_us,
       }
     }, { status: 200 });
 

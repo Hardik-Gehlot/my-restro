@@ -109,7 +109,7 @@ export const validateRestaurantData = (restaurant: Partial<Restaurant>): MultiVa
     }
 
     // Mobile number validation
-    const mobileValidation = validateMobileNumber(restaurant.mobileNo || '');
+    const mobileValidation = validateMobileNumber(restaurant.mobile_no || '');
     if (!mobileValidation.valid) {
         errors.push(mobileValidation.error!);
     }
@@ -117,14 +117,14 @@ export const validateRestaurantData = (restaurant: Partial<Restaurant>): MultiVa
     // URL validations
     const urlFields: Array<{ key: keyof Restaurant; label: string }> = [
         { key: 'logo', label: 'Logo URL' },
-        { key: 'coverImage', label: 'Cover image URL' },
-        { key: 'googleMapLink', label: 'Google Maps link' },
-        { key: 'googleRatingLink', label: 'Google Rating link' },
-        { key: 'instagramLink', label: 'Instagram link' },
-        { key: 'facebookLink', label: 'Facebook link' },
-        { key: 'twitterLink', label: 'Twitter link' },
-        { key: 'linkedinLink', label: 'LinkedIn link' },
-        { key: 'youtubeLink', label: 'YouTube link' },
+        { key: 'cover_image', label: 'Cover image URL' },
+        { key: 'google_map_link', label: 'Google Maps link' },
+        { key: 'google_rating_link', label: 'Google Rating link' },
+        { key: 'instagram_link', label: 'Instagram link' },
+        { key: 'facebook_link', label: 'Facebook link' },
+        { key: 'twitter_link', label: 'Twitter link' },
+        { key: 'linkedin_link', label: 'LinkedIn link' },
+        { key: 'youtube_link', label: 'YouTube link' },
     ];
 
     urlFields.forEach(({ key, label }) => {

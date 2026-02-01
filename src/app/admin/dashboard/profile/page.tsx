@@ -112,7 +112,7 @@ export default function ProfilePage() {
         <div className="bg-white rounded-xl overflow-hidden shadow-sm mb-4">
           <div className="relative h-48">
             <img 
-              src={restaurant.coverImage || PLACEHOLDERS.RESTAURANT_COVER} 
+              src={restaurant.cover_image || PLACEHOLDERS.RESTAURANT_COVER} 
               alt="Cover"
               className="w-full h-full object-cover"
             />
@@ -203,14 +203,14 @@ export default function ProfilePage() {
 
             <div>
               <label className="text-sm font-semibold text-gray-700 block mb-1">Mobile Number</label>
-              <p className="text-base text-gray-900">{restaurant.mobileNo}</p>
+              <p className="text-base text-gray-900">{restaurant.mobile_no}</p>
             </div>
 
-                        {restaurant.googleMapLink && (
+                        {restaurant.google_map_link && (
                           <div>
                             <label className="text-sm font-semibold text-gray-700 block mb-1">Google Maps</label>
                             <a
-                              href={restaurant.googleMapLink}
+                              href={restaurant.google_map_link}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="text-base text-blue-600 hover:underline flex items-center gap-1"
@@ -220,11 +220,11 @@ export default function ProfilePage() {
                           </div>
                         )}
             
-                        {restaurant.googleRatingLink && (
+                        {restaurant.google_rating_link && (
                           <div>
                             <label className="text-sm font-semibold text-gray-700 block mb-1">Google Rating</label>
                             <a
-                              href={restaurant.googleRatingLink}
+                              href={restaurant.google_rating_link}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="text-base text-blue-600 hover:underline flex items-center gap-1"
@@ -236,39 +236,39 @@ export default function ProfilePage() {
             
             <div className="md:col-span-2">
               <label className="text-sm font-semibold text-gray-700 block mb-1">About Us</label>
-              <p className="text-base text-gray-900">{restaurant.aboutus}</p>
+              <p className="text-base text-gray-900">{restaurant.about_us}</p>
             </div>
           </div>
 
           <div className="mt-8">
             <h4 className="text-lg font-bold text-gray-900 mb-4">Social Media</h4>
             <div className="flex flex-wrap gap-4">
-              {restaurant.instagramLink && (
-                <a href={restaurant.instagramLink} target="_blank" rel="noopener noreferrer" className="text-pink-600 hover:text-pink-700 flex items-center gap-2">
+              {restaurant.instagram_link && (
+                <a href={restaurant.instagram_link} target="_blank" rel="noopener noreferrer" className="text-pink-600 hover:text-pink-700 flex items-center gap-2">
                   <Icons.Instagram size={24} />
                   <span className="sr-only">Instagram</span>
                 </a>
               )}
-              {restaurant.facebookLink && (
-                <a href={restaurant.facebookLink} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-700 flex items-center gap-2">
+              {restaurant.facebook_link && (
+                <a href={restaurant.facebook_link} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-700 flex items-center gap-2">
                   <Icons.Facebook size={24} />
                   <span className="sr-only">Facebook</span>
                 </a>
               )}
-              {restaurant.twitterLink && (
-                <a href={restaurant.twitterLink} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-500 flex items-center gap-2">
+              {restaurant.twitter_link && (
+                <a href={restaurant.twitter_link} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-500 flex items-center gap-2">
                   <Icons.Twitter size={24} />
                   <span className="sr-only">Twitter</span>
                 </a>
               )}
-              {restaurant.linkedinLink && (
-                <a href={restaurant.linkedinLink} target="_blank" rel="noopener noreferrer" className="text-blue-700 hover:text-blue-800 flex items-center gap-2">
+              {restaurant.linkedin_link && (
+                <a href={restaurant.linkedin_link} target="_blank" rel="noopener noreferrer" className="text-blue-700 hover:text-blue-800 flex items-center gap-2">
                   <Icons.Linkedin size={24} />
                   <span className="sr-only">LinkedIn</span>
                 </a>
               )}
-              {restaurant.youtubeLink && (
-                <a href={restaurant.youtubeLink} target="_blank" rel="noopener noreferrer" className="text-red-600 hover:text-red-700 flex items-center gap-2">
+              {restaurant.youtube_link && (
+                <a href={restaurant.youtube_link} target="_blank" rel="noopener noreferrer" className="text-red-600 hover:text-red-700 flex items-center gap-2">
                   <Icons.Youtube size={24} />
                   <span className="sr-only">YouTube</span>
                 </a>

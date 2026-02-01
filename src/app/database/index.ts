@@ -303,7 +303,9 @@ export const db = {
 
       try {
         await idb.set(KEYS.RESTAURANT_DATA, cacheData);
-        console.log('Restaurant data cached in IndexedDB with Firebase ref');
+        // Clear cart data when fresh restaurant data is fetched
+        await idb.del(KEYS.CART_DATA);
+        console.log('Restaurant data cached and cart cleared');
       } catch (cacheError) {
         console.warn('Failed to cache restaurant data:', cacheError);
       }

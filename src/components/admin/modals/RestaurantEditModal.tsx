@@ -15,28 +15,28 @@ const RestaurantEditModal = ({ restaurant, onClose, onSave }: RestaurantEditModa
         ...restaurant,
         tagline: restaurant.tagline || '',
         logo: restaurant.logo || '',
-        coverImage: restaurant.coverImage || '',
-        aboutus: restaurant.aboutus || '',
-        googleMapLink: restaurant.googleMapLink || '',
-        googleRatingLink: restaurant.googleRatingLink || '',
-        instagramLink: restaurant.instagramLink || '',
-        facebookLink: restaurant.facebookLink || '',
-        twitterLink: restaurant.twitterLink || '',
-        linkedinLink: restaurant.linkedinLink || '',
-        youtubeLink: restaurant.youtubeLink || '',
+        cover_image: restaurant.cover_image || '',
+        about_us: restaurant.about_us || '',
+        google_map_link: restaurant.google_map_link || '',
+        google_rating_link: restaurant.google_rating_link || '',
+        instagram_link: restaurant.instagram_link || '',
+        facebook_link: restaurant.facebook_link || '',
+        twitter_link: restaurant.twitter_link || '',
+        linkedin_link: restaurant.linkedin_link || '',
+        youtube_link: restaurant.youtube_link || '',
     });
-    const [errors, setErrors] = useState<{ name?: string; mobileNo?: string }>({});
+    const [errors, setErrors] = useState<{ name?: string; mobile_no?: string }>({});
 
     const update = (key: keyof Restaurant, value: string) => {
         setForm(prev => ({ ...prev, [key]: value }));
         // Clear error for this field when user starts typing
-        if (errors[key as 'name' | 'mobileNo']) {
+        if (errors[key as 'name' | 'mobile_no']) {
             setErrors(prev => ({ ...prev, [key]: undefined }));
         }
     };
 
     const validateForm = (): boolean => {
-        const newErrors: { name?: string; mobileNo?: string } = {};
+        const newErrors: { name?: string; mobile_no?: string } = {};
 
         // Validate restaurant name
         if (!form.name || form.name.trim() === '') {
@@ -44,10 +44,10 @@ const RestaurantEditModal = ({ restaurant, onClose, onSave }: RestaurantEditModa
         }
 
         // Validate mobile number
-        if (!form.mobileNo || form.mobileNo.trim() === '') {
-            newErrors.mobileNo = 'Mobile number is required';
-        } else if (!/^\d{10}$/.test(form.mobileNo.trim())) {
-            newErrors.mobileNo = 'Mobile number must be exactly 10 digits';
+        if (!form.mobile_no || form.mobile_no.trim() === '') {
+            newErrors.mobile_no = 'Mobile number is required';
+        } else if (!/^\d{10}$/.test(form.mobile_no.trim())) {
+            newErrors.mobile_no = 'Mobile number must be exactly 10 digits';
         }
 
         setErrors(newErrors);
@@ -148,15 +148,15 @@ const RestaurantEditModal = ({ restaurant, onClose, onSave }: RestaurantEditModa
                                                     </div>
                                                     <div className="sm:col-span-2">
                                                         <input
-                                                            value={form.mobileNo}
-                                                            onChange={(e) => update("mobileNo", e.target.value)}
+                                                            value={form.mobile_no}
+                                                            onChange={(e) => update("mobile_no", e.target.value)}
                                                             className={`w-full border p-3 rounded-lg text-gray-900 ${
-                                                                errors.mobileNo ? 'border-red-500' : 'border-gray-300'
+                                                                errors.mobile_no ? 'border-red-500' : 'border-gray-300'
                                                             }`}
                                                             placeholder="10 digit mobile number"
                                                         />
-                                                        {errors.mobileNo && (
-                                                            <p className="mt-1 text-sm text-red-600">{errors.mobileNo}</p>
+                                                        {errors.mobile_no && (
+                                                            <p className="mt-1 text-sm text-red-600">{errors.mobile_no}</p>
                                                         )}
                                                     </div>
                                                 </div>
@@ -178,8 +178,8 @@ const RestaurantEditModal = ({ restaurant, onClose, onSave }: RestaurantEditModa
                                                     </div>
                                                     <div className="sm:col-span-2">
                                                         <input
-                                                            value={form.coverImage}
-                                                            onChange={(e) => update("coverImage", e.target.value)}
+                                                            value={form.cover_image}
+                                                            onChange={(e) => update("cover_image", e.target.value)}
                                                             className="w-full border border-gray-300 p-3 rounded-lg text-gray-900"
                                                         />
                                                     </div>
@@ -190,8 +190,8 @@ const RestaurantEditModal = ({ restaurant, onClose, onSave }: RestaurantEditModa
                                                     </div>
                                                     <div className="sm:col-span-2">
                                                         <textarea
-                                                            value={form.aboutus}
-                                                            onChange={(e) => update("aboutus", e.target.value)}
+                                                            value={form.about_us}
+                                                            onChange={(e) => update("about_us", e.target.value)}
                                                             className="w-full border border-gray-300 p-3 rounded-lg text-gray-900 min-h-[100px]"
                                                         />
                                                     </div>
@@ -202,8 +202,8 @@ const RestaurantEditModal = ({ restaurant, onClose, onSave }: RestaurantEditModa
                                                                                                     </div>
                                                                                                     <div className="sm:col-span-2">
                                                                                                         <input
-                                                                                                            value={form.googleMapLink}
-                                                                                                            onChange={(e) => update("googleMapLink", e.target.value)}
+                                                                                                            value={form.google_map_link}
+                                                                                                            onChange={(e) => update("google_map_link", e.target.value)}
                                                                                                             className="w-full border border-gray-300 p-3 rounded-lg text-gray-900"
                                                                                                         />
                                                                                                     </div>
@@ -214,8 +214,8 @@ const RestaurantEditModal = ({ restaurant, onClose, onSave }: RestaurantEditModa
                                                                                                     </div>
                                                                                                     <div className="sm:col-span-2">
                                                                                                         <input
-                                                                                                            value={form.googleRatingLink}
-                                                                                                            onChange={(e) => update("googleRatingLink", e.target.value)}
+                                                                                                            value={form.google_rating_link}
+                                                                                                            onChange={(e) => update("google_rating_link", e.target.value)}
                                                                                                             className="w-full border border-gray-300 p-3 rounded-lg text-gray-900"
                                                                                                         />
                                                                                                     </div>
@@ -226,8 +226,8 @@ const RestaurantEditModal = ({ restaurant, onClose, onSave }: RestaurantEditModa
                                                                                                     </div>
                                                                                                     <div className="sm:col-span-2">
                                                                                                         <input
-                                                                                                            value={form.instagramLink}
-                                                                                                            onChange={(e) => update("instagramLink", e.target.value)}
+                                                                                                            value={form.instagram_link}
+                                                                                                            onChange={(e) => update("instagram_link", e.target.value)}
                                                                                                             className="w-full border border-gray-300 p-3 rounded-lg text-gray-900"
                                                                                                         />
                                                                                                     </div>
@@ -237,8 +237,8 @@ const RestaurantEditModal = ({ restaurant, onClose, onSave }: RestaurantEditModa
                                                     </div>
                                                     <div className="sm:col-span-2">
                                                         <input
-                                                            value={form.facebookLink}
-                                                            onChange={(e) => update("facebookLink", e.target.value)}
+                                                            value={form.facebook_link}
+                                                            onChange={(e) => update("facebook_link", e.target.value)}
                                                             className="w-full border border-gray-300 p-3 rounded-lg text-gray-900"
                                                         />
                                                     </div>
@@ -249,8 +249,8 @@ const RestaurantEditModal = ({ restaurant, onClose, onSave }: RestaurantEditModa
                                                     </div>
                                                     <div className="sm:col-span-2">
                                                         <input
-                                                            value={form.twitterLink}
-                                                            onChange={(e) => update("twitterLink", e.target.value)}
+                                                            value={form.twitter_link}
+                                                            onChange={(e) => update("twitter_link", e.target.value)}
                                                             className="w-full border border-gray-300 p-3 rounded-lg text-gray-900"
                                                         />
                                                     </div>
@@ -261,8 +261,8 @@ const RestaurantEditModal = ({ restaurant, onClose, onSave }: RestaurantEditModa
                                                     </div>
                                                     <div className="sm:col-span-2">
                                                         <input
-                                                            value={form.linkedinLink}
-                                                            onChange={(e) => update("linkedinLink", e.target.value)}
+                                                            value={form.linkedin_link}
+                                                            onChange={(e) => update("linkedin_link", e.target.value)}
                                                             className="w-full border border-gray-300 p-3 rounded-lg text-gray-900"
                                                         />
                                                     </div>
@@ -273,8 +273,8 @@ const RestaurantEditModal = ({ restaurant, onClose, onSave }: RestaurantEditModa
                                                     </div>
                                                     <div className="sm:col-span-2">
                                                         <input
-                                                            value={form.youtubeLink}
-                                                            onChange={(e) => update("youtubeLink", e.target.value)}
+                                                            value={form.youtube_link}
+                                                            onChange={(e) => update("youtube_link", e.target.value)}
                                                             className="w-full border border-gray-300 p-3 rounded-lg text-gray-900"
                                                         />
                                                     </div>

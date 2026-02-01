@@ -27,8 +27,14 @@ const Sidebar = ({ restaurant, open, setOpen }: SidebarProps) => {
     { href: '/admin/dashboard/profile', icon: Icons.FiUser, label: 'Profile' },
     { href: '/admin/dashboard/menu', icon: Icons.BiSolidDish, label: 'Menu' },
     { href: '/admin/dashboard/category', icon: Icons.HiMiniRectangleStack, label: 'Category' },
+    { 
+      href: '/admin/dashboard/ordering', 
+      icon: Icons.FiShoppingCart, 
+      label: 'Ordering',
+      visible: restaurant?.active_plan && restaurant.active_plan !== 'menu'
+    },
     { href: '/admin/dashboard/setting', icon: Icons.IoIosSettings, label: 'Settings' },
-  ];
+  ].filter(link => link.visible !== false);
 
   const handleLogout = async () => {
     if (confirm('Are you sure you want to logout?')) {

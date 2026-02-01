@@ -23,16 +23,34 @@ export const getServiceRoleClient = () => {
  */
 export const fetchRestaurantWithMenu = async (restaurantId: string) => {
     try {
-        // Fetch restaurant (Exclude sensitive plan details and system fields for public)
+        // Fetch restaurant (Include ordering fields and plan info)
         const { data: restaurant, error: restaurantError } = await supabase
             .from('restaurants')
-            .select('id, name, tagline, mobile_no, logo, cover_image, google_map_link, google_rating_link, about_us, instagram_link, facebook_link, twitter_link, linkedin_link, youtube_link')
+            .select(`
+                id, name, tagline, mobile_no, logo, cover_image, google_map_link, google_rating_link, about_us, 
+                instagram_link, facebook_link, twitter_link, linkedin_link, youtube_link,
+                active_plan, plan_expiry,
+                gst_no, cgst_rate, sgst_rate, 
+                delivery_charges_type, delivery_charge_fixed, delivery_charge_min, delivery_charge_max, delivery_instruction,
+                enabled_services
+            `)
             .eq('id', restaurantId)
             .single();
 
         if (restaurantError) throw restaurantError;
+        if (!restaurant) return null;
 
-        // Fetch dishes with variations and category details (Exclude system fields)
+        // Check plan expiry
+        if (restaurant.plan_expiry) {
+            const expiryDate = new Date(restaurant.plan_expiry);
+            const now = new Date();
+            if (expiryDate < now) {
+                console.warn(`Restaurant ${restaurant.name} (${restaurantId}) has an expired plan.`);
+                return null; // This will trigger a "Not Found" on the frontend
+            }
+        }
+
+        // Fetch dishes with variations and category details
         const { data: dishes, error: dishesError } = await supabase
             .from('dishes')
             .select(`
@@ -44,7 +62,7 @@ export const fetchRestaurantWithMenu = async (restaurantId: string) => {
 
         if (dishesError) throw dishesError;
 
-        // Fetch categories (Exclude system fields)
+        // Fetch categories
         const { data: categories, error: categoriesError } = await supabase
             .from('categories')
             .select('id, name, restaurant_id')
@@ -52,7 +70,7 @@ export const fetchRestaurantWithMenu = async (restaurantId: string) => {
 
         if (categoriesError) throw categoriesError;
 
-        // Transform data to match frontend types
+        // Transform data to match frontend types (using actual column names)
         const menuData: Dish[] = (dishes || []).map((dish: any) => ({
             id: dish.id,
             restaurantId: dish.restaurant_id,
@@ -80,17 +98,28 @@ export const fetchRestaurantWithMenu = async (restaurantId: string) => {
             id: restaurant.id,
             name: restaurant.name,
             tagline: restaurant.tagline || '',
-            mobileNo: restaurant.mobile_no,
+            mobile_no: restaurant.mobile_no,
             logo: restaurant.logo || '',
-            coverImage: restaurant.cover_image || '',
-            googleMapLink: restaurant.google_map_link || '',
-            googleRatingLink: restaurant.google_rating_link || '',
-            aboutus: restaurant.about_us || '',
-            instagramLink: restaurant.instagram_link,
-            facebookLink: restaurant.facebook_link,
-            twitterLink: restaurant.twitter_link,
-            linkedinLink: restaurant.linkedin_link,
-            youtubeLink: restaurant.youtube_link,
+            cover_image: restaurant.cover_image || '',
+            google_map_link: restaurant.google_map_link || '',
+            google_rating_link: restaurant.google_rating_link || '',
+            about_us: restaurant.about_us || '',
+            instagram_link: restaurant.instagram_link,
+            facebook_link: restaurant.facebook_link,
+            twitter_link: restaurant.twitter_link,
+            linkedin_link: restaurant.linkedin_link,
+            youtube_link: restaurant.youtube_link,
+            active_plan: restaurant.active_plan,
+            plan_expiry: restaurant.plan_expiry,
+            gst_no: restaurant.gst_no,
+            cgst_rate: restaurant.cgst_rate,
+            sgst_rate: restaurant.sgst_rate,
+            delivery_charges_type: restaurant.delivery_charges_type,
+            delivery_charge_fixed: restaurant.delivery_charge_fixed,
+            delivery_charge_min: restaurant.delivery_charge_min,
+            delivery_charge_max: restaurant.delivery_charge_max,
+            delivery_instruction: restaurant.delivery_instruction,
+            enabled_services: restaurant.enabled_services,
         };
 
         return {
@@ -115,17 +144,26 @@ export const updateRestaurant = async (restaurantId: string, updates: Partial<Re
         .update({
             name: updates.name,
             tagline: updates.tagline,
-            mobile_no: updates.mobileNo,
+            mobile_no: updates.mobile_no,
             logo: updates.logo,
-            cover_image: updates.coverImage,
-            google_map_link: updates.googleMapLink,
-            google_rating_link: updates.googleRatingLink,
-            about_us: updates.aboutus,
-            instagram_link: updates.instagramLink,
-            facebook_link: updates.facebookLink,
-            twitter_link: updates.twitterLink,
-            linkedin_link: updates.linkedinLink,
-            youtube_link: updates.youtubeLink,
+            cover_image: updates.cover_image,
+            google_map_link: updates.google_map_link,
+            google_rating_link: updates.google_rating_link,
+            about_us: updates.about_us,
+            instagram_link: updates.instagram_link,
+            facebook_link: updates.facebook_link,
+            twitter_link: updates.twitter_link,
+            linkedin_link: updates.linkedin_link,
+            youtube_link: updates.youtube_link,
+            gst_no: updates.gst_no,
+            cgst_rate: updates.cgst_rate,
+            sgst_rate: updates.sgst_rate,
+            delivery_charges_type: updates.delivery_charges_type,
+            delivery_charge_fixed: updates.delivery_charge_fixed,
+            delivery_charge_min: updates.delivery_charge_min,
+            delivery_charge_max: updates.delivery_charge_max,
+            delivery_instruction: updates.delivery_instruction,
+            enabled_services: updates.enabled_services,
             updated_at: new Date().toISOString(),
         })
         .eq('id', restaurantId)
