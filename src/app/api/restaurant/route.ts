@@ -49,8 +49,9 @@ export async function GET(request: NextRequest) {
         instagram_link, facebook_link, twitter_link, linkedin_link, youtube_link,
         active_plan, plan_expiry,
         gst_no, cgst_rate, sgst_rate, 
+        gst_no, cgst_rate, sgst_rate, 
         delivery_charges_type, delivery_charge_fixed, delivery_charge_min, delivery_charge_max, delivery_instruction,
-        enabled_services,
+        enabled_services, telegram_chat_id,
         categories (id, name, restaurant_id),
         dishes (
           id, restaurant_id, category_id, name, description, image, is_veg, is_available,
@@ -185,6 +186,7 @@ export async function PUT(request: NextRequest) {
         delivery_charge_max: updatedData.delivery_charge_max,
         delivery_instruction: updatedData.delivery_instruction,
         enabled_services: updatedData.enabled_services,
+        telegram_chat_id: updatedData.telegram_chat_id,
       })
       .eq('id', payload.restaurantId)
       .select()

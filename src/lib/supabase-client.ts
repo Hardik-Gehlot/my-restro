@@ -164,6 +164,7 @@ export const updateRestaurant = async (restaurantId: string, updates: Partial<Re
             delivery_charge_max: updates.delivery_charge_max,
             delivery_instruction: updates.delivery_instruction,
             enabled_services: updates.enabled_services,
+            telegram_chat_id: updates.telegram_chat_id,
             updated_at: new Date().toISOString(),
         })
         .eq('id', restaurantId)

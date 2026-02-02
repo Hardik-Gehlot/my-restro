@@ -110,6 +110,16 @@ export interface Restaurant {
   delivery_charge_max?: number;
   delivery_instruction?: string;
   enabled_services?: string; // Stringified array like "[dinein,takeaway,delivery]"
+  telegram_chat_id?: string;
+}
+
+export interface Order {
+  id: string;
+  restaurant_id: string;
+  receipt: string;
+  total_amount: number;
+  order_number: number;
+  created_at: string;
 }
 
 export interface CartItem {

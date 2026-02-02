@@ -30,7 +30,7 @@ const Sidebar = ({ restaurant, open, setOpen }: SidebarProps) => {
     { 
       href: '/admin/dashboard/ordering', 
       icon: Icons.FiShoppingCart, 
-      label: 'Ordering',
+      label: 'Ordering & Billing',
       visible: restaurant?.active_plan && restaurant.active_plan !== 'menu'
     },
     { href: '/admin/dashboard/setting', icon: Icons.IoIosSettings, label: 'Settings' },
