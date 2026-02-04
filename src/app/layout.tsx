@@ -37,6 +37,7 @@ export default function RootLayout({
           {children}
         <Analytics />
         </ToastProvider>
+        <Analytics />
       </body>
     </html>
   );
