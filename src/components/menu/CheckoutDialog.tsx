@@ -63,9 +63,6 @@ const CheckoutDialog = ({
     total: subtotal + cgst + sgst + deliveryCharge,
   };
 
-  const minTotal = 0; // Deprecated
-  const maxTotal = 0; // Deprecated
-
   const enabledServices = (() => {
     try {
       return JSON.parse(

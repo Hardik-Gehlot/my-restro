@@ -31,7 +31,7 @@ export const fetchRestaurantWithMenu = async (restaurantId: string) => {
                 instagram_link, facebook_link, twitter_link, linkedin_link, youtube_link,
                 active_plan, plan_expiry,
                 gst_no, cgst_rate, sgst_rate, 
-                delivery_charges_type, delivery_charge_fixed, delivery_charge_min, delivery_charge_max, delivery_instruction,
+                delivery_price, delivery_instruction,
                 enabled_services
             `)
             .eq('id', restaurantId)
@@ -114,10 +114,7 @@ export const fetchRestaurantWithMenu = async (restaurantId: string) => {
             gst_no: restaurant.gst_no,
             cgst_rate: restaurant.cgst_rate,
             sgst_rate: restaurant.sgst_rate,
-            delivery_charges_type: restaurant.delivery_charges_type,
-            delivery_charge_fixed: restaurant.delivery_charge_fixed,
-            delivery_charge_min: restaurant.delivery_charge_min,
-            delivery_charge_max: restaurant.delivery_charge_max,
+            delivery_price: restaurant.delivery_price,
             delivery_instruction: restaurant.delivery_instruction,
             enabled_services: restaurant.enabled_services,
         };
@@ -158,10 +155,7 @@ export const updateRestaurant = async (restaurantId: string, updates: Partial<Re
             gst_no: updates.gst_no,
             cgst_rate: updates.cgst_rate,
             sgst_rate: updates.sgst_rate,
-            delivery_charges_type: updates.delivery_charges_type,
-            delivery_charge_fixed: updates.delivery_charge_fixed,
-            delivery_charge_min: updates.delivery_charge_min,
-            delivery_charge_max: updates.delivery_charge_max,
+            delivery_price: updates.delivery_price,
             delivery_instruction: updates.delivery_instruction,
             enabled_services: updates.enabled_services,
             telegram_chat_id: updates.telegram_chat_id,

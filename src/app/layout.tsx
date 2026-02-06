@@ -18,14 +18,6 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: WEBSITE_DETAILS.name,
   description: "Digitize your restaurant with modern digital menus",
-  manifest: "/manifest.json",
-};
-
-export const viewport = {
-  themeColor: "#f97316",
-  width: "device-width",
-  initialScale: 1,
-  maximumScale: 1,
 };
 
 export default function RootLayout({

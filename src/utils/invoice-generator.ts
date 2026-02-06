@@ -229,13 +229,7 @@ export const generateInvoicePDF = (
     if (orderType === 'delivery') {
         currentY += 6;
         doc.text('Delivery Charge:', totalsBoxX + 5, currentY);
-
-        if (restaurant.delivery_charges_type === 'variable') {
-            const rangeStr = `Rs. ${restaurant.delivery_charge_min} – ${restaurant.delivery_charge_max}`;
-            doc.text(rangeStr, totalsBoxX + totalsBoxWidth - 5, currentY, { align: 'right' });
-        } else {
-            doc.text(formatCurrency(totals.deliveryCharge), totalsBoxX + totalsBoxWidth - 5, currentY, { align: 'right' });
-        }
+        doc.text(formatCurrency(totals.deliveryCharge), totalsBoxX + totalsBoxWidth - 5, currentY, { align: 'right' });
     }
 
     // Divider line
@@ -251,14 +245,7 @@ export const generateInvoicePDF = (
     doc.setTextColor(...primaryColor);
     doc.text('TOTAL:', totalsBoxX + 5, currentY);
 
-    if (orderType === 'delivery' && restaurant.delivery_charges_type === 'variable') {
-        const minTotal = totals.subtotal + totals.cgst + totals.sgst + (restaurant.delivery_charge_min || 0);
-        const maxTotal = totals.subtotal + totals.cgst + totals.sgst + (restaurant.delivery_charge_max || 0);
-        const rangeTotalStr = `Rs. ${minTotal.toFixed(2)} – ${maxTotal.toFixed(2)}`;
-        doc.text(rangeTotalStr, totalsBoxX + totalsBoxWidth - 5, currentY, { align: 'right' });
-    } else {
-        doc.text(formatCurrency(totals.total), totalsBoxX + totalsBoxWidth - 5, currentY, { align: 'right' });
-    }
+    doc.text(formatCurrency(totals.total), totalsBoxX + totalsBoxWidth - 5, currentY, { align: 'right' });
 
     // =============================
     // FOOTER SECTION
@@ -432,9 +419,7 @@ export const generateThermalReceipt = (
 
     if (orderType === 'delivery') {
         doc.text('Delivery:', 2, currentY);
-        if (restaurant.delivery_charges_type === 'variable') {
-            doc.text(`${restaurant.delivery_charge_min}-${restaurant.delivery_charge_max}`, pageWidth - 2, currentY, { align: 'right' });
-        } else if (totals.deliveryCharge > 0) {
+        if (totals.deliveryCharge > 0) {
             doc.text(formatCurrency(totals.deliveryCharge), pageWidth - 2, currentY, { align: 'right' });
         } else {
             doc.text(formatCurrency(0), pageWidth - 2, currentY, { align: 'right' });
@@ -451,13 +436,7 @@ export const generateThermalReceipt = (
     doc.setFont('helvetica', 'bold');
     doc.text('TOTAL:', 2, currentY);
 
-    if (orderType === 'delivery' && restaurant.delivery_charges_type === 'variable') {
-        const minTotal = totals.subtotal + totals.cgst + totals.sgst + (restaurant.delivery_charge_min || 0);
-        const maxTotal = totals.subtotal + totals.cgst + totals.sgst + (restaurant.delivery_charge_max || 0);
-        doc.text(`${minTotal.toFixed(0)}-${maxTotal.toFixed(0)}`, pageWidth - 2, currentY, { align: 'right' });
-    } else {
-        doc.text(formatCurrency(totals.total), pageWidth - 2, currentY, { align: 'right' });
-    }
+    doc.text(formatCurrency(totals.total), pageWidth - 2, currentY, { align: 'right' });
 
     currentY += 8;
     doc.setLineWidth(0.2);
