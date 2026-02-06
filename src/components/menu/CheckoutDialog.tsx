@@ -4,7 +4,7 @@ import { Icons } from "@/lib/icons";
 import { CartItem, Restaurant } from "@/types";
 import { generateRecieptMessage } from "@/utils/whatsapp-helper";
 import { FiPlus, FiMinus } from "react-icons/fi";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import FullscreenLoader from "../shared/FullscreenLoader";
 
 interface CheckoutDialogProps {
@@ -33,11 +33,14 @@ const CheckoutDialog = ({
   const [serviceType, setServiceType] = useState<
     "dinein" | "takeaway" | "delivery"
   >("dinein");
+  const searchParams = useSearchParams();
+  const tableNoParam = searchParams.get("tableNo");
+
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
     address: "",
-    tableNo: "",
+    tableNo: tableNoParam || "",
   });
 
   const subtotal = cart.reduce(
@@ -49,9 +52,7 @@ const CheckoutDialog = ({
 
   let deliveryCharge = 0;
   if (serviceType === "delivery") {
-    if (restaurant.delivery_charges_type === "fixed") {
-      deliveryCharge = restaurant.delivery_charge_fixed || 0;
-    }
+    deliveryCharge = restaurant.delivery_price || 0;
   }
 
   const totals = {
@@ -62,10 +63,8 @@ const CheckoutDialog = ({
     total: subtotal + cgst + sgst + deliveryCharge,
   };
 
-  const minTotal =
-    subtotal + cgst + sgst + (restaurant.delivery_charge_min || 0);
-  const maxTotal =
-    subtotal + cgst + sgst + (restaurant.delivery_charge_max || 0);
+  const minTotal = 0; // Deprecated
+  const maxTotal = 0; // Deprecated
 
   const enabledServices = (() => {
     try {
@@ -94,7 +93,7 @@ const CheckoutDialog = ({
 
   const isFormValid = () => {
     if (serviceType === "dinein") {
-      return formData.tableNo.trim() !== "";
+      return true; // Table no is optional/handled via URL
     } else if (serviceType === "takeaway") {
       return (
         isNameValid && formData.name !== "" && phoneRegex.test(formData.phone)
@@ -221,10 +220,10 @@ const CheckoutDialog = ({
               <div className="pointer-events-none fixed inset-y-0 right-0 flex max-w-full">
                 <Transition.Child
                   as={Fragment}
-                  enter="transform transition ease-in-out duration-500 sm:duration-700"
+                  enter="transform transition ease-out duration-200 sm:duration-300"
                   enterFrom="translate-y-full"
                   enterTo="translate-y-0"
-                  leave="transform transition ease-in-out duration-500 sm:duration-700"
+                  leave="transform transition ease-in duration-150 sm:duration-200"
                   leaveFrom="translate-y-0"
                   leaveTo="translate-y-full"
                 >
@@ -307,29 +306,11 @@ const CheckoutDialog = ({
 
                           {serviceType === "dinein" ? (
                             <div className="space-y-3">
-                              <div>
-                                <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-tight mb-1">
-                                  Table Number *
-                                </label>
-                                <input
-                                  type="text"
-                                  name="tableNo"
-                                  required
-                                  value={formData.tableNo}
-                                  onChange={handleInputChange}
-                                  className={`w-full px-3 py-2 text-sm bg-gray-50 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:bg-white transition-all text-gray-800 ${
-                                    !isTableValid
-                                      ? "border-red-500 focus:ring-red-500 bg-red-50/50"
-                                      : "border-gray-200"
-                                  }`}
-                                  placeholder="e.g., T12"
-                                />
-                                {!isTableValid && (
-                                  <p className="text-[9px] text-red-500 font-bold mt-1 uppercase">
-                                    Table number required
-                                  </p>
-                                )}
-                              </div>
+                              <p className="text-sm text-gray-500 italic">
+                                {formData.tableNo
+                                  ? `Ordering for Table ${formData.tableNo}`
+                                  : "Ordering for Dine-in"}
+                              </p>
                             </div>
                           ) : (
                             <div className="space-y-3">
@@ -516,9 +497,7 @@ const CheckoutDialog = ({
                             <div className="flex justify-between text-sm text-gray-600">
                               <span>Delivery Charges</span>
                               <span className="font-semibold text-gray-900">
-                                {restaurant.delivery_charges_type === "fixed"
-                                  ? `₹${deliveryCharge.toFixed(2)}`
-                                  : `₹${restaurant.delivery_charge_min}–₹${restaurant.delivery_charge_max}`}
+                                ₹{deliveryCharge.toFixed(2)}
                               </span>
                             </div>
                           )}
@@ -527,25 +506,9 @@ const CheckoutDialog = ({
                               Total Bill
                             </span>
                             <div className="text-right">
-                              {serviceType === "delivery" &&
-                              restaurant.delivery_charges_type ===
-                                "variable" ? (
-                                <span className="text-lg font-black text-orange-600">
-                                  ₹{minTotal.toFixed(0)} – ₹
-                                  {maxTotal.toFixed(0)}
-                                </span>
-                              ) : (
-                                <span className="text-xl font-black text-orange-600">
-                                  ₹{totals.total.toFixed(2)}
-                                </span>
-                              )}
-                              {serviceType === "delivery" &&
-                                restaurant.delivery_charges_type ===
-                                  "variable" && (
-                                  <p className="text-[9px] text-orange-400 font-bold uppercase mt-0.5">
-                                    + Includes Delivery Range
-                                  </p>
-                                )}
+                              <span className="text-xl font-black text-orange-600">
+                                ₹{totals.total.toFixed(2)}
+                              </span>
                             </div>
                           </div>
                         </section>

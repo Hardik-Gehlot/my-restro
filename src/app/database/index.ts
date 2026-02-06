@@ -1,6 +1,7 @@
 // ============================================
 // Database Service with Type Safety & Validation
 // ============================================
+'use client'
 import { RESTAURANT_CACHE_DURATION } from "@/lib/common-data";
 import { mockDishes, mockRestaurants } from "@/lib/mock-data";
 

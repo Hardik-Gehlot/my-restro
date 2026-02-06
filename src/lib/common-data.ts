@@ -1,7 +1,7 @@
 import { Icons } from './icons';
 
 export const WEBSITE_DETAILS = {
-  name: 'DineOnline',
+  name: 'Parivesha',
   icon: Icons.Store
 };
 

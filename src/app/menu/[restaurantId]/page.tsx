@@ -830,14 +830,18 @@ export default function MenuPage() {
 
       {/* Floating Checkout Button - Bottom Middle */}
       <div className="fixed bottom-6 left-0 right-0 z-[40] pointer-events-none px-4 flex justify-center">
-        <AnimatePresence>
+        <AnimatePresence initial={false}>
           {cartCount > 0 && (
             <motion.button
               onClick={() => setIsCheckoutOpen(true)}
-              initial={{ y: 20, opacity: 0, scale: 0.95 }}
-              animate={{ y: 0, opacity: 1, scale: 1 }}
-              exit={{ y: 20, opacity: 0, scale: 0.95 }}
-              transition={{ type: "spring", stiffness: 300, damping: 25 }}
+              initial={false}
+              animate={false}
+              transition={{
+                type: "tween",
+                duration: 0.25,
+                ease: "easeOut",
+              }}
+              layout="position"
               whileHover={{ scale: 1.02, y: -2 }}
               whileTap={{ scale: 0.98 }}
               className="w-full max-w-lg backdrop-blur-3xl bg-white/80 border border-white/40 shadow-[0_20px_50px_rgba(0,0,0,0.15)] text-gray-900 p-2.5 rounded-[2rem] flex items-center justify-between pointer-events-auto transition-all overflow-hidden relative group"
@@ -872,9 +876,8 @@ export default function MenuPage() {
                   </p>
                   <motion.p
                     className="text-xl font-black leading-tight text-gray-900"
-                    key={cartTotal}
-                    initial={{ y: 5, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
+                    animate={{ opacity: [0.6, 1], y: [2, 0] }}
+                    transition={{ duration: 0.15, ease: "easeOut" }}
                   >
                     ₹{cartTotal.toFixed(2)}
                   </motion.p>

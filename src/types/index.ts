@@ -104,10 +104,7 @@ export interface Restaurant {
   cgst_rate?: number;
   sgst_rate?: number;
   gst_no?: string;
-  delivery_charges_type?: "fixed" | "variable";
-  delivery_charge_fixed?: number;
-  delivery_charge_min?: number;
-  delivery_charge_max?: number;
+  delivery_price?: number;
   delivery_instruction?: string;
   enabled_services?: string; // Stringified array like "[dinein,takeaway,delivery]"
   telegram_chat_id?: string;

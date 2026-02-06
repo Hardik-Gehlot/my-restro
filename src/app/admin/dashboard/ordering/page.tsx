@@ -49,10 +49,7 @@ export default function OrderingSettingsPage() {
             cgst_rate: rest.cgst_rate ?? 0,
             sgst_rate: rest.sgst_rate ?? 0,
             gst_no: rest.gst_no ?? "",
-            delivery_charges_type: rest.delivery_charges_type ?? "fixed",
-            delivery_charge_fixed: rest.delivery_charge_fixed ?? 0,
-            delivery_charge_min: rest.delivery_charge_min ?? 0,
-            delivery_charge_max: rest.delivery_charge_max ?? 0,
+            delivery_price: rest.delivery_price ?? 0,
             delivery_instruction: rest.delivery_instruction ?? "",
             enabled_services: rest.enabled_services ?? '["dinein"]',
           });
@@ -74,10 +71,7 @@ export default function OrderingSettingsPage() {
               cgst_rate: rest.cgst_rate ?? 0,
               sgst_rate: rest.sgst_rate ?? 0,
               gst_no: rest.gst_no ?? "",
-              delivery_charges_type: rest.delivery_charges_type ?? "fixed",
-              delivery_charge_fixed: rest.delivery_charge_fixed ?? 0,
-              delivery_charge_min: rest.delivery_charge_min ?? 0,
-              delivery_charge_max: rest.delivery_charge_max ?? 0,
+              delivery_price: rest.delivery_price ?? 0,
               delivery_instruction: rest.delivery_instruction ?? "",
               enabled_services:
                 rest.enabled_services ?? '["dinein", "takeaway", "delivery"]',
@@ -293,63 +287,17 @@ export default function OrderingSettingsPage() {
                 <div className="space-y-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Charge Type
+                      Delivery Price (₹)
                     </label>
-                    <select
-                      name="delivery_charges_type"
-                      value={formData.delivery_charges_type}
+                    <input
+                      type="number"
+                      name="delivery_price"
+                      value={formData.delivery_price}
                       onChange={handleChange}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-gray-800 bg-white"
-                    >
-                      <option value="fixed">Fixed Price</option>
-                      <option value="variable">Variable Range (Min-Max)</option>
-                    </select>
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-gray-800"
+                      placeholder="40"
+                    />
                   </div>
-
-                  {formData.delivery_charges_type === "fixed" ? (
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Fixed Delivery Charge (₹)
-                      </label>
-                      <input
-                        type="number"
-                        name="delivery_charge_fixed"
-                        value={formData.delivery_charge_fixed}
-                        onChange={handleChange}
-                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-gray-800"
-                        placeholder="40"
-                      />
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Min Charge (₹)
-                        </label>
-                        <input
-                          type="number"
-                          name="delivery_charge_min"
-                          value={formData.delivery_charge_min}
-                          onChange={handleChange}
-                          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-gray-800"
-                          placeholder="20"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Max Charge (₹)
-                        </label>
-                        <input
-                          type="number"
-                          name="delivery_charge_max"
-                          value={formData.delivery_charge_max}
-                          onChange={handleChange}
-                          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-gray-800"
-                          placeholder="60"
-                        />
-                      </div>
-                    </div>
-                  )}
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
