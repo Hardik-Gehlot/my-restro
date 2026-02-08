@@ -1,17 +1,17 @@
-'use client';
+"use client";
 
-import { Fragment } from 'react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { Dialog, Transition } from '@headlessui/react';
-import { Icons } from '@/lib/icons';
-import { db } from '@/app/database';
-import { PLACEHOLDERS } from '@/lib/constants';
+import { Fragment } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { Dialog, Transition } from "@headlessui/react";
+import { Icons } from "@/lib/icons";
+import { db } from "@/app/database";
+import { PLACEHOLDERS } from "@/lib/constants";
 
-import { Restaurant } from '@/types';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useState } from 'react';
-import FullscreenLoader from '../shared/FullscreenLoader';
+import { Restaurant } from "@/types";
+import { motion, AnimatePresence } from "framer-motion";
+import { useState } from "react";
+import FullscreenLoader from "../shared/FullscreenLoader";
 
 interface SidebarProps {
   restaurant: Restaurant | null;
@@ -24,34 +24,48 @@ const Sidebar = ({ restaurant, open, setOpen }: SidebarProps) => {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const navLinks = [
-    { href: '/admin/dashboard/profile', icon: Icons.FiUser, label: 'Profile' },
-    { href: '/admin/dashboard/menu', icon: Icons.BiSolidDish, label: 'Menu' },
-    { href: '/admin/dashboard/category', icon: Icons.HiMiniRectangleStack, label: 'Category' },
-    { 
-      href: '/admin/dashboard/ordering', 
-      icon: Icons.FiShoppingCart, 
-      label: 'Ordering & Billing',
-      visible: restaurant?.active_plan && restaurant.active_plan !== 'menu'
+    { href: "/admin/dashboard/profile", icon: Icons.FiUser, label: "Profile" },
+    { href: "/admin/dashboard/menu", icon: Icons.BiSolidDish, label: "Menu" },
+    {
+      href: "/admin/dashboard/category",
+      icon: Icons.HiMiniRectangleStack,
+      label: "Category",
     },
-    { href: '/admin/dashboard/setting', icon: Icons.IoIosSettings, label: 'Settings' },
-  ].filter(link => link.visible !== false);
+    {
+      href: "/admin/dashboard/ordering",
+      icon: Icons.FiShoppingCart,
+      label: "Ordering & Billing",
+      visible: restaurant?.active_plan && restaurant.active_plan !== "menu",
+    },
+    {
+      href: "/admin/dashboard/coupons",
+      icon: Icons.FiTag,
+      label: "Coupons",
+      visible: restaurant?.active_plan && restaurant.active_plan !== "menu",
+    },
+    {
+      href: "/admin/dashboard/setting",
+      icon: Icons.IoIosSettings,
+      label: "Settings",
+    },
+  ].filter((link) => link.visible !== false);
 
   const handleLogout = async () => {
-    if (confirm('Are you sure you want to logout?')) {
+    if (confirm("Are you sure you want to logout?")) {
       // Close sidebar first as per user request
       setOpen(false);
-      
+
       // Start logout loading state
       setIsLoggingOut(true);
-      
+
       try {
         await db.logout();
         // Use a small delay for a smoother transition
         setTimeout(() => {
-          window.location.href = '/admin/login';
+          window.location.href = "/admin/login";
         }, 800);
       } catch (error) {
-        console.error('Logout error:', error);
+        console.error("Logout error:", error);
         setIsLoggingOut(false);
       }
     }
@@ -61,7 +75,7 @@ const Sidebar = ({ restaurant, open, setOpen }: SidebarProps) => {
     <div className="bg-white h-full flex flex-col shadow-lg overflow-y-auto">
       <div className="p-6 text-center border-b">
         <div className="w-24 h-24 rounded-full mx-auto mb-3 overflow-hidden border-2 border-orange-200">
-          <img 
+          <img
             src={restaurant?.logo || PLACEHOLDERS.RESTAURANT_LOGO}
             alt={restaurant?.name}
             className="w-full h-full object-cover"
@@ -80,8 +94,8 @@ const Sidebar = ({ restaurant, open, setOpen }: SidebarProps) => {
                 onClick={() => setOpen(false)}
                 className={`flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-300 font-medium relative group ${
                   pathname.startsWith(link.href)
-                    ? 'text-white shadow-lg'
-                    : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'
+                    ? "text-white shadow-lg"
+                    : "text-gray-700 hover:bg-orange-50 hover:text-orange-600"
                 }`}
               >
                 {pathname.startsWith(link.href) && (
@@ -118,14 +132,22 @@ const Sidebar = ({ restaurant, open, setOpen }: SidebarProps) => {
 
   return (
     <>
-      <FullscreenLoader 
-        isVisible={isLoggingOut} 
-        messages={["Logging out safely...", "Clearing your session...", "Redirecting to login..."]} 
+      <FullscreenLoader
+        isVisible={isLoggingOut}
+        messages={[
+          "Logging out safely...",
+          "Clearing your session...",
+          "Redirecting to login...",
+        ]}
       />
-      
+
       {/* Mobile sidebar */}
       <Transition.Root show={open} as={Fragment}>
-        <Dialog as="div" className="relative z-[100] lg:hidden" onClose={setOpen}>
+        <Dialog
+          as="div"
+          className="relative z-[100] lg:hidden"
+          onClose={setOpen}
+        >
           <Transition.Child
             as={Fragment}
             enter="transition-opacity ease-linear duration-300"
@@ -156,7 +178,10 @@ const Sidebar = ({ restaurant, open, setOpen }: SidebarProps) => {
                     onClick={() => setOpen(false)}
                   >
                     <span className="sr-only">Close sidebar</span>
-                    <Icons.FiX className="h-6 w-6 text-white" aria-hidden="true" />
+                    <Icons.FiX
+                      className="h-6 w-6 text-white"
+                      aria-hidden="true"
+                    />
                   </button>
                 </div>
                 {sidebarContent}
@@ -171,9 +196,7 @@ const Sidebar = ({ restaurant, open, setOpen }: SidebarProps) => {
 
       {/* Static sidebar for desktop */}
       <div className="hidden lg:flex lg:flex-shrink-0 lg:fixed lg:inset-y-0 lg:z-[100]">
-        <div className="flex flex-col w-64">
-          {sidebarContent}
-        </div>
+        <div className="flex flex-col w-64">{sidebarContent}</div>
       </div>
     </>
   );

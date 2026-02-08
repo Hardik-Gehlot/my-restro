@@ -16,10 +16,13 @@ export const generateRecieptMessage = (
     sgst: number;
     deliveryCharge: number;
     total: number;
+  },
+  coupon?: {
+    code: string;
+    discount: number;
   }
 ) => {
-  let message = `*Order from ${restaurant.name}*\n`;
-  message += `--------------------------\n`;
+  let message = `--------------------------\n`;
   message += `*Type:* ${orderType.toUpperCase()}\n`;
 
   if (orderType === 'dinein') {
@@ -51,7 +54,13 @@ export const generateRecieptMessage = (
     message += `*Delivery Charges:* ₹${totals.deliveryCharge}\n`;
   }
 
-  message += `*Total Amount:* ₹${totals.total.toFixed(2)}\n`;
+  if (coupon && coupon.discount > 0) {
+    message += `*Coupon (${coupon.code}):* -₹${coupon.discount.toFixed(2)}\n`;
+    message += `*Total Before Discount:* ₹${totals.total.toFixed(2)}\n`;
+    message += `*Total Amount:* ₹${(totals.total - coupon.discount).toFixed(2)}\n`;
+  } else {
+    message += `*Total Amount:* ₹${totals.total.toFixed(2)}\n`;
+  }
 
   if (orderType === 'delivery' && restaurant.delivery_instruction) {
     message += `--------------------------\n`;

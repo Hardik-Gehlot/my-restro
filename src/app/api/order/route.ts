@@ -27,13 +27,66 @@ async function sendTelegramMessage(chatId: string, text: string) {
 export async function POST(req: Request) {
     try {
         const body = await req.json();
-        const { restaurant_id, receipt, total_amount } = body;
-console.log('body order:',body);
+        const { restaurant_id, receipt, total_amount, coupon_code } = body;
+        console.log('body order:', body);
         if (!restaurant_id || !receipt || !total_amount) {
             return NextResponse.json({ ok: false, error: 'Missing required fields' }, { status: 400 });
         }
 
         const supabase = getServiceRoleClient();
+        let couponId = null;
+        let discountAmount = 0;
+
+        // Validate and apply coupon if provided
+        if (coupon_code) {
+            const { data: coupon, error: couponError } = await supabase
+                .from('coupons')
+                .select('*')
+                .eq('coupon_code', coupon_code.toUpperCase())
+                .eq('restaurant_id', restaurant_id)
+                .single();
+
+            if (couponError || !coupon) {
+                return NextResponse.json({ ok: false, error: 'Invalid coupon code' }, { status: 400 });
+            }
+
+            // Re-validate coupon on server
+            const currentDate = new Date();
+            const startDate = new Date(coupon.start_date);
+            const endDate = new Date(coupon.end_date);
+
+            if (!coupon.is_active) {
+                return NextResponse.json({ ok: false, error: 'Coupon is not active' }, { status: 400 });
+            }
+
+            if (currentDate < startDate || currentDate > endDate) {
+                return NextResponse.json({ ok: false, error: 'Coupon is not valid at this time' }, { status: 400 });
+            }
+
+            if (coupon.current_usage_count >= coupon.max_usage_count) {
+                return NextResponse.json({ ok: false, error: 'Coupon usage limit reached' }, { status: 400 });
+            }
+
+            // Calculate discount
+            if (coupon.coupon_type === 'flat') {
+                discountAmount = Math.min(coupon.discount_value, total_amount);
+            } else if (coupon.coupon_type === 'percentage') {
+                const percentageDiscount = (total_amount * coupon.discount_value) / 100;
+                if (coupon.max_discount_amount && coupon.max_discount_amount > 0) {
+                    discountAmount = Math.min(percentageDiscount, coupon.max_discount_amount, total_amount);
+                } else {
+                    discountAmount = Math.min(percentageDiscount, total_amount);
+                }
+            }
+
+            couponId = coupon.id;
+
+            // Increment coupon usage
+            await supabase
+                .from('coupons')
+                .update({ current_usage_count: coupon.current_usage_count + 1 })
+                .eq('id', coupon.id);
+        }
 
         // 1. Fetch restaurant to get telegram_chat_id and current max order number
         const { data: restaurant, error: restError } = await supabase
@@ -41,7 +94,7 @@ console.log('body order:',body);
             .select('telegram_chat_id, id')
             .eq('id', restaurant_id)
             .single();
-console.log('restaurant order:',restaurant);
+        console.log('restaurant order:', restaurant);
         if (restError || !restaurant) {
             return NextResponse.json({ ok: false, error: 'Restaurant not found' }, { status: 404 });
         }
@@ -61,7 +114,7 @@ console.log('restaurant order:',restaurant);
             newOrderNumber = maxOrder.order_number + 1;
         }
 
-        console.log('newOrderNumber order:',newOrderNumber);
+        console.log('newOrderNumber order:', newOrderNumber);
 
         // 3. Create Order in Database
         const { data: order, error: orderError } = await supabase
@@ -70,12 +123,14 @@ console.log('restaurant order:',restaurant);
                 restaurant_id,
                 receipt,
                 total_amount,
-                order_number: newOrderNumber
+                order_number: newOrderNumber,
+                coupon_id: couponId,
+                discount_amount: discountAmount
             })
             .select()
             .single();
 
-            console.log('order order:',order);
+        console.log('order order:', order);
 
         if (orderError) {
             console.error('Error creating order:', orderError);
@@ -85,16 +140,17 @@ console.log('restaurant order:',restaurant);
         // 4. Send Telegram Notification (Disabled for now)
         let telegramSent = false;
         if (restaurant.telegram_chat_id) {
-          const finalReceipt = `*Order #${newOrderNumber}*\n\n${receipt}`;
-          await sendTelegramMessage(restaurant.telegram_chat_id, finalReceipt);
-          telegramSent = true;
+            const finalReceipt = `*Order #${newOrderNumber}*\n${receipt}`;
+            await sendTelegramMessage(restaurant.telegram_chat_id, finalReceipt);
+            telegramSent = true;
         }
 
         return NextResponse.json({
             ok: true,
             orderId: order.id,
             orderNumber: newOrderNumber,
-            telegramSent 
+            telegramSent,
+            discountAmount
         });
 
     } catch (error) {
