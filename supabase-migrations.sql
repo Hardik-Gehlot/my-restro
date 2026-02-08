@@ -150,3 +150,68 @@ CREATE POLICY "Authenticated can manage dishes" ON dishes FOR ALL
 
 CREATE POLICY "Authenticated can manage variations" ON dish_variations FOR ALL
   USING (auth.role() = 'authenticated');
+
+-- ============================================
+-- 6. Coupons Table
+-- ============================================
+CREATE TABLE IF NOT EXISTS coupons (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  restaurant_id UUID NOT NULL REFERENCES restaurants(id) ON DELETE CASCADE,
+  coupon_code VARCHAR(15) UNIQUE NOT NULL,
+  coupon_type VARCHAR(20) NOT NULL CHECK (coupon_type IN ('flat', 'percentage')),
+  discount_value DECIMAL(10, 2) NOT NULL CHECK (discount_value >= 0),
+  max_discount_amount DECIMAL(10, 2), -- Only for percentage type
+  min_order_value DECIMAL(10, 2) NOT NULL DEFAULT 0 CHECK (min_order_value >= 0),
+  max_usage_count INTEGER NOT NULL DEFAULT 1 CHECK (max_usage_count > 0),
+  current_usage_count INTEGER NOT NULL DEFAULT 0 CHECK (current_usage_count >= 0),
+  start_date TIMESTAMP NOT NULL,
+  end_date TIMESTAMP NOT NULL,
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW(),
+  CONSTRAINT valid_date_range CHECK (end_date > start_date),
+  CONSTRAINT usage_limit CHECK (current_usage_count <= max_usage_count)
+);
+
+-- Add indexes
+CREATE INDEX idx_coupons_restaurant ON coupons(restaurant_id);
+CREATE INDEX idx_coupons_code ON coupons(coupon_code);
+CREATE INDEX idx_coupons_active ON coupons(is_active);
+
+-- Enable RLS
+ALTER TABLE coupons ENABLE ROW LEVEL SECURITY;
+
+-- Public can read active coupons for validation
+CREATE POLICY "Public can read active coupons" ON coupons FOR SELECT USING (is_active = true);
+
+-- Trigger for updated_at
+CREATE TRIGGER update_coupons_updated_at BEFORE UPDATE ON coupons
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- ============================================
+-- 7. Orders Table
+-- ============================================
+CREATE TABLE IF NOT EXISTS orders (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  restaurant_id UUID NOT NULL REFERENCES restaurants(id) ON DELETE CASCADE,
+  order_number INTEGER NOT NULL,
+  receipt TEXT NOT NULL,
+  total_amount DECIMAL(10, 2) NOT NULL CHECK (total_amount >= 0),
+  coupon_id UUID REFERENCES coupons(id) ON DELETE SET NULL,
+  discount_amount DECIMAL(10, 2) DEFAULT 0 CHECK (discount_amount >= 0),
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Add indexes
+CREATE INDEX idx_orders_restaurant ON orders(restaurant_id);
+CREATE INDEX idx_orders_number ON orders(order_number);
+CREATE INDEX idx_orders_coupon ON orders(coupon_id);
+
+-- Enable RLS
+ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
+
+-- Public can create orders
+CREATE POLICY "Public can create orders" ON orders FOR INSERT WITH CHECK (true);
+
+
+alter table orders add column coupon_id UUID;

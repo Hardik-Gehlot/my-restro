@@ -931,4 +931,256 @@ export const db = {
       return { status: 'error', message: 'Network error' };
     }
   },
+
+  /**
+   * Get coupons (returns only id and code for list view)
+   */
+  getCoupons: async (token: string): Promise<ApiResponse> => {
+    if (!validateToken(token)) {
+      return {
+        status: 'error',
+        message: ERROR_MESSAGES.AUTH.INVALID_TOKEN
+      };
+    }
+
+    try {
+      // Get restaurant_id from cached data
+      const cachedData = await idb.get(KEYS.ADMIN_RESTAURANT_DATA);
+      if (!cachedData?.restaurantData?.id) {
+        return {
+          status: 'error',
+          message: 'Restaurant data not found. Please refresh the page.'
+        };
+      }
+
+      const restaurantId = cachedData.restaurantData.id;
+
+      // Fetch from API
+      const response = await fetchWithTimeout(
+        `/api/coupons?restaurant_id=${restaurantId}`,
+        {
+          method: 'GET',
+          headers: createAuthHeaders(token),
+        },
+        CONFIG.API_TIMEOUT
+      );
+
+      const data = await parseJsonResponse(response);
+
+      if (!response.ok) {
+        return {
+          status: 'error',
+          message: data.error || 'Failed to fetch coupons',
+        };
+      }
+
+      return {
+        status: 'success',
+        data: {
+          coupons: data.data || []
+        }
+      };
+    } catch (error) {
+      console.error('Error fetching coupons:', error);
+      return {
+        status: 'error',
+        message: error instanceof ApiError ? error.message : ERROR_MESSAGES.NETWORK.UNKNOWN,
+      };
+    }
+  },
+
+  /**
+   * Get coupon by ID (returns full coupon details for editing)
+   */
+  getCouponById: async (token: string, couponId: string): Promise<ApiResponse> => {
+    if (!validateToken(token)) {
+      return {
+        status: 'error',
+        message: ERROR_MESSAGES.AUTH.INVALID_TOKEN
+      };
+    }
+
+    try {
+      const response = await fetchWithTimeout(
+        `/api/coupons/${couponId}`,
+        {
+          method: 'GET',
+          headers: createAuthHeaders(token),
+        },
+        CONFIG.API_TIMEOUT
+      );
+
+      const data = await parseJsonResponse(response);
+
+      if (!response.ok) {
+        return {
+          status: 'error',
+          message: data.error || 'Failed to fetch coupon',
+        };
+      }
+
+      return {
+        status: 'success',
+        data: data.data
+      };
+    } catch (error) {
+      console.error('Error fetching coupon:', error);
+      return {
+        status: 'error',
+        message: error instanceof ApiError ? error.message : ERROR_MESSAGES.NETWORK.UNKNOWN,
+      };
+    }
+  },
+
+  /**
+   * Add coupon
+   */
+  addCoupon: async (token: string, couponData: any): Promise<ApiResponse> => {
+    if (!validateToken(token)) {
+      return {
+        status: 'error',
+        message: ERROR_MESSAGES.AUTH.INVALID_TOKEN
+      };
+    }
+
+    try {
+      // Get restaurant_id from cached data
+      const cachedData = await idb.get(KEYS.ADMIN_RESTAURANT_DATA);
+      if (!cachedData?.restaurantData?.id) {
+        return {
+          status: 'error',
+          message: 'Restaurant data not found. Please refresh the page.'
+        };
+      }
+
+      const payload = {
+        ...couponData,
+        restaurant_id: cachedData.restaurantData.id
+      };
+
+      const response = await fetchWithTimeout(
+        '/api/coupons',
+        {
+          method: 'POST',
+          headers: createAuthHeaders(token),
+          body: JSON.stringify(payload),
+        },
+        CONFIG.API_TIMEOUT
+      );
+
+      const data = await parseJsonResponse(response);
+
+      if (!response.ok) {
+        return {
+          status: 'error',
+          message: data.error || 'Failed to create coupon',
+        };
+      }
+
+      return {
+        status: 'success',
+        data: data.data,
+        message: 'Coupon created successfully'
+      };
+    } catch (error) {
+      console.error('Error adding coupon:', error);
+      return {
+        status: 'error',
+        message: error instanceof ApiError ? error.message : ERROR_MESSAGES.NETWORK.UNKNOWN,
+      };
+    }
+  },
+
+  /**
+   * Update coupon
+   */
+  updateCoupon: async (token: string, couponId: string, couponData: any): Promise<ApiResponse> => {
+    if (!validateToken(token)) {
+      return {
+        status: 'error',
+        message: ERROR_MESSAGES.AUTH.INVALID_TOKEN
+      };
+    }
+
+    try {
+      const payload = {
+        ...couponData,
+        id: couponId
+      };
+
+      const response = await fetchWithTimeout(
+        '/api/coupons',
+        {
+          method: 'PUT',
+          headers: createAuthHeaders(token),
+          body: JSON.stringify(payload),
+        },
+        CONFIG.API_TIMEOUT
+      );
+
+      const data = await parseJsonResponse(response);
+
+      if (!response.ok) {
+        return {
+          status: 'error',
+          message: data.error || 'Failed to update coupon',
+        };
+      }
+
+      return {
+        status: 'success',
+        data: data.data,
+        message: 'Coupon updated successfully'
+      };
+    } catch (error) {
+      console.error('Error updating coupon:', error);
+      return {
+        status: 'error',
+        message: error instanceof ApiError ? error.message : ERROR_MESSAGES.NETWORK.UNKNOWN,
+      };
+    }
+  },
+
+  /**
+   * Delete coupon
+   */
+  deleteCoupon: async (token: string, couponId: string): Promise<ApiResponse> => {
+    if (!validateToken(token)) {
+      return {
+        status: 'error',
+        message: ERROR_MESSAGES.AUTH.INVALID_TOKEN
+      };
+    }
+
+    try {
+      const response = await fetchWithTimeout(
+        `/api/coupons?id=${couponId}`,
+        {
+          method: 'DELETE',
+          headers: createAuthHeaders(token),
+        },
+        CONFIG.API_TIMEOUT
+      );
+
+      const data = await parseJsonResponse(response);
+
+      if (!response.ok) {
+        return {
+          status: 'error',
+          message: data.error || 'Failed to delete coupon',
+        };
+      }
+
+      return {
+        status: 'success',
+        message: 'Coupon deleted successfully'
+      };
+    } catch (error) {
+      console.error('Error deleting coupon:', error);
+      return {
+        status: 'error',
+        message: error instanceof ApiError ? error.message : ERROR_MESSAGES.NETWORK.UNKNOWN,
+      };
+    }
+  },
 };
